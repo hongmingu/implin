@@ -1,1 +1,5 @@
-if(typeof($.fn.modal)==='undefined'){document.write('<script src="https://d3m4mlntjbzekh.cloudfront.net/bootstrap/js/bootstrap.min.js"><\/script>')}
+if(typeof($.fn.modal)==='undefined'){
+    var scheme = window.location.protocol == "https:" ? "https://" : "http://";
+    var path = scheme + window.location.host + "/bootstrap/js/bootstrap.min.js";
+    document.write('<script src="'+ path +'"><\/script>')
+}
