@@ -2112,6 +2112,8 @@ def re_search_all(request):
         return JsonResponse({'res': 2})
 
 
+
+
 @ensure_csrf_cookie
 def re_search_user(request):
     if request.method == "POST":
@@ -2143,7 +2145,7 @@ def re_search_user(request):
                 sub_output = {
                     'username': user.userusername.username,
                     'user_photo': user.userphoto.file_50_url(),
-                    'user_text_name': user.usertextname.name,
+                    'user_text_name': escape(user.usertextname.name),
                 }
 
                 user_output.append(sub_output)
@@ -2200,472 +2202,137 @@ def re_search_post(request):
                                  'post_next': post_next})
 
         return JsonResponse({'res': 2})
+
+
+
 # ---------------------------------------------------------------------------------------------------------------------------
 
 
-def url_without_scheme(url):
-    if url.startswith('http://www.'):
-        url = url.replace('http://www.', '', 1)
-    elif url.startswith('http://'):
-        url = url.replace('http://', '', 1)
-    elif url.startswith('https://www.'):
-        url = url.replace('https://www.', '', 1)
-    elif url.startswith('https://'):
-        url = url.replace('https://', '', 1)
-    elif url.startswith('www.'):
-        url = url.replace('www.', '', 1)
-    else:
-        pass
-    return url
-
-
-def get_redirected_url(url):
-    import ssl
-    context = ssl._create_unverified_context()
-    result = None
-    try:
-        result = urllib.request.urlopen(url, context=context).geturl()
-    except Exception as e:
-        print(e)
-    return result
-
-
-from threading import Lock
-
-_lock = Lock()
-
-def redirectTest(item):
-    r = None
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-        }
-        try:
-            r = requests.get(item, allow_redirects=False, headers=headers)
-            # r = requests.head(item, allow_redirects=False, headers=headers)
-
-        except Exception as e:
-            print(e)
-        if r is not None:
-            if r.status_code == 301:
-                print('301')
-                return {'status': str(r.status_code), 'url': r.url, 'header_location': r.headers['Location']}
-            elif r.status_code == 302:
-                print('302')
-                return {'status': str(r.status_code), 'url': r.url, 'header_location': r.headers['Location']}
-
-                # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
-                # 301과 302는 다르다고 한다.
-            elif r.status_code == 405:
-                r = requests.get(item, allow_redirects=False, headers=headers)
-                print('here')
-                return {'status': str(r.status_code), 'url': r.url}
-            else:
-                return {'status': str(r.status_code), 'url': r.url}
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
-        pass
-    return r
-
-def is_local_ip(url):
-    from urllib.parse import urlparse
-    import re
-
-    # from urlparse import urlparse  # Python 2
-    if not (url.startswith('http://') or url.startswith('https://')):
-        url = 'https://' + url
-
-    regex = re.compile(
-        r'^(?:http|ftp)s?://'  # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    re_match = None
-    try:
-        re_match = re.match(regex, url)
-    except Exception as e:
-        print(e)
-    if re_match is None:
-        return False
-        # url 이 아닙니다.
-    parsed_uri = urlparse(url)
-    url_formatted = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-    is_ip = ((url_without_scheme(url_formatted).strip().strip('/')).replace('.', '').replace(':', '')).isdigit()
-    is_localhost = (
-        (url_without_scheme(url_formatted).strip().strip('/')).replace('.', '').replace(':', '').lower().startswith('localhost'))
-    if is_ip or is_localhost:
-        return True
-
-    return False
-        # localhost 랑 ip는 안 받는다.
-
-def check_success_url(url, o_count, success_list, not_301_redirect_list):
-    if o_count > 20:
-        return
-    req = None
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-    }
-    is_success = False
-    count = 0
-    if success_list is None:
-        success_list = []
-    if not_301_redirect_list is None:
-        not_301_redirect_list = []
-
-    while is_success is False:
-
-        count = count + 1
-        if count > 7:
-            return
-
-        url = url.strip()
-
-        from furl import furl
-        furl_obj = furl(url)
-        furl_obj.path.normalize()
-        url = furl_obj.url
-
-        try:
-            req = requests.get(url, allow_redirects=False, headers=headers)
-        except Exception as e:
-            print('requests error: ' + str(e) + ' at: ' + url)
-            return
-        if req is not None:
-            if req.status_code == 301:
-                url = req.headers['Location']
-                continue
-            elif req.status_code == 302:
-                url = req.headers['Location']
-                not_301_redirect_list.append(url)
-                # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
-                # 301과 302는 다르다고 한다.
-                continue
-            elif req.status_code == 200:
-                discrete_url = None
-                no_args_url = None
-                import metadata_parser
-                # 다음은 어이없게도 daum.net 입력시 301 redirect 가 없다.
-                if not any(i.get('url') == req.url for i in success_list):
-                    got_url = req.url
-
-                    page = None
-                    discrete_url = None
-
-                    try:
-                        page = metadata_parser.MetadataParser(url=got_url, search_head_only=False, url_headers=headers)
-                    except Exception as e:
-                        print(e)
-                    no_args_url = furl_obj.remove(args=True, fragment=True).url
-                    f = furl(got_url)
-
-                    loc = got_url.replace(f.scheme+'://', '', 1)
-                    title = page.get_metadatas('title', strategy=['page'])
-
-                    scheme = f.scheme
-
-                    discrete_loc = None
-                    discrete_scheme = None
-
-                    if page is not None:
-                        discrete_url = page.get_discrete_url()
-                        f_discrete = furl(discrete_url)
-                        discrete_loc = discrete_url.replace(f_discrete.scheme+'://', '', 1)
-                        discrete_scheme = f_discrete.scheme
-
-                    is_discrete = False
-                    if discrete_url == req.url:
-                        is_discrete = True
-
-                    not_301_redirect = False
-                    if got_url in not_301_redirect_list:
-                        not_301_redirect = True
-
-                    sub_appender = {'loc': loc,
-                                    'title': title,
-                                    'scheme': scheme,
-                                    'is_discrete': is_discrete,
-                                    'discrete_loc': discrete_loc,
-                                    'discrete_scheme': discrete_scheme,
-                                    'in_not_301': not_301_redirect
-                                    }
-                    success_list.append(sub_appender)
-                else:
-                    return
-                o_count = o_count + 1
-                # discrete url 체크
-
-                if discrete_url != req.url:
-                    check_success_url(discrete_url, o_count, success_list, not_301_redirect_list)
-                else:
-                    pass
-                if no_args_url != req.url:
-                    check_success_url(no_args_url, o_count, success_list, not_301_redirect_list)
-                else:
-                    pass
-                is_success = True
-                continue
-            else:
-                print(req.status_code)
-                try:
-                    url = req.headers['Location']
-                    not_301_redirect_list.append(url)
-
-                    print(url)
-                except Exception as e:
-                    print(e)
-                    return
-                continue
-    return
-
-
 @ensure_csrf_cookie
-def re_check_url(request):
+def re_group_register(request):
     if request.method == "POST":
         if request.is_ajax():
-            url = request.POST.get('url', None)
-
-            if is_local_ip(url):
-                return JsonResponse({'res': 0, 'message': 'localhost or ip'})
-            has_scheme = True
-            if not (url.startswith('https://') or url.startswith('http://')):
-                has_scheme = False
-
-            success_list = []
-            not_301_redirect_list = []
-            if has_scheme is False:
-                check_success_url('http://' + url, 0, success_list, not_301_redirect_list)
-                check_success_url('https://' + url, 0, success_list, not_301_redirect_list)
-            else:
-                check_success_url(url, 0, success_list, not_301_redirect_list)
-
-            print(success_list)
-            print(not_301_redirect_list)
-            '''
-            url: https://github.com/gruns/furl/blob/master/API.md
-            furl.netloc: github.com
-            furl.origin: https://github.com
-            '''
-            '''
-            has_scheme = True
-            if not (url.startswith('https://') or url.startswith('http://')):
-                has_scheme = False
-            
-            # if not check_local_ip(url):
-            #     return JsonResponse({'res': 0, 'message': 'localhost or ip'})
-            print(is_local_ip(url))
-            is_success = False
-            count = 0
-            success_list = []
-            not_301_redirect_list = []
-            if has_scheme is False:
-                check_success_url('http://' + url, 0, success_list, not_301_redirect_list)
-                check_success_url('https://' + url, 0, success_list, not_301_redirect_list)
-            else:
-                check_success_url(url, 0, success_list, not_301_redirect_list)
-
-            print(success_list)
-            print(not_301_redirect_list)
-            '''
-            # 여기서 not_301_redirect_list 에 있는 거랑 겹치면 후순위로 밀리게 한다.
-            # 유튜브 줄임에서 찾아가면 302 로케이션이 후순위로 오는게 적절할 것 같다.
-            # 301 로케이션은 그대로 괜찮음. 알규먼트 없앤건 그것도 괜찮음. 이건 생각해보자.
-            # url = url_without_scheme(url)
-            '''
-            scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
-            print('base url: ' + url)
-            '''
-            url_set = []
-            import metadata_parser
-            # page = metadata_parser.MetadataParser(url='http://'+url, search_head_only=False, url_headers=headers)
-            # print('discrete_url: '+page.get_discrete_url())
-            # print('discrete_url: '+page.get_discrete_url())
-            '''
-            resolved_urls = []
-
-            for item in scheme_list:
-                made_url = item + url
-
-                import ssl
-                context = ssl._create_unverified_context()
-                redirected_url = None
-
+            if request.user.is_superuser:
+                name = request.POST.get('name', None)
+                desc = request.POST.get('desc', None)
                 try:
-                    redirected_url = urllib.request.urlopen(made_url, context=context).geturl()
+                    group = Group.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
                 except Exception as e:
-                    # 안 열림
-                    print('redirect error: ' + str(e))
-                    print('url_was: ' + made_url)
+                    return JsonResponse({'res': 0})
 
-                if redirected_url is not None:
-                    redirected_url = url_without_scheme(redirected_url).strip()
-                    # 여기서 리다이렉트 url 이 끝에 / 있는 경우도 있고 없는 경우도 있어서 해야함. 만약 스트립 '/' 이 아니라
-                    # '/'을 더해주는 것으로 한다면 get parameter 있는 경우가 귀찮아진다.
-                    if redirected_url not in resolved_urls:
-                        resolved_urls.append(redirected_url)
-
-            scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
-
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-            }
-            for item in resolved_urls:
-                for scheme_item in scheme_list:
-                    test_url = scheme_item + item
-                    req = None
-                    try:
-                        req = requests.get(test_url, allow_redirects=False, headers=headers)
-                    except Exception as e:
-                        print('requests error: '+str(e))
-                        print('url_was: '+ test_url)
-                    if req is not None:
-                        url_response = None
-                        print('test_url: ' + test_url)
-                        if req.status_code == 301:
-                            url_response = {'status': str(req.status_code), 'url': req.url,
-                                    'location': req.headers['Location']}
-                        elif req.status_code == 302:
-                            url_response = {'status': str(req.status_code), 'url': req.url,
-                                    'location': req.headers['Location']}
-
-                            # 이 로케이션이 이상한 곳으로 갈 경우 그것도 테스트.
-                            # 301과 302는 다르다고 한다.
-                        elif req.status_code == 200:
-                            url_response = {'status': str(req.status_code), 'url': req.url}
-                        else:
-                            url_response = {'status': str(req.status_code), 'url': req.url}
-                        print('result: '+ str(url_response) )
-                        print('url_was: '+ test_url)
-                    else:
-                        req = None
-            '''
-            return JsonResponse({'res': 1})
+                return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 
 
-'''
-print('accepted url: '+url)
-print('redirected_url: '+redirected_url)
-import re
-regex = re.compile(
-    r'^(?:http|ftp)s?://'  # http:// or https://
-    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
-    r'localhost|'  # localhost...
-    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
-    r'(?::\d+)?'  # optional port
-    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-try:
-    print('re.match result: ' + re.match(regex, url))
-except Exception as e:
-    print(e)
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-}
-
-
-print('here')
-
-
-# url_re = re.compile(r"https?://(www\.)?")
-
-# dom_raw = url_re.sub('',
-#                   url).replace(
-#     " ", "").strip(
-#     '/')
-
-# dom = [dom_raw]
-# print(dom)
-
-def concatenate_url(url_item):
-    scheme_list = ['http://www.', 'http://', 'https://www.', 'https://']
-    for item in scheme_list:
-        made_item = item + url_item
-        #		print domTest
-        redirectTest(made_item)
-
-concatenate_url(url)
-print('Done')
-import metadata_parser
-
-# 위에서 200이건 300이건 301이건 302 이건 뽑힌 것에서 메타데이터 파싱을 진행해야 한다.
-# 티스토리 캐노니컬 주소 아닌 곳에서 어떻게 리스폰스가 오는지 확인하라. 그것도 200이면 그걸 고려해야하고
-# 대표주소 아닐 경우 200 안 오면 그것을 고려해야 한다.
-# moneycake.tistory.com/43 여기에 요청했을 시 왜 403인데도 제대로 작동하지 않는지 확인해봐야한다.
-page = metadata_parser.MetadataParser(url=url, search_head_only=False, url_headers=headers)
-print('-----------------')
-print('discrete url: ' + page.get_discrete_url())
-print('title :' + page.get_metadata('title'))
-print('description: ' + page.get_metadata('description'))
-# 사주포춘보고 타이틀, meta title, 그다음 meta description
-print('title og: ' + page.get_metadatas('title', strategy=['og', ]))
-print('title og, page, dc' + page.get_metadatas('title', strategy=['og', 'page', 'dc', ]))
-print('----------get_redirect_url: ' + get_redirected_url(url))
-'''
-def test10(request):
-    if request.method == 'POST':
+@ensure_csrf_cookie
+def re_group_list(request):
+    if request.method == "POST":
         if request.is_ajax():
-            ajax_url = request.POST.get('ajax_url', None)
-            refresh_url = request.POST.get('refresh_url', None)
+            if request.user.is_superuser:
 
-            '''
+                last_pk = request.POST.get('last_pk', None)
+                groups = None
+                if last_pk == '':
+                    groups = Group.objects.all().order_by('-pk').distinct()[:30]
+                else:
+                    groups = Group.objects.filter(pk__lt=last_pk).order_by('-pk').distinct()[:30]
+                output = []
+                count = 0
+                pk = None
+                for group in groups:
+                    count = count + 1
+                    pk = group.pk
+                    sub_output = {
+                        'name': group.name,
+                        'desc': group.description,
+                        'id': group.uuid,
+                    }
 
-            a = 'http://www.cwi.nl:80/%7Eguido/Python.html'
-            b = '/create/new/'
-            c = 532
-            d = u'dkakasdkjdjakdjadjfalskdjfalk'
-            f1 = 'http://localhost'
-            f2 = 'localhost:8000'
-            print(re.match(regex, "http://www.example.com"))
-            print(re.match(regex, "example.com"))
-            print('-----')
-            print(re.match(regex, a))
-            print(re.match(regex, b))
-            url = "https://goo.gl/7Gt5nQ"
-            url2 = "http://f-st.co/THHI6hC"
-            url_refresh_sample = "http://www.isthe.com/chongo/tech/comp/cgi/redirect.html"
-            url_google = "http://google.com"
-            redirect_url = get_redirected_url(url_refresh_sample)
-            print(redirect_url)
-            ssl._create_default_https_context = ssl._create_unverified_context
-            html = urllib.request.urlopen(ajax_url)
-            bs_object = BeautifulSoup(html.read(), "html.parser")
-            bs_refresh = bs_object.find('link', attrs={'rel': 'canonical'})
-            # bs_refresh = bs_object.find('meta', attrs={'http-equiv': 'Refresh'})
+                    output.append(sub_output)
 
-            print(bs_refresh)
-            #refresh 랑 Refresh 구별해야함 그리고 smtp, ftp 그외 는 따로 분류할수도 있어야함.
-            # bs_refresh_content = bs_refresh['content']
-            # print(bs_refresh_content)
-            # got_url = bs_refresh_content.partition('=')[2]
-            # print(got_url)
+                return JsonResponse({'res': 1,
+                                     'output': output,
+                                     'last_pk': pk})
 
-            bs_pretty = bs_refresh.prettify()
-            '''
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-            }
+        return JsonResponse({'res': 2})
 
-            try:
-                r = requests.head('http://moneycake.tistory.com/43', allow_redirects=False, headers=headers)
-                print(r.status_code)
-            except requests.exceptions.RequestException as e:
-                pass
+@ensure_csrf_cookie
+def re_solo_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                name = request.POST.get('name', None)
+                desc = request.POST.get('desc', None)
+                try:
+                    solo = Solo.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
 
-            return JsonResponse({'success': 'yeah'})
-    else:
-        return render(request, 'testapp/test10.html')
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
 
 
-import requests
+
+@ensure_csrf_cookie
+def re_solo_list(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+
+                last_pk = request.POST.get('last_pk', None)
+                groups = None
+                if last_pk == '':
+                    solos = Solo.objects.all().order_by('-pk').distinct()[:30]
+                else:
+                    solos = Solo.objects.filter(pk__lt=last_pk).order_by('-pk').distinct()[:30]
+                output = []
+                count = 0
+                pk = None
+                for solo in solos:
+                    count = count + 1
+                    pk = solo.pk
+                    sub_output = {
+                        'name': solo.name,
+                        'desc': solo.description,
+                        'id': solo.uuid,
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1,
+                                     'output': output,
+                                     'last_pk': pk})
+
+        return JsonResponse({'res': 2})
 
 
-def strip_scheme(url):
-    parsed = urlparse(url)
-    scheme = "%s://" % parsed.scheme
-    return parsed.geturl().replace(scheme, '', 1)
 
+@ensure_csrf_cookie
+def re_member_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                solo_id = request.POST.get('solo_id', None)
+                group_id = request.POST.get('group_id', None)
+                solo = None
+                try:
+                    solo = Solo.objects.get(uuid=solo_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                group = None
+                try:
+                    group = Group.objects.get(uuid=group_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                try:
+                    member = Member.objects.create(group=group, solo=solo)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
 
 # 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
 

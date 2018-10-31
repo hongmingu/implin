@@ -170,3 +170,39 @@ def home(request):
     if request.method == "GET":
 
         return render(request, 'baseapp/home.html', )
+
+def b_admin(request):
+    if request.method == "GET":
+        if request.user.is_superuser:
+            return render(request, 'baseapp/b_admin.html')
+
+        return render(request, '404.html', )
+
+
+def b_admin_solo(request):
+    if request.method == "GET":
+        if request.user.is_superuser:
+            return render(request, 'baseapp/b_admin_solo.html')
+
+        return render(request, '404.html', )
+
+
+def b_admin_group(request):
+    if request.method == "GET":
+        if request.user.is_superuser:
+            return render(request, 'baseapp/b_admin_group.html')
+
+        return render(request, '404.html', )
+
+def b_admin_group_edit(request, uuid):
+    if request.method == "GET":
+        if request.user.is_superuser:
+            return render(request, 'baseapp/b_admin_group.html')
+
+        return render(request, '404.html', )
+def b_admin_member(request):
+    if request.method == "GET":
+        if request.user.is_superuser:
+            return render(request, 'baseapp/b_admin_member.html')
+
+        return render(request, '404.html', )

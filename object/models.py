@@ -115,7 +115,7 @@ class PostChat(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
     you_say = models.BooleanField(default=True)
     before = models.ForeignKey("PostChat", on_delete=models.CASCADE, null=True, blank=True)
-       kind = models.PositiveSmallIntegerField(choices=KINDS_CHOICES, default=0)
+    kind = models.PositiveSmallIntegerField(choices=KINDS_CHOICES, default=0)
     uuid = models.CharField(max_length=34, unique=True, default=uuid.uuid4().hex)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -358,24 +358,7 @@ class PostFollowCount(models.Model):
 # 우선이다. 원칙과 우선순위. 우선순위와 원칙. 우선순위와 예외와 규칙.
 # ----------------------------------------------------------------------------------------------------------------------
 
-class GroupCeleb(models.Model):
-
-    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
-    description = models.TextField(max_length=2000, null=True, blank=True, default=None)
-    uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
-
-    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "group name: %s, desc: %s" % (self.name, self.description)
-
-    class Meta:
-        unique_together = ('name', 'description',)
-
-
-class SoloCeleb(models.Model):
+class Group(models.Model):
 
     name = models.TextField(max_length=1000, null=True, blank=True, default=None)
     description = models.TextField(max_length=2000, null=True, blank=True, default=None)
@@ -385,14 +368,66 @@ class SoloCeleb(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "group name: %s, desc: %s" % (self.name, self.description)
+        return "name: %s, desc: %s" % (self.name, self.description)
 
     class Meta:
         unique_together = ('name', 'description',)
 
-class CelebPhoto(models.Model):
-    file = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_celeb_photo)
+
+class Solo(models.Model):
+
+    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    description = models.TextField(max_length=2000, null=True, blank=True, default=None)
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
+    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "name: %s, desc: %s" % (self.name, self.description)
+
+    class Meta:
+        unique_together = ('name', 'description',)
+
+
+class GroupName(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
+
+    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    description = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    main = models.BooleanField(default=False)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "name: %s, desc: %s" % (self.name, self.description)
+
+    class Meta:
+        unique_together = ('name', 'group',)
+
+
+class SoloName(models.Model):
+    solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
+
+    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    description = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    main = models.BooleanField(default=False)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "name: %s, desc: %s" % (self.name, self.description)
+
+    class Meta:
+        unique_together = ('name', 'solo',)
+
+class GroupPhoto(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
+    file = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_group_celeb_photo)
+
+    uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
+    main = models.BooleanField(default=False)
+
     description = models.TextField(max_length=1000, null=True, blank=True, default=None)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -400,28 +435,29 @@ class CelebPhoto(models.Model):
     def __str__(self):
         return "desc: %s" % self.description
 
-class GroupCelebPhoto(models.Model):
-    group_celeb = models.ForeignKey(GroupCeleb, on_delete=models.CASCADE, null=True, blank=True)
-    celeb_photo = models.ForeignKey(CelebPhoto, on_delete=models.CASCADE, null=True, blank=True)
+
+class SoloPhoto(models.Model):
+    solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
+    file = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_solo_celeb_photo)
+
+    uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
     main = models.BooleanField(default=False)
+
+    description = models.TextField(max_length=1000, null=True, blank=True, default=None)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return "desc: %s" % self.description
 
-    class Meta:
-        unique_together = ('group_celeb', 'main',)
 
-class SoloCelebPhoto(models.Model):
-    solo_celeb = models.ForeignKey(SoloCeleb, on_delete=models.CASCADE, null=True, blank=True)
-    celeb_photo = models.ForeignKey(CelebPhoto, on_delete=models.CASCADE, null=True, blank=True)
-    main = models.BooleanField(default=False)
+class Member(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
+    solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "desc: %s" % self.description
-
+        return "solo: %s - group: %s" % (self.solo.name, self.group.name)
     class Meta:
-        unique_together = ('solo_celeb', 'main',)
+        unique_together = ('group', 'solo',)
