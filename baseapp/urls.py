@@ -17,7 +17,7 @@ urlpatterns = [
     re_path(r'^b/admin/group/$', views.b_admin_group, name='b_admin_group'),
     re_path(r'^b/admin/member/$', views.b_admin_member, name='b_admin_member'),
     re_path(r'^b/admin/group/edit/(?P<uuid>([0-9a-f]{32}))/$', views.b_admin_group_edit, name='b_admin_group_edit'),
-    re_path(r'^b/admin/solo/edit/(?P<uuid>([0-9a-f]{32}))/$', views.b_admin_group_edit, name='b_admin_solo_edit'),
+    re_path(r'^b/admin/solo/edit/(?P<uuid>([0-9a-f]{32}))/$', views.b_admin_solo_edit, name='b_admin_solo_edit'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^re/group/register/$', base_ajax_views.re_group_register,

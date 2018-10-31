@@ -37,12 +37,7 @@
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
-                <div><h3>Member</h3></div>
-                <div>group: <input id="group_id_input"></div>
-                <div>solo: <input id="solo_id_input"></div>
-                <a href=""><div style="background-color: silver" id="register">register</div></a>
-                <div id="obj_list">
-                </div>
+                <div><h4>Solo Edit</h4></div>
 
             </div>
         </div>
@@ -50,31 +45,9 @@
 </div>
 </body>
 <script>
-    $(function () {
-        $('#register').click(function (e) {
-            e.preventDefault()
-            $.ajax({
-                url: '/re/member/register/',
-                type: 'post',
-                dataType: 'json',
-                cache: false,
-                data: {
-                    solo_id: $('#solo_id_input').val(),
-                    group_id: $('#group_id_input').val(),
-                },
-                success: function (data) {
-                    if (data.res === 1) {
-                        alert('success')
-                        $('#solo_id_input').val('')
-                        $('#group_id_input'). val('')
-                    }else {
-                        alert('failed')
+</script>
 
-                    }
-                }
-            });
-        })
-    })
+<script>
 </script>
 
 

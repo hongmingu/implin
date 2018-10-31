@@ -32,7 +32,6 @@
 
 <div class="hidden" id="page_kind" data-u="create_new"></div>
 <div class="hidden" id="last_num" data-u=""></div>
-<div class="hidden" id="just_created" data-u="{{ just_created.ok }}"></div>
 
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
@@ -52,17 +51,6 @@
     <div class="hidden" id="post_description" data-u="{{ post.postdescription.description}}"></div>
 {% endif %}
 
-{% if just_created.ok == "on" %}
-    <div class="hidden" id="just_created" data-u="on"></div>
-{% else %}
-    <div class="hidden" id="just_created" data-u="off"></div>
-
-    {% if just_created.current == "open" %}
-        <div class="hidden" id="current_open" data-u="open"></div>
-    {% else %}
-        <div class="hidden" id="current_open" data-u="close"></div>
-    {% endif %}
-{% endif %}
 
 <div class="container-fluid margin_top_50">
     <div class="row">

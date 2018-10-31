@@ -31,15 +31,34 @@
 {% else %}
     <div class="hidden" id="user_id"></div>
 {% endif %}
+<div class="hidden" id="id">{{ id }}</div>
 <!--page info end -->
 
 <div class="container-fluid margin_top_50">
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
-                <a href="{% url 'baseapp:b_admin_group' %}"><div>group</div></a>
-                <a href="{% url 'baseapp:b_admin_solo' %}"><div>solo</div></a>
-
+                <div><h4>Group Edit</h4></div>
+                <div align="center">
+                    <img class="img_300_300" id="img_300" src="">
+                </div>
+                <div align="center">
+                        <span id="span_change_photo">Change</span><br>
+                        <span id="span_base_reset">BaseReset</span>
+                </div>
+                <div class="h4">name</div>
+                <div class="h5">description</div>
+                <div>name: <input id="name_input"></div>
+                <div>desc: <input id="desc_input"></div>
+                <a href=""><div style="background-color: silver" id="register">register</div></a>
+                <div class="h4">main_name</div>
+                <div>name: <input id="name_input"></div>
+                <a href=""><div style="background-color: silver" id="register">register</div></a>
+                <div class="h4">main_name</div>
+                <div class="h4">main_name</div>
+                <div>delete name: <input id="name_input"></div>
+                    <!-- delete name 은 직접입력해서 지우는 걸로 하자 간단하게-->
+                <a href=""><div style="background-color: silver" id="register">register</div></a>
             </div>
         </div>
     </div>
@@ -47,9 +66,5 @@
 </body>
 <script>
 </script>
-
-<script>
-</script>
-
 
 </html>

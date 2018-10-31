@@ -197,9 +197,19 @@ def b_admin_group(request):
 def b_admin_group_edit(request, uuid):
     if request.method == "GET":
         if request.user.is_superuser:
-            return render(request, 'baseapp/b_admin_group.html')
+            return render(request, 'baseapp/b_admin_group_edit.html', {'id': uuid})
 
         return render(request, '404.html', )
+
+
+def b_admin_solo_edit(request, uuid):
+    if request.method == "GET":
+        if request.user.is_superuser:
+            return render(request, 'baseapp/b_admin_solo_edit.html')
+
+        return render(request, '404.html', )
+
+
 def b_admin_member(request):
     if request.method == "GET":
         if request.user.is_superuser:
