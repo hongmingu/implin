@@ -2216,14 +2216,12 @@ def re_group_register(request):
                 name = request.POST.get('name', None)
                 desc = request.POST.get('desc', None)
                 try:
-                    group = Group.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
-                except Exception as e:
+                    with transaction.atomic():
+                        group = Group.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
+                        group_name = GroupName.objects.create(name=name, group=group)
+                        group_main_name = GroupMainName.objects.create(group_name=group_name, group=group)
+                except Exception:
                     return JsonResponse({'res': 0})
-                try:
-                    group_main_name = GroupMainName.objects.create(name=name)
-                except Exception as e:
-                    return JsonResponse({'res': 0})
-                # 여기 transaction
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 
@@ -2269,13 +2267,11 @@ def re_solo_register(request):
                 name = request.POST.get('name', None)
                 desc = request.POST.get('desc', None)
                 try:
-                    solo = Solo.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
-                except Exception as e:
-                    return JsonResponse({'res': 0})
-
-                try:
-                    solo_main_name = SoloMainName.objects.create(name=name)
-                except Exception as e:
+                    with transaction.atomic():
+                        solo = Solo.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
+                        solo_name = SoloName.objects.create(name=name, solo=solo)
+                        solo_main_name = SoloMainName.objects.create(solo_name=solo_name, solo=solo)
+                except Exception:
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
@@ -2369,7 +2365,7 @@ def re_b_admin_group_edit(request):
                 try:
                     main_name = GroupMainName.objects.get(group=group)
                 except Exception as e:
-                    return JsonResponse({'res': 0})
+                    print(e)
 
                 name_output = []
                 names = None
@@ -2385,14 +2381,65 @@ def re_b_admin_group_edit(request):
                     name_output.append(sub_output)
 
                 photo = None
+
                 try:
-                    photo = group.grouppho
+                    photo = group.groupmainphoto.group_photo.file.url
+                except Exception as e:
+                    pass
 
                 return JsonResponse({'res': 1,
-                                     'main_name': main_name,
+                                     'main_name': main_name.group_name.name,
                                      'name_output': name_output,
                                      'default_name': group.name,
-                                     'default_desc': group.description})
+                                     'default_desc': group.description,
+                                     'main_photo': photo})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_group_edit_main_name(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                main_name = request.POST.get('main_name', None)
+                main_name = main_name.strip()
+                id = request.POST.get('id', None)
+                if id == '':
+                    return JsonResponse({'res': 0})
+                group = None
+                try:
+                    group = Group.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                group_main_name = group.groupmainname
+                group_name = None
+                try:
+                    group_name = GroupName.objects.get(name=main_name, group=group)
+                except Exception as e:
+                    pass
+                if group_name is None:
+                    group_name = GroupName.objects.create(name=main_name, group=group)
+
+                group_main_name.group_name = group_name
+                group_main_name.save()
+
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_group_delete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                try:
+                    group = Group.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                group.delete()
+                return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 # 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
 

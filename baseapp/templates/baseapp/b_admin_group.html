@@ -45,6 +45,9 @@
                 <div>name: <input id="name_input"></div>
                 <div>desc: <input id="desc_input"></div>
                 <a href=""><div style="background-color: silver" id="register">register</div></a>
+                <div>delete id: <input id="id_delete_input"></div>
+                <a href=""><div style="background-color: silver" id="id_delete">delete</div></a>
+
                 <div id="obj_list">
                 </div>
                 <a href=""><div style="background-color: pink" id="more_load">more_load</div></a>
@@ -106,6 +109,24 @@
                 data: {
                     name: $('#name_input').val(),
                     desc: $('#desc_input').val(),
+                },
+                success: function (data) {
+                    console.log(data)
+                    if (data.res === 1) {
+                        location.reload()
+                    }
+                }
+            });
+        })
+        $('#id_delete').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/b/admin/group/delete/',
+                type: 'post',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    id: $('#id_delete_input').val(),
                 },
                 success: function (data) {
                     if (data.res === 1) {

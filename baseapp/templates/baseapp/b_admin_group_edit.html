@@ -48,14 +48,14 @@
                 </div>
                 <div style="background-color: #8e97ed"><h4>Default Edit</h4></div>
                 <div class="h4">default name</div>
-                <div class="h5" id="default_name">names current</div>
+                <div class="h5" id="default_name"></div>
                 <div>name: <input id="default_name_input"></div>
                 <div class="h4">default description</div>
-                <div class="h5" id="default_desc">description current</div>
+                <div class="h5" id="default_desc"></div>
                 <div>desc: <input id="default_desc_input"></div>
                 <a href=""><div style="background-color: silver" id="default_register">register</div></a>
                 <div class="h4" style="background-color: #8e97ed">main_name</div>
-                <div class="h5" id="main_name">main_name</div>
+                <div class="h5" id="main_name"></div>
 
                 <div>main name: <input id="main_name_input"></div>
                 <a href=""><div style="background-color: silver" id="main_name_register">main name register</div></a>
@@ -74,20 +74,44 @@
 <script>
     $(function () {
         $.ajax({
-                url: '/re/b/admin/group/edit/',
+            url: '/re/b/admin/group/edit/',
+            type: 'post',
+            dataType: 'json',
+            cache: false,
+            data: {
+                id: $('#id').html(),
+            },
+            success: function (data) {
+                if (data.res === 1) {
+                    $('#default_name').html(data.default_name)
+                    $('#default_desc').html(data.default_desc)
+                    $('#main_name').html(data.main_name)
+                    console.log(data)
+                    //location.reload()
+                }
+            }
+        });
+
+        $('#main_name_register').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/b/admin/group/edit/main/name/',
                 type: 'post',
                 dataType: 'json',
                 cache: false,
                 data: {
-                    id: $('#id').val(),
+                    id: $('#id').html(),
+                    main_name: $('#main_name_input').val()
                 },
                 success: function (data) {
                     if (data.res === 1) {
-                        console.log(data)
-                        //location.reload()
+                        location.reload()
+                    } else {
+                        alert('failed')
                     }
                 }
             });
+        })
     })
 </script>
 
