@@ -31,6 +31,9 @@ urlpatterns = [
 
     re_path(r'^re/member/register/$', base_ajax_views.re_member_register,
             name='re_member_register'),
+
+    re_path(r'^re/b/admin/group/edit/$', base_ajax_views.re_b_admin_group_edit,
+            name='re_b_admin_group_edit'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^create/new/$', views.create_new, name='create_new'),

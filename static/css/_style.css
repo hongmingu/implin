@@ -218,9 +218,6 @@
         .word_wrap_break_word {
             word-wrap: break-word;
         }
-        .background_white{
-            background-color: white;
-        }
         .padding_top_5{
             padding-top: 5px;
         }

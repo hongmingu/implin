@@ -46,26 +46,49 @@
                         <span id="span_change_photo">Change</span><br>
                         <span id="span_base_reset">BaseReset</span>
                 </div>
-                <div class="h4">name</div>
-                <div class="h5">description</div>
-                <div>name: <input id="name_input"></div>
-                <div>desc: <input id="desc_input"></div>
-                <a href=""><div style="background-color: silver" id="register">register</div></a>
-                <div class="h4">main_name</div>
-                <div>name: <input id="name_input"></div>
-                <a href=""><div style="background-color: silver" id="register">register</div></a>
+                <div style="background-color: #8e97ed"><h4>Default Edit</h4></div>
+                <div class="h4">default name</div>
+                <div class="h5" id="default_name">names current</div>
+                <div>name: <input id="default_name_input"></div>
+                <div class="h4">default description</div>
+                <div class="h5" id="default_desc">description current</div>
+                <div>desc: <input id="default_desc_input"></div>
+                <a href=""><div style="background-color: silver" id="default_register">register</div></a>
+                <div class="h4" style="background-color: #8e97ed">main_name</div>
+                <div class="h5" id="main_name">main_name</div>
+
+                <div>main name: <input id="main_name_input"></div>
+                <a href=""><div style="background-color: silver" id="main_name_register">main name register</div></a>
+                <div class="h4" style="background-color: #8e97ed">names list</div>
                 <div id="name_list"></div>
                 <div class="h5">main_name</div>
                 <div class="h5">main_name</div>
-                <div>delete name: <input id="name_input"></div>
+                <div>delete name: <input id="name_delete_input"></div>
                     <!-- delete name 은 직접입력해서 지우는 걸로 하자 간단하게 하고 name등록시에 strip 걸어주는 것 잊지마.-->
-                <a href=""><div style="background-color: silver" id="register">register</div></a>
+                <a href=""><div style="background-color: silver" id="register">name delete</div></a>
             </div>
         </div>
     </div>
 </div>
 </body>
 <script>
+    $(function () {
+        $.ajax({
+                url: '/re/b/admin/group/edit/',
+                type: 'post',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    id: $('#id').val(),
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        console.log(data)
+                        //location.reload()
+                    }
+                }
+            });
+    })
 </script>
 
 </html>

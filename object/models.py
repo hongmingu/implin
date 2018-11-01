@@ -394,8 +394,19 @@ class GroupName(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
 
     name = models.TextField(max_length=1000, null=True, blank=True, default=None)
-    description = models.TextField(max_length=1000, null=True, blank=True, default=None)
-    main = models.BooleanField(default=False)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "name: %s, desc: %s" % (self.name, self.description)
+
+    class Meta:
+        unique_together = ('name', 'group',)
+
+class GroupMainName(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE, null=True, blank=True)
+
+    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -410,8 +421,6 @@ class SoloName(models.Model):
     solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
 
     name = models.TextField(max_length=1000, null=True, blank=True, default=None)
-    description = models.TextField(max_length=1000, null=True, blank=True, default=None)
-    main = models.BooleanField(default=False)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -421,12 +430,39 @@ class SoloName(models.Model):
     class Meta:
         unique_together = ('name', 'solo',)
 
+
+class SoloMainName(models.Model):
+    solo = models.OneToOneField(Solo, on_delete=models.CASCADE, null=True, blank=True)
+
+    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "name: %s, desc: %s" % (self.name, self.description)
+
+    class Meta:
+        unique_together = ('name', 'solo',)
+
+
 class GroupPhoto(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
     file = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_group_celeb_photo)
 
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
-    main = models.BooleanField(default=False)
+
+    description = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "desc: %s" % self.description
+
+class GroupMainPhoto(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE, null=True, blank=True)
+    group_photo = models.ForeignKey(GroupPhoto, on_delete=models.CASCADE, null=True, blank=True)
+
+    uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
     description = models.TextField(max_length=1000, null=True, blank=True, default=None)
     updated = models.DateTimeField(auto_now=True)
@@ -451,6 +487,20 @@ class SoloPhoto(models.Model):
         return "desc: %s" % self.description
 
 
+class SoloMainPhoto(models.Model):
+    solo = models.OneToOneField(Solo, on_delete=models.CASCADE, null=True, blank=True)
+    solo_photo = models.ForeignKey(SoloPhoto, on_delete=models.CASCADE, null=True, blank=True)
+
+    uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
+
+    description = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "desc: %s" % self.description
+
+
 class Member(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
     solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
@@ -459,5 +509,6 @@ class Member(models.Model):
 
     def __str__(self):
         return "solo: %s - group: %s" % (self.solo.name, self.group.name)
+
     class Meta:
         unique_together = ('group', 'solo',)

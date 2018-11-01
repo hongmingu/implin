@@ -64,9 +64,17 @@
                 },
                 success: function (data) {
                     if (data.res === 1) {
-                        alert('success')
-                        $('#solo_id_input').val('')
-                        $('#group_id_input'). val('')
+                        if (data.result === 'delete'){
+                            alert('deleted')
+                            $('#solo_id_input').val('')
+                            $('#group_id_input'). val('')
+                        } else if (data.result === 'create'){
+                            alert('created')
+                            $('#solo_id_input').val('')
+                            $('#group_id_input'). val('')
+                        } else {
+                            alert('res was 1 but failed')
+                        }
                     }else {
                         alert('failed')
 
