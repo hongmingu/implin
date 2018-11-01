@@ -37,6 +37,9 @@ urlpatterns = [
             name='re_b_admin_group_edit'),
     re_path(r'^re/b/admin/group/edit/main/name/$', base_ajax_views.re_b_admin_group_edit_main_name,
             name='re_b_admin_group_edit_main_name'),
+    re_path(r'^re/b/admin/group/upload/photo/$', base_ajax_views.re_b_admin_group_upload_photo,
+            name='re_b_admin_group_upload_photo'),
+
     # --------------------------------------------------------------------------------
 
     re_path(r'^create/new/$', views.create_new, name='create_new'),

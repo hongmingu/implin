@@ -25,7 +25,7 @@ from django.http import JsonResponse
 from authapp import options
 from authapp import texts
 from object.models import *
-from .forms import PostProfilePhotoForm, PostChatPhotoForm
+from .forms import BAdminGroupPhotoForm, BAdminSoloPhotoForm
 from relation.models import *
 from notice.models import *
 from .models import *
@@ -2220,6 +2220,7 @@ def re_group_register(request):
                         group = Group.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
                         group_name = GroupName.objects.create(name=name, group=group)
                         group_main_name = GroupMainName.objects.create(group_name=group_name, group=group)
+                        group_main_photo = GroupMainPhoto.objects.create(group=group)
                 except Exception:
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
@@ -2380,19 +2381,33 @@ def re_b_admin_group_edit(request):
                     }
                     name_output.append(sub_output)
 
-                photo = None
+                main_photo = None
 
                 try:
-                    photo = group.groupmainphoto.group_photo.file.url
+                    main_photo = group.groupmainphoto.file_300_url()
                 except Exception as e:
                     pass
 
+                photos = None
+                try:
+                    photos = GroupPhoto.objects.filter(group=group).order_by('-created')
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                photo_ouput = []
+                for photo in photos:
+                    sub_output = {
+                        'photo': photo.file_300_url(),
+                        'id': photo.uuid
+                    }
+                    photo_ouput.append(sub_output)
                 return JsonResponse({'res': 1,
                                      'main_name': main_name.group_name.name,
                                      'name_output': name_output,
                                      'default_name': group.name,
                                      'default_desc': group.description,
-                                     'main_photo': photo})
+                                     'main_photo': main_photo,
+                                     'photo_output': photo_ouput,})
         return JsonResponse({'res': 2})
 
 
@@ -2441,6 +2456,100 @@ def re_b_admin_group_delete(request):
                 group.delete()
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
+
+
+
+@ensure_csrf_cookie
+def re_b_admin_group_upload_photo(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+
+            if request.is_ajax():
+                try:
+                    group = Group.objects.get(uuid=request.POST['id'])
+                except:
+                    return JsonResponse({'res': 0})
+                try:
+                    group_photo = GroupPhoto.objects.create(group=group, uuid=uuid.uuid4().hex)
+                except:
+                    return JsonResponse({'res': 0})
+                form = BAdminGroupPhotoForm(request.POST, request.FILES, instance=group_photo)
+                if form.is_valid():
+
+                    DJANGO_TYPE = request.FILES['file'].content_type
+
+                    if DJANGO_TYPE == 'image/jpeg':
+                        PIL_TYPE = 'jpeg'
+                        FILE_EXTENSION = 'jpg'
+                    elif DJANGO_TYPE == 'image/png':
+                        PIL_TYPE = 'png'
+                        FILE_EXTENSION = 'png'
+                        # DJANGO_TYPE == 'image/gif
+                    else:
+                        return JsonResponse({'res': 0, 'message': texts.UNEXPECTED_ERROR})
+
+                    from io import BytesIO
+                    from PIL import Image
+                    from django.core.files.uploadedfile import SimpleUploadedFile
+                    import os
+                    x = float(request.POST['x'])
+                    y = float(request.POST['y'])
+                    width = float(request.POST['width'])
+                    height = float(request.POST['height'])
+                    rotate = float(request.POST['rotate'])
+                    # Open original photo which we want to thumbnail using PIL's Image
+                    try:
+                        with transaction.atomic():
+
+                            image = Image.open(BytesIO(request.FILES['file'].read()))
+                            image_modified = image.rotate(-1 * rotate, expand=True).crop((x, y, x + width, y + height))
+                            # use our PIL Image object to create the thumbnail, which already
+                            image = image_modified.resize((300, 300), Image.ANTIALIAS)
+
+                            # Save the thumbnail
+                            temp_handle = BytesIO()
+                            image.save(temp_handle, PIL_TYPE, quality=95)
+                            temp_handle.seek(0)
+
+                            # Save image to a SimpleUploadedFile which can be saved into ImageField
+                            # print(os.path.split(request.FILES['file'].name)[-1])
+                            suf = SimpleUploadedFile(os.path.split(request.FILES['file'].name)[-1],
+                                                     temp_handle.read(), content_type=DJANGO_TYPE)
+                            # Save SimpleUploadedFile into image field
+                            group_photo.file_300.save(
+                                '%s.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+                                suf, save=True)
+
+                            # request.FILES['file'].seek(0)
+                            # image = Image.open(BytesIO(request.FILES['file'].read()))
+
+                            # use our PIL Image object to create the thumbnail, which already
+                            image = image_modified.resize((50, 50), Image.ANTIALIAS)
+
+                            # Save the thumbnail
+                            temp_handle = BytesIO()
+                            image.save(temp_handle, PIL_TYPE, quality=95)
+                            temp_handle.seek(0)
+
+                            # Save image to a SimpleUploadedFile which can be saved into ImageField
+                            # print(os.path.split(request.FILES['file'].name)[-1])
+                            suf = SimpleUploadedFile(os.path.split(request.FILES['file'].name)[-1],
+                                                     temp_handle.read(), content_type=DJANGO_TYPE)
+                            # Save SimpleUploadedFile into image field
+                            # print(os.path.splitext(suf.name)[0])
+                            # user_photo.file_50.save(
+                            #     '50_%s.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+                            #     suf, save=True)
+                            group_photo.file_50.save(
+                                '%s.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+                                suf, save=True)
+
+                            return JsonResponse({'res': 1, 'url': group_photo.file_300_url()})
+                    except Exception:
+                        return JsonResponse({'res': 0, 'message': texts.UNEXPECTED_ERROR})
+
+            return JsonResponse({'res': 0, 'message': texts.UNEXPECTED_ERROR})
+
 # 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
 
 # That's it!

@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, reverse
-from .forms import PostCreateForm
 from relation.models import *
 from object.models import *
 from object.numbers import *
@@ -64,8 +63,6 @@ def create_new(request):
                                            has_another_profile=has_another_profile,
                                            uuid=uuid_made,
                                            is_open=False)
-                if has_another_profile:
-                    PostProfile.objects.create(post=post, name=profile_name)
                 post_first_check = PostFirstCheck.objects.create(post=post)
                 post_like_count = PostLikeCount.objects.create(post=post)
                 post_comment_count = PostCommentCount.objects.create(post=post)
@@ -76,8 +73,7 @@ def create_new(request):
     if request.method == "GET":
         if not request.user.is_authenticated:
             return redirect(reverse('baseapp:main_create_log_in'))
-        form = PostCreateForm
-        return render(request, 'baseapp/create_new_first.html', {'form': form})
+        return render(request, 'baseapp/create_new_first.html')
 
 
 def post_update(request, uuid):
