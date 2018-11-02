@@ -2403,13 +2403,28 @@ def re_b_admin_group_edit(request):
                         'id': photo.uuid
                     }
                     photo_ouput.append(sub_output)
+
+                member_solos = None
+                try:
+                    member_solos = Member.objects.filter(group=group).order_by('-created')
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                member_solo_output = []
+                for member_solo in member_solos:
+                    sub_output = {
+                        'name': member_solo.solo.name,
+                        'id': member_solo.solo.uuid,
+                    }
+                    member_solo_output.append(sub_output)
                 return JsonResponse({'res': 1,
                                      'main_name': main_name.group_name.name,
                                      'name_output': name_output,
                                      'default_name': group.name,
                                      'default_desc': group.description,
                                      'main_photo': main_photo,
-                                     'photo_output': photo_ouput,})
+                                     'photo_output': photo_ouput,
+                                     'member_solo_output': member_solo_output})
         return JsonResponse({'res': 2})
 
 
@@ -2729,13 +2744,28 @@ def re_b_admin_solo_edit(request):
                         'id': photo.uuid
                     }
                     photo_ouput.append(sub_output)
+
+                member_groups = None
+                try:
+                    member_groups = Member.objects.filter(solo=solo).order_by('-created')
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                member_group_output = []
+                for member_group in member_groups:
+                    sub_output = {
+                        'name': member_group.group.name,
+                        'id': member_group.group.uuid,
+                    }
+                    member_group_output.append(sub_output)
                 return JsonResponse({'res': 1,
                                      'main_name': main_name.solo_name.name,
                                      'name_output': name_output,
                                      'default_name': solo.name,
                                      'default_desc': solo.description,
                                      'main_photo': main_photo,
-                                     'photo_output': photo_ouput,})
+                                     'photo_output': photo_ouput,
+                                     'member_group_output': member_group_output})
         return JsonResponse({'res': 2})
 
 
