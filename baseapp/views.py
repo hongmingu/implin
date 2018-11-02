@@ -201,7 +201,7 @@ def b_admin_group_edit(request, uuid):
 def b_admin_solo_edit(request, uuid):
     if request.method == "GET":
         if request.user.is_superuser:
-            return render(request, 'baseapp/b_admin_solo_edit.html')
+            return render(request, 'baseapp/b_admin_solo_edit.html', {'id': uuid})
 
         return render(request, '404.html', )
 

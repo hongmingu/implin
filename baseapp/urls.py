@@ -31,6 +31,8 @@ urlpatterns = [
 
     re_path(r'^re/member/register/$', base_ajax_views.re_member_register,
             name='re_member_register'),
+
+
     re_path(r'^re/b/admin/group/delete/$', base_ajax_views.re_b_admin_group_delete,
             name='re_admin_group_delete'),
     re_path(r'^re/b/admin/group/edit/$', base_ajax_views.re_b_admin_group_edit,
@@ -39,6 +41,43 @@ urlpatterns = [
             name='re_b_admin_group_edit_main_name'),
     re_path(r'^re/b/admin/group/upload/photo/$', base_ajax_views.re_b_admin_group_upload_photo,
             name='re_b_admin_group_upload_photo'),
+    re_path(r'^re/b/admin/group/edit/main/photo/register/$', base_ajax_views.re_b_admin_group_edit_main_photo_register,
+            name='re_b_admin_group_edit_main_photo_register'),
+    re_path(r'^re/b/admin/group/edit/photo/delete/$', base_ajax_views.re_b_admin_group_edit_photo_delete,
+            name='re_b_admin_group_edit_photo_delete'),
+
+    re_path(r'^re/b/admin/group/edit/name/delete/$', base_ajax_views.re_b_admin_group_edit_name_delete,
+            name='re_b_admin_group_edit_name_delete'),
+
+    re_path(r'^re/b/admin/group/edit/name/register/$', base_ajax_views.re_b_admin_group_edit_name_register,
+            name='re_b_admin_group_edit_name_register'),
+
+    re_path(r'^re/b/admin/group/edit/default/register/$', base_ajax_views.re_b_admin_group_edit_default_register,
+            name='re_b_admin_group_edit_default_register'),
+
+    # --------------------------------------------------------------------------------
+
+    re_path(r'^re/b/admin/solo/delete/$', base_ajax_views.re_b_admin_solo_delete,
+            name='re_admin_solo_delete'),
+    re_path(r'^re/b/admin/solo/edit/$', base_ajax_views.re_b_admin_solo_edit,
+            name='re_b_admin_solo_edit'),
+    re_path(r'^re/b/admin/solo/edit/main/name/$', base_ajax_views.re_b_admin_solo_edit_main_name,
+            name='re_b_admin_solo_edit_main_name'),
+    re_path(r'^re/b/admin/solo/upload/photo/$', base_ajax_views.re_b_admin_solo_upload_photo,
+            name='re_b_admin_solo_upload_photo'),
+    re_path(r'^re/b/admin/solo/edit/main/photo/register/$', base_ajax_views.re_b_admin_solo_edit_main_photo_register,
+            name='re_b_admin_solo_edit_main_photo_register'),
+    re_path(r'^re/b/admin/solo/edit/photo/delete/$', base_ajax_views.re_b_admin_solo_edit_photo_delete,
+            name='re_b_admin_solo_edit_photo_delete'),
+
+    re_path(r'^re/b/admin/solo/edit/name/delete/$', base_ajax_views.re_b_admin_solo_edit_name_delete,
+            name='re_b_admin_solo_edit_name_delete'),
+
+    re_path(r'^re/b/admin/solo/edit/name/register/$', base_ajax_views.re_b_admin_solo_edit_name_register,
+            name='re_b_admin_solo_edit_name_register'),
+
+    re_path(r'^re/b/admin/solo/edit/default/register/$', base_ajax_views.re_b_admin_solo_edit_default_register,
+            name='re_b_admin_solo_edit_default_register'),
 
     # --------------------------------------------------------------------------------
 

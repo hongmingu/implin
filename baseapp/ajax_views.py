@@ -2272,6 +2272,8 @@ def re_solo_register(request):
                         solo = Solo.objects.create(name=name, description=desc, uuid=uuid.uuid4().hex)
                         solo_name = SoloName.objects.create(name=name, solo=solo)
                         solo_main_name = SoloMainName.objects.create(solo_name=solo_name, solo=solo)
+                        solo_main_photo = SoloMainPhoto.objects.create(solo=solo)
+
                 except Exception:
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
@@ -2550,6 +2552,453 @@ def re_b_admin_group_upload_photo(request):
 
             return JsonResponse({'res': 0, 'message': texts.UNEXPECTED_ERROR})
 
+@ensure_csrf_cookie
+def re_b_admin_group_edit_main_photo_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                photo_id = request.POST.get('photo_id', None)
+                try:
+                    group = Group.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                group_photo = None
+                try:
+                    group_photo = GroupPhoto.objects.get(uuid=photo_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                group_main_photo = group.groupmainphoto
+                group_main_photo.uuid = group_photo.uuid
+                group_main_photo.group_photo = group_photo
+                group_main_photo.save()
+
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_b_admin_group_edit_photo_delete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                photo_id = request.POST.get('photo_id', None)
+                try:
+                    group = Group.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                group_photo = None
+                try:
+                    group_photo = GroupPhoto.objects.get(uuid=photo_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                group_main_photo = group.groupmainphoto
+                if group_main_photo.uuid == group_photo.uuid or group_main_photo.group_photo == group_photo:
+                    return JsonResponse({'res': 0})
+                group_photo.delete()
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_b_admin_group_edit_name_delete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                name = request.POST.get('name', None)
+                name = name.strip()
+                try:
+                    group = Group.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                group_name = None
+                try:
+                    group_name = GroupName.objects.get(name=name, group=group)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                group_main_name = group.groupmainname
+                if group_main_name.group_name == group_name:
+                    return JsonResponse({'res': 0})
+                group_name.delete()
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_group_edit_name_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                name = request.POST.get('name', None)
+                name = name.strip()
+                try:
+                    group = Group.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                group_name = None
+                try:
+                    group_name = GroupName.objects.create(name=name, group=group)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_group_edit_default_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                name = request.POST.get('name', None)
+                name = name.strip()
+                desc = request.POST.get('desc', None)
+                desc = desc.strip()
+                try:
+                    group = Group.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                try:
+                    group.name = name
+                    group.description = desc
+                    group.save()
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+# -----------------------------------------------------------------------------
+
+
+@ensure_csrf_cookie
+def re_b_admin_solo_edit(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                if id == '':
+                    return JsonResponse({'res': 0})
+                solo = None
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                main_name = None
+                try:
+                    main_name = SoloMainName.objects.get(solo=solo)
+                except Exception as e:
+                    print(e)
+
+                name_output = []
+                names = None
+                try:
+                    names = SoloName.objects.filter(solo=solo).order_by('-created')
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                for name in names:
+                    sub_output = {
+                        'name': name.name
+                    }
+                    name_output.append(sub_output)
+
+                main_photo = None
+
+                try:
+                    main_photo = solo.solomainphoto.file_300_url()
+                except Exception as e:
+                    pass
+
+                photos = None
+                try:
+                    photos = SoloPhoto.objects.filter(solo=solo).order_by('-created')
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                photo_ouput = []
+                for photo in photos:
+                    sub_output = {
+                        'photo': photo.file_300_url(),
+                        'id': photo.uuid
+                    }
+                    photo_ouput.append(sub_output)
+                return JsonResponse({'res': 1,
+                                     'main_name': main_name.solo_name.name,
+                                     'name_output': name_output,
+                                     'default_name': solo.name,
+                                     'default_desc': solo.description,
+                                     'main_photo': main_photo,
+                                     'photo_output': photo_ouput,})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_solo_edit_main_name(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                main_name = request.POST.get('main_name', None)
+                main_name = main_name.strip()
+                id = request.POST.get('id', None)
+                if id == '':
+                    return JsonResponse({'res': 0})
+                solo = None
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                solo_main_name = solo.solomainname
+                solo_name = None
+                try:
+                    solo_name = Solo.objects.get(name=main_name, solo=solo)
+                except Exception as e:
+                    pass
+                if solo_name is None:
+                    solo_name = SoloName.objects.create(name=main_name, solo=solo)
+
+                solo_main_name.solo_name = solo_name
+                solo_main_name.save()
+
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_solo_delete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                solo.delete()
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+
+@ensure_csrf_cookie
+def re_b_admin_solo_upload_photo(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+
+            if request.is_ajax():
+                try:
+                    solo = Solo.objects.get(uuid=request.POST['id'])
+                except:
+                    return JsonResponse({'res': 0})
+                try:
+                    solo_photo = SoloPhoto.objects.create(solo=solo, uuid=uuid.uuid4().hex)
+                except:
+                    return JsonResponse({'res': 0})
+                form = BAdminSoloPhotoForm(request.POST, request.FILES, instance=solo_photo)
+                if form.is_valid():
+
+                    DJANGO_TYPE = request.FILES['file'].content_type
+
+                    if DJANGO_TYPE == 'image/jpeg':
+                        PIL_TYPE = 'jpeg'
+                        FILE_EXTENSION = 'jpg'
+                    elif DJANGO_TYPE == 'image/png':
+                        PIL_TYPE = 'png'
+                        FILE_EXTENSION = 'png'
+                        # DJANGO_TYPE == 'image/gif
+                    else:
+                        return JsonResponse({'res': 0, 'message': texts.UNEXPECTED_ERROR})
+
+                    from io import BytesIO
+                    from PIL import Image
+                    from django.core.files.uploadedfile import SimpleUploadedFile
+                    import os
+                    x = float(request.POST['x'])
+                    y = float(request.POST['y'])
+                    width = float(request.POST['width'])
+                    height = float(request.POST['height'])
+                    rotate = float(request.POST['rotate'])
+                    # Open original photo which we want to thumbnail using PIL's Image
+                    try:
+                        with transaction.atomic():
+
+                            image = Image.open(BytesIO(request.FILES['file'].read()))
+                            image_modified = image.rotate(-1 * rotate, expand=True).crop((x, y, x + width, y + height))
+                            # use our PIL Image object to create the thumbnail, which already
+                            image = image_modified.resize((300, 300), Image.ANTIALIAS)
+
+                            # Save the thumbnail
+                            temp_handle = BytesIO()
+                            image.save(temp_handle, PIL_TYPE, quality=95)
+                            temp_handle.seek(0)
+
+                            # Save image to a SimpleUploadedFile which can be saved into ImageField
+                            # print(os.path.split(request.FILES['file'].name)[-1])
+                            suf = SimpleUploadedFile(os.path.split(request.FILES['file'].name)[-1],
+                                                     temp_handle.read(), content_type=DJANGO_TYPE)
+                            # Save SimpleUploadedFile into image field
+                            solo_photo.file_300.save(
+                                '%s.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+                                suf, save=True)
+
+                            # request.FILES['file'].seek(0)
+                            # image = Image.open(BytesIO(request.FILES['file'].read()))
+
+                            # use our PIL Image object to create the thumbnail, which already
+                            image = image_modified.resize((50, 50), Image.ANTIALIAS)
+
+                            # Save the thumbnail
+                            temp_handle = BytesIO()
+                            image.save(temp_handle, PIL_TYPE, quality=95)
+                            temp_handle.seek(0)
+
+                            # Save image to a SimpleUploadedFile which can be saved into ImageField
+                            # print(os.path.split(request.FILES['file'].name)[-1])
+                            suf = SimpleUploadedFile(os.path.split(request.FILES['file'].name)[-1],
+                                                     temp_handle.read(), content_type=DJANGO_TYPE)
+                            # Save SimpleUploadedFile into image field
+                            # print(os.path.splitext(suf.name)[0])
+                            # user_photo.file_50.save(
+                            #     '50_%s.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+                            #     suf, save=True)
+                            solo_photo.file_50.save(
+                                '%s.%s' % (os.path.splitext(suf.name)[0], FILE_EXTENSION),
+                                suf, save=True)
+
+                            return JsonResponse({'res': 1, 'url': solo_photo.file_300_url()})
+                    except Exception:
+                        return JsonResponse({'res': 0, 'message': texts.UNEXPECTED_ERROR})
+
+            return JsonResponse({'res': 0, 'message': texts.UNEXPECTED_ERROR})
+
+@ensure_csrf_cookie
+def re_b_admin_solo_edit_main_photo_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                photo_id = request.POST.get('photo_id', None)
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                solo_photo = None
+                try:
+                    solo_photo = SoloPhoto.objects.get(uuid=photo_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                solo_main_photo = solo.solomainphoto
+                solo_main_photo.uuid = solo_photo.uuid
+                solo_main_photo.solo_photo = solo_photo
+                solo_main_photo.save()
+
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_b_admin_solo_edit_photo_delete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                photo_id = request.POST.get('photo_id', None)
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                solo_photo = None
+                try:
+                    solo_photo = SoloPhoto.objects.get(uuid=photo_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                solo_main_photo = solo.solomainphoto
+                if solo_main_photo.uuid == solo_photo.uuid or solo_main_photo.solo_photo == solo_photo:
+                    return JsonResponse({'res': 0})
+                solo_photo.delete()
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_b_admin_solo_edit_name_delete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                name = request.POST.get('name', None)
+                name = name.strip()
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                solo_name = None
+                try:
+                    solo_name = SoloName.objects.get(name=name, solo=solo)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                solo_main_name = solo.solomainname
+                if solo_main_name.solo_name == solo_name:
+                    return JsonResponse({'res': 0})
+                solo_name.delete()
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_solo_edit_name_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                name = request.POST.get('name', None)
+                name = name.strip()
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                solo_name = None
+                try:
+                    solo_name = SoloName.objects.create(name=name, solo=solo)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_b_admin_solo_edit_default_register(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                id = request.POST.get('id', None)
+                name = request.POST.get('name', None)
+                name = name.strip()
+                desc = request.POST.get('desc', None)
+                desc = desc.strip()
+                try:
+                    solo = Solo.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                try:
+                    solo.name = name
+                    solo.description = desc
+                    solo.save()
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
 # 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
 
 # That's it!

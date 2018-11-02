@@ -64,11 +64,20 @@
                 <a href=""><div style="background-color: silver" id="main_name_register">main name register</div></a>
                 <div class="h4" style="background-color: #8e97ed">names list</div>
                 <div id="name_list"></div>
-                <div class="h5">main_name</div>
-                <div class="h5">main_name</div>
+                <div>name: <input id="name_input"></div>
+                <a href=""><div style="background-color: silver" id="name_register">name register</div></a>
                 <div>delete name: <input id="name_delete_input"></div>
                     <!-- delete name 은 직접입력해서 지우는 걸로 하자 간단하게 하고 name등록시에 strip 걸어주는 것 잊지마.-->
-                <a href=""><div style="background-color: silver" id="register">name delete</div></a>
+                <a href=""><div style="background-color: silver" id="name_delete">name delete</div></a>
+
+                <div>photo to main name: <input id="photo_main_input"></div>
+                    <!-- delete name 은 직접입력해서 지우는 걸로 하자 간단하게 하고 name등록시에 strip 걸어주는 것 잊지마.-->
+                <a href=""><div style="background-color: silver" id="photo_main_register">photo main register</div></a>
+
+                <div>photo delete: <input id="photo_delete_input"></div>
+                    <!-- delete name 은 직접입력해서 지우는 걸로 하자 간단하게 하고 name등록시에 strip 걸어주는 것 잊지마.-->
+                <a href=""><div style="background-color: silver" id="photo_delete">photo delete</div></a>
+
                 <div class="h4" style="background-color: #8e97ed">photos list</div>
                 <div id="photo_list"></div>
 
@@ -116,6 +125,98 @@
 </body>
 <script>
     $(function () {
+        $('#default_register').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/b/admin/group/edit/default/register/',
+                type: 'post',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    id: $('#id').html(),
+                    name: $('#default_name_input').val(),
+                    desc: $('#default_desc_input').val(),
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        location.reload()
+                    }
+                }
+            });
+        })
+        $('#photo_main_register').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/b/admin/group/edit/main/photo/register/',
+                type: 'post',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    id: $('#id').html(),
+                    photo_id: $('#photo_main_input').val(),
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        location.reload()
+                    }
+                }
+            });
+        })
+        $('#photo_delete').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/b/admin/group/edit/photo/delete/',
+                type: 'post',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    id: $('#id').html(),
+                    photo_id: $('#photo_delete_input').val(),
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        location.reload()
+                    }
+                }
+            });
+        })
+        $('#name_delete').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/b/admin/group/edit/name/delete/',
+                type: 'post',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    id: $('#id').html(),
+                    name: $('#name_delete_input').val(),
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        location.reload()
+                    }
+                }
+            });
+        })
+
+        $('#name_register').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url: '/re/b/admin/group/edit/name/register/',
+                type: 'post',
+                dataType: 'json',
+                cache: false,
+                data: {
+                    id: $('#id').html(),
+                    name: $('#name_input').val(),
+                },
+                success: function (data) {
+                    if (data.res === 1) {
+                        location.reload()
+                    }
+                }
+            });
+        })
         $.ajax({
             url: '/re/b/admin/group/edit/',
             type: 'post',
@@ -130,6 +231,9 @@
                     $('#default_desc').html(data.default_desc)
                     $('#main_name').html(data.main_name)
                     $('#img_300').attr('src', data.main_photo)
+                    $.each(data.name_output, function (key, value) {
+                        $('#name_list').append('<div class="h5">'+value.name+'</div>')
+                    })
                     $.each(data.photo_output, function (key, value) {
                         $('#photo_list').append('<div><img class="img_300_300" src="'+value.photo+'"></div><div>'+value.id+'</div>')
                     })
@@ -138,7 +242,6 @@
                 }
             }
         });
-
         $('#main_name_register').click(function (e) {
             e.preventDefault()
             $.ajax({
@@ -190,7 +293,7 @@
 
         /* SCRIPTS TO HANDLE THE CROPPER BOX */
         var image;
-        var cropper
+        var cropper;
         $("#modal_crop").on("shown.bs.modal", function () {
             image = document.getElementById('img_crop');
             cropper = new Cropper(image, {
@@ -222,8 +325,6 @@
 
         });
 
-        /* SCRIPT TO COLLECT THE DATA AND POST TO THE SERVER
-         * 모달 오픈시 너무 큰 그림이면 로딩하는 시간 주는 거 구현하고, 세이브 후 기다리는거 구현하고 체인지 안 되었어도 모달 꺼지면 디스트로이 하게 구현하라. */
         $(".js-crop-and-upload").click(function () {
             var cropData = cropper.getData();
 
