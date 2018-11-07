@@ -79,30 +79,6 @@ class PostFirstCheck(models.Model):
         return "Post pk: %s" % self.post.pk
 
 
-class PostProfile(models.Model):
-    post = models.OneToOneField("Post", on_delete=models.CASCADE, null=True, blank=True)
-
-    name = models.CharField(max_length=30, null=True, blank=True)
-
-    file_50 = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_post_profile_50)
-    file_300 = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_post_profile_300)
-
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "PostPhoto pk: %s, username: %s" % (self.pk, self.post.user.userusername.username)
-
-    def file_50_url(self):
-        if self.file_50:
-            return self.file_50.url
-        return "/media/default/default_photo_50.png"
-
-    def file_300_url(self):
-        if self.file_300:
-            return self.file_300.url
-        return "/media/default/default_photo_300.png"
-
 from .numbers import *
 KINDS_CHOICES = (
     (POSTCHAT_START, "start"),
@@ -187,16 +163,6 @@ class PostChatText(models.Model):
     def __str__(self):
         return "postchat text: %s" % self.pk
 
-
-class PostChatPhoto(models.Model):
-    post_chat = models.OneToOneField("PostChat", on_delete=models.CASCADE, null=True, blank=True)
-
-    file = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_post_chat_photo)
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "post chat photo: %s" % self.pk
 
 
 class PostChatRestMessage(models.Model):
@@ -398,23 +364,22 @@ class GroupName(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "name: %s, desc: %s" % (self.name, self.description)
+        return "name: %s, desc: %s" % (self.name, self.pk)
 
     class Meta:
         unique_together = ('name', 'group',)
 
 class GroupMainName(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE, null=True, blank=True)
-
-    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    group_name = models.ForeignKey(GroupName, on_delete=models.CASCADE, null=True, blank=True)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "name: %s, desc: %s" % (self.name, self.description)
+        return "name: %s, desc: %s" % (self.group_name.name, self.pk)
 
     class Meta:
-        unique_together = ('name', 'group',)
+        unique_together = ('group', 'group_name',)
 
 
 class SoloName(models.Model):
@@ -425,7 +390,7 @@ class SoloName(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "name: %s, desc: %s" % (self.name, self.description)
+        return "name: %s, desc: %s" % (self.name, self.pk)
 
     class Meta:
         unique_together = ('name', 'solo',)
@@ -433,22 +398,21 @@ class SoloName(models.Model):
 
 class SoloMainName(models.Model):
     solo = models.OneToOneField(Solo, on_delete=models.CASCADE, null=True, blank=True)
-
-    name = models.TextField(max_length=1000, null=True, blank=True, default=None)
+    solo_name = models.ForeignKey(SoloName, on_delete=models.CASCADE, null=True, blank=True)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
-        return "name: %s, desc: %s" % (self.name, self.description)
+        return "name: %s, desc: %s" % (self.solo_name.name, self.pk)
 
     class Meta:
-        unique_together = ('name', 'solo',)
+        unique_together = ('solo', 'solo_name',)
 
 
 class GroupPhoto(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
-    file = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_group_celeb_photo)
-
+    file_50 = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_group_celeb_photo_50)
+    file_300 = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_group_celeb_photo_300)
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
     description = models.TextField(max_length=1000, null=True, blank=True, default=None)
@@ -457,10 +421,20 @@ class GroupPhoto(models.Model):
 
     def __str__(self):
         return "desc: %s" % self.description
+
+    def file_50_url(self):
+        if self.file_50:
+            return self.file_50.url
+        return "/media/default/default_photo_50.png"
+
+    def file_300_url(self):
+        if self.file_300:
+            return self.file_300.url
+        return "/media/default/default_photo_300.png"
 
 class GroupMainPhoto(models.Model):
     group = models.OneToOneField(Group, on_delete=models.CASCADE, null=True, blank=True)
-    group_photo = models.ForeignKey(GroupPhoto, on_delete=models.CASCADE, null=True, blank=True)
+    group_photo = models.ForeignKey(GroupPhoto, on_delete=models.SET_NULL, null=True, blank=True)
 
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
@@ -471,11 +445,20 @@ class GroupMainPhoto(models.Model):
     def __str__(self):
         return "desc: %s" % self.description
 
+    def file_50_url(self):
+        if self.group_photo:
+            return self.group_photo.file_50.url
+        return "/media/default/default_photo_50.png"
+
+    def file_300_url(self):
+        if self.group_photo:
+            return self.group_photo.file_300.url
+        return "/media/default/default_photo_300.png"
 
 class SoloPhoto(models.Model):
     solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
-    file = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_solo_celeb_photo)
-
+    file_50 = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_solo_celeb_photo_50)
+    file_300 = models.ImageField(null=True, blank=True, default=None, upload_to=get_file_path_solo_celeb_photo_300)
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
     main = models.BooleanField(default=False)
 
@@ -486,10 +469,19 @@ class SoloPhoto(models.Model):
     def __str__(self):
         return "desc: %s" % self.description
 
+    def file_50_url(self):
+        if self.file_50:
+            return self.file_50.url
+        return "/media/default/default_photo_50.png"
+
+    def file_300_url(self):
+        if self.file_300:
+            return self.file_300.url
+        return "/media/default/default_photo_300.png"
 
 class SoloMainPhoto(models.Model):
     solo = models.OneToOneField(Solo, on_delete=models.CASCADE, null=True, blank=True)
-    solo_photo = models.ForeignKey(SoloPhoto, on_delete=models.CASCADE, null=True, blank=True)
+    solo_photo = models.ForeignKey(SoloPhoto, on_delete=models.SET_NULL, null=True, blank=True)
 
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
@@ -500,10 +492,20 @@ class SoloMainPhoto(models.Model):
     def __str__(self):
         return "desc: %s" % self.description
 
+    def file_50_url(self):
+        if self.solo_photo:
+            return self.solo_photo.file_50.url
+        return "/media/default/default_photo_50.png"
+
+    def file_300_url(self):
+        if self.solo_photo:
+            return self.solo_photo.file_300.url
+        return "/media/default/default_photo_300.png"
 
 class Member(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
     solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
+
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -512,3 +514,9 @@ class Member(models.Model):
 
     class Meta:
         unique_together = ('group', 'solo',)
+
+class TestDecimal(models.Model):
+    decimal_10 = models.DecimalField(max_digits=12, decimal_places=2)
+
+    # >>> Decimal('10.50') - Decimal('0.20')
+    # Decimal('10.30')

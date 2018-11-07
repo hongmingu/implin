@@ -212,3 +212,60 @@ def b_admin_member(request):
             return render(request, 'baseapp/b_admin_member.html')
 
         return render(request, '404.html', )
+
+
+from django.urls import reverse
+from django.shortcuts import render
+from paypal.standard.forms import PayPalPaymentsForm
+
+from django.views.decorators.http import require_GET
+from django.views.decorators.csrf import csrf_exempt
+
+
+def pay_charge(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            q = request.GET.get('q', None)
+            if not q.isdigit():
+                return render(request, '404.html')
+
+            # What you want the button to do.
+            user_id = request.user.username # 이거 데이터베이스에서 중복값 없도록 해야 한다. 여기 수정해야함.
+            paypal_dict = {
+                "business": "ghdalsrn2sell@gmail.com", # 판매자 계정 잘 써야 한다.
+                "amount": q,
+                "item_name": "name of the item",
+                "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
+                "return": request.build_absolute_uri(reverse('baseapp:pay_return')),
+                "cancel_return": request.build_absolute_uri(reverse('baseapp:pay_cancel_return')),
+                "custom": request.user.username,  # Custom command to correlate to some function later (optional)
+            }
+            print('reverse paypal-ipn: ' + reverse('paypal-ipn'))
+            print('send uuid: '+ user_id)
+            # Create the instance.
+            form = PayPalPaymentsForm(initial=paypal_dict)
+            context = {"form": form}
+            return render(request, "baseapp/pay_charge.html", context)
+# 여기서 paypal - profile - my selling tools - Instant payment notifications
+
+
+@csrf_exempt
+def pay_return(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return render(request, "baseapp/pay_return.html")
+
+
+@csrf_exempt
+def pay_cancel_return(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return render(request, "baseapp/pay_cancel_return.html")
+
+
+@csrf_exempt
+def pay_start(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+           return render(request, "baseapp/pay_start.html")
+

@@ -11,7 +11,8 @@ with open(SETTINGS_FILE) as f:
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = [] 이건 기본값
+ALLOWED_HOSTS = '*'  # 이건 ngrok 사용시
 
 
 # Application definition
@@ -30,10 +31,18 @@ INSTALLED_APPS = [
     'object',
     'notice',
     'relation',
+    'paypal.standard.ipn',
     'debug_toolbar',
+
 ]
 # django debug-toolbar
 INTERNAL_IPS = ('127.0.0.1',)
+
+# For Sandbox account-------------------------------------------------------------------
+PAYPAL_TEST = True
+# For PAYPAL PDT------------------------------------------------------------------------
+# PAYPAL_IDENTITY_TOKEN = '_RTtiajy1U_SW7WO_iPEzawd_vsej2iO5GSSxfBs2LmjjDwEHUApVfCCzmy'
+# installed_apps : 'paypal.standard.ipn',
 
 SITE_ID = 1
 WSGI_APPLICATION = 'implin.wsgi.local.application'

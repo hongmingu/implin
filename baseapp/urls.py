@@ -12,6 +12,11 @@ urlpatterns = [
 
     re_path(r'^$', views.home, name='home'),
 
+    re_path(r'^pay/charge/$', views.pay_charge, name='pay_charge'),
+    re_path(r'^pay/return/$', views.pay_return, name="pay_return"),
+    re_path(r'^pay/cancel/return/$', views.pay_cancel_return, name="pay_cancel_return"),
+    re_path(r'^pay/start/$', views.pay_start, name="pay_start"),
+
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),
     re_path(r'^b/admin/solo/$', views.b_admin_solo, name='b_admin_solo'),
     re_path(r'^b/admin/group/$', views.b_admin_group, name='b_admin_group'),

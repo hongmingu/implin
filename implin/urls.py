@@ -19,6 +19,8 @@ from django.urls import path, re_path, include
 urlpatterns = [
     re_path(r'^accounts/', include('authapp.urls')),
     re_path(r'^', include('baseapp.urls')),
+    re_path(r'^payment/paypal', include('paypal.standard.ipn.urls')),
+    # https://www.뭐뭐닷컴.com/payment/paypal 이걸 paypal의 ipn 설정에 입력하면 된다.
 ]
 
 
