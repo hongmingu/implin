@@ -23,6 +23,7 @@ from django.http import JsonResponse
 from authapp import options
 from authapp import texts
 from relation.models import FollowerCount, FollowingCount
+from object.models import Charge
 from notice.models import NoticeCount
 from .forms import *
 from .models import *
@@ -181,9 +182,9 @@ def main_create_log_in(request):
                 new_password = form.cleaned_data['password']
                 new_email = form.cleaned_data['email']
                 new_username = new_username.lower()
+
                 try:
                     with transaction.atomic():
-
                         checker_username_result = 0
                         counter_username = 0
                         while checker_username_result is 0:
@@ -201,7 +202,8 @@ def main_create_log_in(request):
                                         counter_username = counter_username + 1
                                     else:
                                         return render_with_clue_loginform_createform(request, 'authapp/main_second.html',
-                                                                                     texts.CREATING_USER_EXTRA_ERROR, LoginForm(),
+                                                                                     texts.CREATING_USER_EXTRA_ERROR,
+                                                                                     LoginForm(),
                                                                                      UserCreateForm(data))
                             else:
                                 return render_with_clue_loginform_createform(request, 'authapp/main_second.html',
@@ -242,8 +244,10 @@ def main_create_log_in(request):
                         new_following_count = FollowingCount.objects.create(user=new_user_create)
                         new_follower_count = FollowerCount.objects.create(user=new_user_create)
                         new_notice_count = NoticeCount.objects.create(user=new_user_create)
+                        new_charge = Charge.objects.create(user=new_user_create)
 
-                except Exception:
+                except Exception as e:
+                    print(e)
                     return render_with_clue_loginform_createform(request, 'authapp/main_second.html',
                                                              texts.CREATING_USER_EXTRA_ERROR, LoginForm(),
                                                              UserCreateForm(data))
@@ -296,7 +300,7 @@ def main_create_log_in(request):
                 login(request, new_user_create)
                 ####################################################
                 ####################################################
-                return redirect(reverse('baseapp:user_main', kwargs={'user_username': new_user_username.username}))
+                return redirect(reverse('baseapp:home'))
             else:
                 # 여기 로그인 된 경우 작업 해야 한다. 자동으로 기본화면으로 넘어가도록 하라.
                 return render_with_clue_loginform_createform(request, 'authapp/main_second.html',

@@ -37,11 +37,14 @@
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
-                <h3>How much do you need?</h3>
-                <br>
-                <input id="unit_input" pattern="^\d{0,8}$"/>
-                <br>
-                <a href="" onClick=""><span id="charge">charge</span></a>
+                <div align="center" class="pay_charge">
+                    <h3>How much do you need?</h3>
+                    <br>
+                    <input id="unit_input" pattern="^\d{0,8}$"/><span class="dollar_unit">$</span>
+                    <br>
+                    <a href=""><div class="charge clickable" id="charge">charge</div></a>
+                </div>
+
             </div>
         </div>
     </div>
@@ -56,7 +59,9 @@
                 return false
             }
             var str_unit = get_unit.toString()
-            window.open('/pay/charge/?q='+str_unit, '', 'width=768, height=800');
+            var height = 'height=' + window.innerHeight
+            window.open('/pay/charge/?q='+str_unit, '',
+                'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, fullscreen=yes, width=768,'+ height);
             return false;
         })
 

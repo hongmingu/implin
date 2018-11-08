@@ -365,3 +365,17 @@ transform: translateX(10px) translateY(-10px)
         .height_10{
             height: 10px;
         }
+        .pay_charge{
+            margin: auto;
+            width: 100%;
+            padding: 30% 0;
+            text-align: center;
+        }
+        .charge{
+            margin-top: 10px;
+            background-color: #abb5ff;
+            font-size: 14px;
+        }
+        .dollar_unit{
+            font-size: 14px; font-weight: bold; margin-left: 3px;
+        }

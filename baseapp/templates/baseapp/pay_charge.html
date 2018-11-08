@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Payment</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
 </head>
 <body>
-<h1>Ipn payment</h1>
+<div class="pay_charge">
+<h2>GalaBoard</h2>
+
+<h2>{{ charge }} $</h2>
 <br>
 
 <!-- writes out the form tag automatically -->
 {{ form.render }}
+</div>
 </body>
 </html>

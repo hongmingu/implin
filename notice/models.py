@@ -161,15 +161,6 @@ class NoticeFollow(models.Model):
         return "Notice_pk: %s, follow_user: %s" % (self.notice.pk, self.follow.user.userusername.username)
 
 
-class NoticePostFollow(models.Model):
-    notice = models.OneToOneField(Notice, on_delete=models.CASCADE, null=True, blank=True)
-    post_follow = models.ForeignKey(PostFollow, on_delete=models.CASCADE, null=True, blank=True)
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "Notice_pk: %s, post_follow_user: %s" % (self.notice.pk, self.post_follow.user.userusername.username)
-
 
 class NoticePostComment(models.Model):
     notice = models.OneToOneField(Notice, on_delete=models.CASCADE, null=True, blank=True)
@@ -189,33 +180,3 @@ class NoticePostLike(models.Model):
 
     def __str__(self):
         return "Notice_pk: %s, post_like_user: %s" % (self.pk, self.post_like.user.userusername.username)
-
-
-class NoticePostChatLike(models.Model):
-    notice = models.OneToOneField(Notice, on_delete=models.CASCADE, null=True, blank=True)
-    post_chat_like = models.ForeignKey(PostChatLike, on_delete=models.CASCADE, null=True, blank=True)
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "Notice_pk: %s, post_chat_like_user: %s" % (self.pk, self.post_chat_like.user.userusername.username)
-
-
-class NoticePostChatRest(models.Model):
-    notice = models.OneToOneField(Notice, on_delete=models.CASCADE, null=True, blank=True)
-    post_chat_rest = models.ForeignKey(PostChatRestMessage, on_delete=models.CASCADE, null=True, blank=True)
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "Notice_pk: %s, post_chat_rest_user: %s" % (self.pk, self.post_chat_rest.user.userusername.username)
-
-
-class NoticePostChatRestLike(models.Model):
-    notice = models.OneToOneField(Notice, on_delete=models.CASCADE, null=True, blank=True)
-    post_chat_rest_like = models.ForeignKey(PostChatRestMessageLike, on_delete=models.CASCADE, null=True, blank=True)
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "Notice_pk: %s, post_chat_rest_like_user: %s" % (self.pk, self.post_chat_rest_like.user.userusername.username)

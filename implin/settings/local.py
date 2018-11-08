@@ -60,8 +60,8 @@ MIDDLEWARE = [
 ]
 # Authentication Backend
 AUTHENTICATION_BACKENDS = [
-    # 'authapp.backends.EmailOrUsernameAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
+    'authapp.backends.EmailOrUsernameAuthBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
 ]
 
 #### Static settings
@@ -88,40 +88,3 @@ EMAIL_HOST_USER = SMTPusername
 EMAIL_HOST_PASSWORD = SMTPpassword
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'test-username@moneycurry.com'
-
-# aws workmail 사용
-#########################reCAPTCHA#############################
-
-GOOGLE_RECAPTCHA_SECRET_KEY = '6Ld4Tz4UAAAAALpirKbseTu8m01Afd6Fr-fW5OBy'
-
-#---------------------channels-----------------------
-# Channel layer definitions
-# http://channels.readthedocs.io/en/latest/topics/channel_layers.html
-CHANNEL_LAYERS = {
-    "default": {
-        # This example app uses the Redis channel layer implementation channels_redis
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            # "hosts": [(redis_host, 6379)],
-            "hosts": [('redis://127.0.0.1:6379')],
-        },
-    },
-}
-
-
-
-# ASGI_APPLICATION should be set to your outermost router
-ASGI_APPLICATION = 'implin.routing.application'
-
-# Cache (It's different from channels)
-'''
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis-test-cache.tegk2s.0001.usw2.cache.amazonaws.com:6379",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
-'''

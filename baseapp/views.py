@@ -228,13 +228,13 @@ def pay_charge(request):
             q = request.GET.get('q', None)
             if not q.isdigit():
                 return render(request, '404.html')
-
+            business = 'ghdalsrn2sell@gmail.com'
             # What you want the button to do.
             user_id = request.user.username # 이거 데이터베이스에서 중복값 없도록 해야 한다. 여기 수정해야함.
             paypal_dict = {
-                "business": "ghdalsrn2sell@gmail.com", # 판매자 계정 잘 써야 한다.
+                "business": business, # 판매자 계정 잘 써야 한다.
                 "amount": q,
-                "item_name": "name of the item",
+                "item_name": "galaboard charge",
                 "notify_url": request.build_absolute_uri(reverse('paypal-ipn')),
                 "return": request.build_absolute_uri(reverse('baseapp:pay_return')),
                 "cancel_return": request.build_absolute_uri(reverse('baseapp:pay_cancel_return')),
@@ -244,7 +244,7 @@ def pay_charge(request):
             print('send uuid: '+ user_id)
             # Create the instance.
             form = PayPalPaymentsForm(initial=paypal_dict)
-            context = {"form": form}
+            context = {"form": form, 'charge': q}
             return render(request, "baseapp/pay_charge.html", context)
 # 여기서 paypal - profile - my selling tools - Instant payment notifications
 
@@ -267,5 +267,7 @@ def pay_cancel_return(request):
 def pay_start(request):
     if request.method == "GET":
         if request.user.is_authenticated:
-           return render(request, "baseapp/pay_start.html")
+            from django.utils import timezone
+            print(timezone.now())
+            return render(request, "baseapp/pay_start.html")
 
