@@ -160,35 +160,49 @@ def create_profile(sender, instance, created, **kwargs):
 from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
 
+from decimal import Decimal
+
+
 def ipn_signal(sender, **kwargs):
     ipn_obj = sender
-    print_opj = ipn_obj
-    print('------IPN----------')
-    print(dir(print_opj))
-    print('txn_id: ' + print_opj.txn_id)
-    print('receipt_id: ' + print_opj.receipt_id)
-    print('receiver_id: ' + print_opj.receiver_id)
-    print('payer_id: ' + print_opj.payer_id)
-    print('rp_invoice_id: ' + print_opj.rp_invoice_id)
-    print('receiver_email: ' + print_opj.receiver_email)
-    print('auth_amount: ' + str(print_opj.auth_amount))
-    print('payment_gross: ' + str(print_opj.payment_gross))
-    print('payment_date: ' + str(print_opj.payment_date))
-    print('pk: ' + str(print_opj.pk))
-    print('tax: ' + str(print_opj.tax))
-    print('auth_id: ' + print_opj.auth_id)
+    user = None
+    wallet = None
+    print('payment_gross: ' + str(ipn_obj.payment_gross))
+    print('custom: ' + str(ipn_obj.custom))
+    print('txn_id: ' + str(ipn_obj.txn_id))
+
     if ipn_obj.custom:
-        print('uuid was: ' + ipn_obj.custom)
+        try:
+            user = User.objects.get(username=ipn_obj.custom)
+        except Exception as e:
+            return
+        try:
+            wallet = Wallet.objects.get(user=user)
+        except Exception as e:
+            return
     if ipn_obj.payment_status == ST_PP_COMPLETED:
-        print('payment status: ' + ipn_obj.payment_status)
-        print('ST_PP_COMPLETED: ' + ST_PP_COMPLETED)
+        try:
+            with transaction.atomic():
+                charge_log, created = ChargeLog.objects.get_or_create(wallet=wallet,
+                                                                      transaction_id=ipn_obj.txn_id,
+                                                                      gross=Decimal(ipn_obj.payment_gross))
+                if created:
+                    wallet.gross = F('gross') + Decimal(ipn_obj.payment_gross)
+                    wallet.save()
+                    # 여러번 실험해서 더플리케이트 실험 하면 됨.
+        except Exception as e:
+            print(e)
+            return
+    else:
+        pass
+
         # WARNING !
         # Check that the receiver email is the same we previously
         # set on the `business` field. (The user could tamper with
         # that fields on the payment form before it goes to PayPal)
-        if ipn_obj.receiver_email != "ghdalsrn2sell@gmail.com":
-            # Not a valid payment
-            return
+        # if ipn_obj.receiver_email != "ghdalsrn2sell@gmail.com":
+        #     Not a valid payment
+        #     return
 
         # ALSO: for the same reason, you need to check the amount
         # received, `custom` etc. are all what you expect or what
@@ -198,8 +212,6 @@ def ipn_signal(sender, **kwargs):
         # if ipn_obj.mc_gross == price and ipn_obj.mc_currency == 'USD':
         #     pass
         #     ...
-    else:
-        pass
 
 
 valid_ipn_received.connect(ipn_signal)

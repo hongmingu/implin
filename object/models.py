@@ -330,32 +330,52 @@ class Charge(models.Model):
         return "user: %s - charge: %s $" % (self.user.username, self.amount)
 
 
+class Wallet(models.Model):
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "user: %s - wallet gross: %s $" % (self.user.username, self.gross)
+
+
 class ChargeLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    charge = models.ForeignKey(Charge, on_delete=models.SET_NULL, null=True, blank=True)
+    wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True, blank=True)
 
     transaction_id = models.CharField(max_length=255, blank=True, null=True, default=None)
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
-    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "user: %s - transaction_id: %s $" % (self.user.userusername.username, self.transaction_id)
+        return "user: %s - transaction_id: %s $" % (self.wallet.user.userusername.username, self.transaction_id)
+
+    class Meta:
+        unique_together = ('wallet', 'transaction_id',)
 
 
 class PayLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True, blank=True)
     post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True, blank=True)
 
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
-    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "pay user: %s - amount: %s $" % (self.user.userusername.username, self.amount)
+        return "pay user: %s - amount: %s $" % (self.post.user.userusername.username, self.gross)
+
+    class Meta:
+        unique_together = ('wallet', 'post',)
+
+
+class TestDec(models.Model):
+    decimal = models.DecimalField(max_digits=12, decimal_places=2, default=0)

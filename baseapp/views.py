@@ -269,5 +269,6 @@ def pay_start(request):
         if request.user.is_authenticated:
             from django.utils import timezone
             print(timezone.now())
+
             return render(request, "baseapp/pay_start.html")
 
