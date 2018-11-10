@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Demo</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
+
+    {% load static from staticfiles %}
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/nav_badge.js' %}"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    {% if user.is_authenticated %}
+    {% else %}
+    {% endif %}
+
+</head>
+<body class="light_background_color height_100">
+{% include 'baseapp/_navbar.html' %}
+
+{% include 'others/bootstrap_tester.html' %}
+
+{% if user.is_authenticated %}
+    <div class="hidden" id="user_id">{{ user.username }}</div>
+{% else %}
+    <div class="hidden" id="user_id"></div>
+{% endif %}
+    <div class="hidden" id="keyword"></div>
+
+    <div class="hidden" id="solo_id"></div>
+    <div class="hidden" id="group_id"></div>
+    <div class="hidden" id="solo_end">false</div>
+    <div class="hidden" id="group_end">false</div>
+
+<div class="container-fluid margin_top_50">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+            <div class="row" id="content">
+
+                <div class="row div_base">
+                    <div>
+                        <h4>Search registered person or group</h4>
+                    </div>
+                    <div align="center">
+                        <form>
+                            <div class="input-group input-group-sm">
+                                <input class="form-control" placeholder="search" id="create_search_input">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-default" id="create_search_btn">
+                                        <i class="glyphicon glyphicon-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <a href="">
+                        <div class="create_search_result" id="create_search_result">
+                            <div>
+                                <div class="create_search_img_wrapper">
+                                    <img class="create_search_img" src="https://www.twicenest.com/files/attach/images/223355/745/555/003/ee632c11b899b88e654f72da9efef0f8.jpg">
+                                </div>
+                                <div class="create_search_detail_wrapper"><div class="create_search_detail_name">채영</div><div class="create_search_detail_explain h5">채영</div></div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href=""><div class="create_search_more_load clickable h5 hidden" align="center" id="create_search_more_load">more load</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+<script>
+</script>
+<script>
+    $(function () {
+
+        $('#create_search_btn').click(function (e) {
+            e.preventDefault()
+            var keyword = $('#create_search_input').val()
+
+            if (keyword.replace(/ /g,'')==='') {
+                return false
+            }
+            if (keyword.length > 2048) {
+                return false
+            }
+            $('#keyword').html(keyword)
+            $.ajax({
+                url:'/re/create/search/', type:'post', dataType:'json', cache:false,
+                data:{
+                    keyword: keyword,
+                    solo_id: $('#solo_id').html(),
+                    group_id: $('#group_id').html(),
+                    solo_end: $('#solo_end').html(),
+                    group_end: $('#group_end').html(),
+                },
+                success:function (data) {
+                    if (data.res === 1){
+                        console.log(data)
+                        if(data.group_end === 'true'){
+                            $('#group_end').html('true')
+                        }
+                        if(data.solo_end === 'true'){
+                            $('#solo_end').html('true')
+                        }
+                        $('#solo_id').html(data.solo_id)
+                        $('#group_id').html(data.group_id)
+                        if(data.solo_end==='true' && data.group_end ==='true'){
+                            if (!($('#create_search_more_load').hasClass('hidden'))){
+                               $('#create_search_more_load').addClass('hidden')
+                            }
+                        } else {
+                            if ($('#create_search_more_load').hasClass('hidden')){
+                               $('#create_search_more_load').removeClass('hidden')
+                            }
+                        }
+
+                    }
+                }
+            });
+
+        })
+
+$('.modal_reading_form_textarea').on("keypress", function (e) {
+    /* ENTER PRESSED*/
+    if (e.keyCode == 13 && !e.shiftKey) {
+
+        var keyword = $('#create_search_input').val()
+
+        if (keyword.replace(/ /g,'')==='') {
+            return false
+        }
+        if (keyword.length > 2048) {
+            return false
+        }
+        $.ajax({
+            url: '/re/post/chat/add/rest/', type: 'post', dataType: 'json', cache: false,
+            data: {
+                post_chat_id: $('#reading_post_chat_last_id').html(),
+                text: text,
+            },
+            success: function (data) {
+            }
+        })
+        return false;
+    }
+})
+        // added keywords 는 $('.added_keyword').length 를 이용해 30개를 맥스로 하자. 수정시에도 이걸 이용하면 편할 것이다.
+        // 그리고 수정시엔 keyword to add 랑 keyword to delete 를 만들고 그 아래 컴플릿을 해서 장고 서버에서도 다루기 쉽게 하자.
+        // F 카운터 걸어서 중복제거시에도 제거 안되게 하면 됨 .
+
+
+    });
+
+</script>
+</html>

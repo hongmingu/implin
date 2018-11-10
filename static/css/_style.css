@@ -382,3 +382,24 @@ transform: translateX(10px) translateY(-10px)
         .close_window{
             font-size: 18px; background-color: #ce8483;
         }
+        .create_search_more_load{
+            background-color: #c4e3f3; font-size: 14px;
+        }
+        .create_search_result{
+            margin-top: 10px;
+        }
+        .create_search_img_wrapper{
+            display: inline-block; max-width: 50px; vertical-align: top;
+        }
+        .create_search_img{
+            height: 50px; width: 50px; border-radius: 3px;
+        }
+        .create_search_detail_wrapper{
+            display: inline-block; margin-left: 10px;
+        }
+        .create_search_detail_name{
+            font-size: 18px;
+        }
+        .create_search_detail_explain{
+            font-size: 14px; background-color: #c4e3f3;
+        }
