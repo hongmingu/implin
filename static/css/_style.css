@@ -379,3 +379,6 @@ transform: translateX(10px) translateY(-10px)
         .dollar_unit{
             font-size: 14px; font-weight: bold; margin-left: 3px;
         }
+        .close_window{
+            font-size: 18px; background-color: #ce8483;
+        }

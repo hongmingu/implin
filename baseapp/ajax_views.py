@@ -3030,7 +3030,98 @@ def re_b_admin_solo_edit_default_register(request):
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
 # 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
+@ensure_csrf_cookie
+def re_create_search(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_superuser:
+                keyword = request.POST.get('keyword', None)
+                group_id = request.POST.get('group_id', None)
+                solo_id = request.POST.get('solo_id', None)
+                group_end = request.POST.get('group_end', None)
+                solo_end = request.POST.get('solo_end', None)
+                qs1 = None
+                qs2 = None
+                if solo_end == 'false':
+                    if solo_id == '':
+                        qs1 = Solo.objects.filter(soloname__name__contains=keyword).order_by('created')[:10]
+                    else:
+                        solo = None
+                        try:
+                            solo = Solo.objects.get(uuid=solo_id)
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                        qs1 = Solo.objects.filter(soloname__name__contains=keyword,
+                                                  pk__gt=solo.pk).order_by('created')[:10]
 
+                elif solo_end == 'true':
+                    qs1 = Solo.objects.none()
+
+                if group_end == 'false':
+                    if group_id == '':
+                        qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
+                    else:
+                        group = None
+                        try:
+                            group = Group.objects.get(uuid=group_id)
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                        qs2 = Group.objects.filter(groupname__name__contains=keyword,
+                                                   pk__gt=group.pk).order_by('created')[:10]
+
+                elif group_end == 'true':
+                    qs2 = Group.objects.none()
+                # qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
+                from itertools import chain
+                from operator import attrgetter
+                # ascending oreder
+                result_list = sorted(
+                    chain(qs1, qs2),
+                    key=attrgetter('created'))
+
+                # descending order
+                # result_list = sorted(
+                #     chain(queryset1, queryset2),
+                #     key=attrgetter('date_created'),
+                #     reverse=True)
+
+                solo_id = ''
+                group_id = ''
+                solo_end = 'true'
+                group_end = 'true'
+                output = []
+                for item in result_list:
+                    kind = ''
+                    main_name = None
+                    main_photo = None
+                    if str(item).startswith('group'):
+                        kind = 'group'
+                        main_name = item.groupmainname.group_name.name
+                        main_photo = item.groupmainphoto.file_50_url()
+                        group_id = item.uuid
+                        group_end = 'false'
+                    elif str(item).startswith('solo'):
+                        kind = 'solo'
+                        main_name = item.solomainname.solo_name.name
+                        main_photo = item.solomainphoto.file_50_url()
+                        solo_id = item.uuid
+                        solo_end = 'false'
+
+                    sub_output = {
+                        'kind': kind,
+                        'main_name': main_name,
+                        'main_photo': main_photo,
+                        'id': item.uuid
+                    }
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1,
+                                     'output': output,
+                                     'group_id': group_id,
+                                     'solo_id': solo_id,
+                                     'group_end': group_end,
+                                     'solo_end': solo_end})
+        return JsonResponse({'res': 2})
 # That's it!
 
 

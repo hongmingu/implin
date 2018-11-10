@@ -17,6 +17,13 @@ urlpatterns = [
     re_path(r'^pay/cancel/return/$', views.pay_cancel_return, name="pay_cancel_return"),
     re_path(r'^pay/start/$', views.pay_start, name="pay_start"),
 
+    re_path(r'^create/new/$', views.create_new, name="create_new"),
+    # --------------------------------------------------------------------------------
+    re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
+            name='re_create_search'),
+
+    # --------------------------------------------------------------------------------
+
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),
     re_path(r'^b/admin/solo/$', views.b_admin_solo, name='b_admin_solo'),
     re_path(r'^b/admin/group/$', views.b_admin_group, name='b_admin_group'),
@@ -113,13 +120,7 @@ urlpatterns = [
             name='re_post_update'),
     re_path(r'^re/post/update/profile/name/$', base_ajax_views.re_post_update_profile_name,
             name='re_post_update_profile_name'),
-    re_path(r'^re/post/chat/remove/$', base_ajax_views.re_post_chat_remove,
-            name='re_post_chat_remove'),
 
-    re_path(r'^re/post/chat/modify/populate/$', base_ajax_views.re_post_chat_modify_populate,
-            name='re_post_chat_modify_populate'),
-    re_path(r'^re/post/chat/more/load/$', base_ajax_views.re_post_chat_more_load,
-            name='re_post_chat_more_load'),
     re_path(r'^re/home/feed/$', base_ajax_views.re_home_feed,
             name='re_home_feed'),
 
@@ -133,30 +134,6 @@ urlpatterns = [
             name='re_comment_more_load'),
     re_path(r'^re/post/like/$', base_ajax_views.re_post_like,
             name='re_post_like'),
-
-    re_path(r'^re/post/already/read/$', base_ajax_views.re_post_already_read,
-            name='re_post_already_read'),
-
-    re_path(r'^re/post/reading/more/load/$', base_ajax_views.re_post_reading_more_load,
-            name='re_post_reading_more_load'),
-
-    re_path(r'^re/post/chat/next/load/$', base_ajax_views.re_post_chat_next_load,
-            name='re_post_chat_next_load'),
-
-    re_path(r'^re/post/chat/like/$', base_ajax_views.re_post_chat_like,
-            name='re_post_chat_like'),
-
-    re_path(r'^re/post/chat/add/rest/$', base_ajax_views.re_post_chat_add_rest,
-            name='re_post_chat_add_rest'),
-
-    re_path(r'^re/post/chat/rest/more/load/$', base_ajax_views.re_post_chat_rest_more_load,
-            name='re_post_chat_more_load'),
-
-    re_path(r'^re/post/chat/rest/like/$', base_ajax_views.re_post_chat_rest_like,
-            name='re_post_chat_rest_like'),
-
-    re_path(r'^re/post/chat/rest/delete/$', base_ajax_views.re_post_chat_rest_delete,
-            name='re_post_chat_rest_delete'),
 
     re_path(r'^re/profile/follow/$', base_ajax_views.re_profile_follow,
             name='re_profile_follow'),
@@ -174,17 +151,6 @@ urlpatterns = [
             name='re_profile_follower'),
     re_path(r'^re/post/like/list/$', base_ajax_views.re_post_like_list,
             name='re_post_like_list'),
-    re_path(r'^re/post/chat/like/list/$', base_ajax_views.re_post_chat_like_list,
-            name='re_post_chat_like_list'),
-
-    re_path(r'^re/post/chat/rest/like/list/$', base_ajax_views.re_post_chat_rest_like_list,
-            name='re_post_chat_rest_like_list'),
-
-    re_path(r'^re/post/follow/$', base_ajax_views.re_post_follow,
-            name='re_post_follow'),
-
-    re_path(r'^re/post/follow/list/$', base_ajax_views.re_post_follow_list,
-            name='re_post_follow_list'),
 
     re_path(r'^re/explore/feed/$', base_ajax_views.re_explore_feed,
             name='re_explore_feed'),

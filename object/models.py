@@ -97,7 +97,7 @@ class Group(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "name: %s, desc: %s" % (self.name, self.description)
+        return "group name: %s, desc: %s" % (self.name, self.description)
 
     class Meta:
         unique_together = ('name', 'description',)
@@ -113,7 +113,7 @@ class Solo(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "name: %s, desc: %s" % (self.name, self.description)
+        return "solo name: %s, desc: %s" % (self.name, self.description)
 
     class Meta:
         unique_together = ('name', 'description',)
