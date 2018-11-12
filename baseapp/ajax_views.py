@@ -3194,23 +3194,29 @@ def re_create_group_post_complete(request):
                     return JsonResponse({'res': 0})
 
                 from django.db.models import F
+                from django.utils.timezone import localdate
 
                 text = text.strip()
                 if text == '':
                     text = None
                 id = uuid.uuid4().hex
+
+
                 try:
                     with transaction.atomic():
-
                         post = Post.objects.create(gross=gross, user=request.user, uuid=id)
                         post_text = PostText.objects.create(post=post, text=text)
-                        group_date_pay = GroupDatePay.objects.get_or_create(group=group)
+                        local_date = localdate()
+                        group_date_pay, created = GroupDatePay.objects.get_or_create(group=group, date=local_date)
+
                         group_date_pay.gross = F('gross') + gross
                         group_date_pay.save()
                         group_post = GroupPost.objects.create(post=post, group=group, group_date_pay=group_date_pay)
                         pay_log = PayLog.objects.create(post=post, gross=gross, uuid=uuid.uuid4().hex, wallet=wallet)
                         wallet.gross = F('gross') - gross
                         wallet.save()
+                        pass
+
                 except Exception as e:
                     print(e)
                     return JsonResponse({'res': 0})

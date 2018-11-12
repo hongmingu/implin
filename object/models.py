@@ -12,8 +12,7 @@ from django.utils.timezone import now
 class Post(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     uuid = models.CharField(max_length=34, unique=True, null=True, default=None)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -39,7 +38,7 @@ class PostText(models.Model):
 class PostComment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
     text = models.TextField(max_length=1000, null=True, blank=True)
-    uuid = models.CharField(max_length=34, unique=True, default=uuid.uuid4().hex)
+    uuid = models.CharField(max_length=34, unique=True, default=None, null=True, blank=True)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
@@ -117,6 +116,35 @@ class Solo(models.Model):
 
     class Meta:
         unique_together = ('name', 'description',)
+
+
+class GroupPost(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
+    group_date_pay = models.ForeignKey("GroupDatePay", on_delete=models.CASCADE, null=True, blank=True)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "name: %s, desc: %s" % (self.group, self.pk)
+
+    class Meta:
+        unique_together = ('group', 'post',)
+
+
+class SoloPost(models.Model):
+    solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
+    solo_date_pay = models.ForeignKey("SoloDatePay", on_delete=models.CASCADE, null=True, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "name: %s, desc: %s" % (self.solo, self.pk)
+
+    class Meta:
+        unique_together = ('solo', 'post',)
 
 
 class GroupName(models.Model):
@@ -276,9 +304,9 @@ class SoloMainPhoto(models.Model):
 
 class GroupDatePay(models.Model):
     group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
-    date = models.DateField(auto_now_add=True, null=True, blank=True)
+    date = models.DateField(default=None, null=True, blank=True)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -289,9 +317,9 @@ class GroupDatePay(models.Model):
 
 class SoloDatePay(models.Model):
     solo = models.ForeignKey(Solo, on_delete=models.SET_NULL, null=True, blank=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
-    date = models.DateField(auto_now_add=True, null=True, blank=True)
+    date = models.DateField(default=None, null=True, blank=True)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -317,17 +345,6 @@ class Member(models.Model):
 # =--------------------------------------------------------------------------------------------------------------
     # >>> Decimal('10.50') - Decimal('0.20')
     # Decimal('10.30')
-
-
-class Charge(models.Model):
-    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "user: %s - charge: %s $" % (self.user.username, self.amount)
 
 
 class Wallet(models.Model):
