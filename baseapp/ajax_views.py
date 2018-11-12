@@ -3034,7 +3034,7 @@ def re_b_admin_solo_edit_default_register(request):
 def re_create_search(request):
     if request.method == "POST":
         if request.is_ajax():
-            if request.user.is_superuser:
+            if request.user.is_authenticated:
                 keyword = request.POST.get('keyword', None)
                 group_id = request.POST.get('group_id', None)
                 solo_id = request.POST.get('solo_id', None)
@@ -3044,14 +3044,14 @@ def re_create_search(request):
                 qs2 = None
                 if solo_end == 'false':
                     if solo_id == '':
-                        qs1 = Solo.objects.filter(soloname__name__contains=keyword).order_by('created')[:10]
+                        qs1 = Solo.objects.filter(soloname__name__icontains=keyword).order_by('created')[:10]
                     else:
                         solo = None
                         try:
                             solo = Solo.objects.get(uuid=solo_id)
                         except Exception as e:
                             return JsonResponse({'res': 0})
-                        qs1 = Solo.objects.filter(soloname__name__contains=keyword,
+                        qs1 = Solo.objects.filter(soloname__name__icontains=keyword,
                                                   pk__gt=solo.pk).order_by('created')[:10]
 
                 elif solo_end == 'true':
@@ -3059,14 +3059,14 @@ def re_create_search(request):
 
                 if group_end == 'false':
                     if group_id == '':
-                        qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
+                        qs2 = Group.objects.filter(groupname__name__icontains=keyword).order_by('created')[:10]
                     else:
                         group = None
                         try:
                             group = Group.objects.get(uuid=group_id)
                         except Exception as e:
                             return JsonResponse({'res': 0})
-                        qs2 = Group.objects.filter(groupname__name__contains=keyword,
+                        qs2 = Group.objects.filter(groupname__name__icontains=keyword,
                                                    pk__gt=group.pk).order_by('created')[:10]
 
                 elif group_end == 'true':
@@ -3094,24 +3094,33 @@ def re_create_search(request):
                     kind = ''
                     main_name = None
                     main_photo = None
+                    member_list = []
                     if str(item).startswith('group'):
                         kind = 'group'
                         main_name = item.groupmainname.group_name.name
                         main_photo = item.groupmainphoto.file_50_url()
                         group_id = item.uuid
                         group_end = 'false'
+                        members = Member.objects.filter(group=item)
+                        for i in members:
+                            member_list.append(i.solo.solomainname.solo_name.name)
                     elif str(item).startswith('solo'):
                         kind = 'solo'
                         main_name = item.solomainname.solo_name.name
                         main_photo = item.solomainphoto.file_50_url()
                         solo_id = item.uuid
                         solo_end = 'false'
+                        members = Member.objects.filter(solo=item)
+                        for i in members:
+                            member_list.append(i.group.groupmainname.group_name.name)
 
                     sub_output = {
                         'kind': kind,
                         'main_name': main_name,
                         'main_photo': main_photo,
-                        'id': item.uuid
+                        'id': item.uuid,
+                        'member': member_list
+
                     }
                     output.append(sub_output)
 
@@ -3122,7 +3131,112 @@ def re_create_search(request):
                                      'group_end': group_end,
                                      'solo_end': solo_end})
         return JsonResponse({'res': 2})
-# That's it!
 
 
+@ensure_csrf_cookie
+def re_create_check_server_time(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                from django.utils.timezone import localtime
+                time = localtime()
+                return JsonResponse({'res': 1, 'time': time})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_create_group_post(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                group_id = request.POST.get('group_id', None)
+                group = None
+                try:
+                    group = Group.objects.get(uuid=group_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                output = {
+                    'main_name': group.groupmainname.group_name.name,
+                    'main_photo': group.groupmainphoto.file_300_url(),
+                    'wallet': request.user.wallet.gross,
+                }
+
+                return JsonResponse({'res': 1, 'output': output})
+        return JsonResponse({'res': 2})
+
+from decimal import Decimal
+
+@ensure_csrf_cookie
+def re_create_group_post_complete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                group_id = request.POST.get('group_id', None)
+                gross = request.POST.get('gross', None)
+                text = request.POST.get('text', None)
+                gross = Decimal(gross)
+                group = None
+                try:
+                    group = Group.objects.get(uuid=group_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                wallet = None
+
+                try:
+                    wallet = Wallet.objects.get(user=request.user)
+                except Exception as e:
+
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                if wallet.gross < gross:
+                    return JsonResponse({'res': 0})
+
+                from django.db.models import F
+
+                text = text.strip()
+                if text == '':
+                    text = None
+                id = uuid.uuid4().hex
+                try:
+                    with transaction.atomic():
+
+                        post = Post.objects.create(gross=gross, user=request.user, uuid=id)
+                        post_text = PostText.objects.create(post=post, text=text)
+                        group_date_pay = GroupDatePay.objects.get_or_create(group=group)
+                        group_date_pay.gross = F('gross') + gross
+                        group_date_pay.save()
+                        group_post = GroupPost.objects.create(post=post, group=group, group_date_pay=group_date_pay)
+                        pay_log = PayLog.objects.create(post=post, gross=gross, uuid=uuid.uuid4().hex, wallet=wallet)
+                        wallet.gross = F('gross') - gross
+                        wallet.save()
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                return JsonResponse({'res': 1, 'id': id})
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_create_solo_post(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                group_id = request.POST.get('group_id', None)
+                group = None
+                try:
+                    group = Group.objects.get(uuid=group_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                from django.utils import timezone
+                print(str(timezone.now()))
+                output = {
+                    'main_name': group.groupmainname.group_name.name,
+                    'main_photo': group.groupmainphoto.file_300_url(),
+
+                }
+
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
 #localhost, http:///change/new/, 이런거 확인. 그리고 줄임 주소 변경 여부 확인. get_current_url 이용

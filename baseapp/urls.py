@@ -18,10 +18,20 @@ urlpatterns = [
     re_path(r'^pay/start/$', views.pay_start, name="pay_start"),
 
     re_path(r'^create/new/$', views.create_new, name="create_new"),
+    re_path(r'^create/group/post/(?P<uuid>([0-9a-f]{32}))/$', views.create_group_post, name="create_group_post"),
+    re_path(r'^create/solo/post/(?P<uuid>([0-9a-f]{32}))/$', views.create_solo_post, name="create_solo_post"),
     # --------------------------------------------------------------------------------
     re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
             name='re_create_search'),
 
+    re_path(r'^re/create/check/server/time/$', base_ajax_views.re_create_check_server_time,
+            name='re_create_check_server_time'),
+    re_path(r'^re/create/group/post/$', base_ajax_views.re_create_group_post,
+            name='re_create_group_post'),
+    re_path(r'^re/create/solo/post/$', base_ajax_views.re_create_solo_post,
+            name='re_create_solo_post'),
+    re_path(r'^re/create/group/post/complete/$', base_ajax_views.re_create_group_post_complete,
+            name='re_create_group_post_complete'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),

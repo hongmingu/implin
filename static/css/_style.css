@@ -403,3 +403,42 @@ transform: translateX(10px) translateY(-10px)
         .create_search_detail_explain{
             font-size: 14px; background-color: #c4e3f3;
         }
+        .create_post_textarea{
+            height: 100px!important; resize: none; width: 100%;
+        }
+        .create_post_input{
+            width: 100%; font-weight: bold;
+        }
+        .create_post_complete{
+            background-color: #c4e3f3; font-size: 16px;
+        }
+        .create_post_current{
+            font-size: 16px; background-color: #cbf3a6;
+        }
+        .create_post_current_wallet{
+            font-size: 16px; font-weight: bold;
+        }
+        .create_post_wanna_charge{
+            background-color: #c4e3f3; border-radius: 3px; font-size: 12px;
+        }
+        .create_post_before{
+            font-size: 11px; color: grey;
+        }
+        .create_post_check_server_time{
+            background-color: #f3deab; border-radius: 3px; font-size: 12px;
+        }
+        .create_post_server_time{
+            height: 30px; font-size: 20px; vertical-align: top;
+        }
+        .create_post_note{
+            font-size: 11px; background-color: pink; margin-top: 3px;
+        }
+        .create_post_note_wrapper{
+            height: 14px;
+        }
+        .create_post_img{
+            height: 300px; width: 300px; border-radius: 3px;
+        }
+        .create_post_name{
+            font-size: 16px; font-weight: bold;
+        }

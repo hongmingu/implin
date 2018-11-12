@@ -24,7 +24,6 @@ def created_follow(sender, instance, created, **kwargs):
             return
         try:
             with transaction.atomic():
-                print('1')
                 notice = Notice.objects.create(user=instance.follow, kind=FOLLOW)
                 notice_follow = NoticeFollow.objects.create(notice=notice, follow=instance)
                 notice_count = instance.follow.noticecount
@@ -121,42 +120,18 @@ def deleted_notice_post_like(sender, instance, **kwargs):
     except:
         pass
 
-
-
-from paypal.standard.ipn.signals import valid_ipn_received
-
-'''
-@receiver(post_save, sender=TestModel_2)
-def create_update_log(sender, instance, created, **kwargs):
+@receiver(post_save, sender=Post)
+def created_post(sender, instance, created, **kwargs):
     if created:
-        TestModelLog_2.objects.create(description=instance.description, status=20)
-    else:
-        TestModelLog_2.objects.create(description=instance.description, status=33)
+        try:
+            with transaction.atomic():
+                post_count = PostCommentCount.objects.create(post=instance)
+                post_like_count = PostLikeCount.objects.create(post=instance)
+        except Exception as e:
+            print(e)
+            pass
 
 
-@receiver(post_delete, sender=TestModel_2)
-def delete_log(sender, instance, **kwargs):
-    TestModelLog_2.objects.create(description=instance.description, status=2038)
-
-# 값 포함해서 보내기 ------
-def save(self, commit=True):
-    user = super(CustomFormThing, self).save(commit=False)
-    #set some other attrs on user here ...
-    user._some = 'some'
-    user._other = 'other'
-    if commit:
-        user.save()
-
-    return user
-
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    some_id = getattr(instance, '_some', None)
-    other_id = getattr(instance, '_other', None)
-
-    if created:
-# 값 포함해서 보내기 end -----
-'''
 from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
 
@@ -196,25 +171,40 @@ def ipn_signal(sender, **kwargs):
     else:
         pass
 
-        # WARNING !
-        # Check that the receiver email is the same we previously
-        # set on the `business` field. (The user could tamper with
-        # that fields on the payment form before it goes to PayPal)
-        # if ipn_obj.receiver_email != "ghdalsrn2sell@gmail.com":
-        #     Not a valid payment
-        #     return
-
-        # ALSO: for the same reason, you need to check the amount
-        # received, `custom` etc. are all what you expect or what
-        # is allowed.
-
-        # Undertake some action depending upon `ipn_obj`.\
-        # if ipn_obj.mc_gross == price and ipn_obj.mc_currency == 'USD':
-        #     pass
-        #     ...
-
-
 valid_ipn_received.connect(ipn_signal)
+'''
+@receiver(post_save, sender=TestModel_2)
+def create_update_log(sender, instance, created, **kwargs):
+    if created:
+        TestModelLog_2.objects.create(description=instance.description, status=20)
+    else:
+        TestModelLog_2.objects.create(description=instance.description, status=33)
+
+
+@receiver(post_delete, sender=TestModel_2)
+def delete_log(sender, instance, **kwargs):
+    TestModelLog_2.objects.create(description=instance.description, status=2038)
+
+# 값 포함해서 보내기 ------
+def save(self, commit=True):
+    user = super(CustomFormThing, self).save(commit=False)
+    #set some other attrs on user here ...
+    user._some = 'some'
+    user._other = 'other'
+    if commit:
+        user.save()
+
+    return user
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    some_id = getattr(instance, '_some', None)
+    other_id = getattr(instance, '_other', None)
+
+    if created:
+# 값 포함해서 보내기 end -----
+'''
+
 # 여기 datetime 을 instance.updated 로 할지 now() 로 할지 결정해야한다 .
 '''
     ['DoesNotExist', 'Meta', 'MultipleObjectsReturned', 'PAYMENT_STATUS_CHOICES', '__class__', '__delattr__',

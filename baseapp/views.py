@@ -239,3 +239,17 @@ def create_new(request):
         if not request.user.is_authenticated:
             return redirect(reverse('baseapp:main_create_log_in'))
         return render(request, 'baseapp/create_new.html')
+
+
+def create_solo_post(request, uuid):
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
+        return render(request, 'baseapp/create_solo_post.html', {'id': uuid})
+
+
+def create_group_post(request, uuid):
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
+        return render(request, 'baseapp/create_group_post.html', {'id': uuid})
