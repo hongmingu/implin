@@ -118,10 +118,36 @@ class Solo(models.Model):
         unique_together = ('name', 'description',)
 
 
+class GroupDate(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    date = models.DateField(default=None, null=True, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('group', 'date',)
+
+
+class SoloDate(models.Model):
+    solo = models.ForeignKey(Solo, on_delete=models.SET_NULL, null=True, blank=True)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    date = models.DateField(default=None, null=True, blank=True)
+
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('solo', 'date',)
+
+
 class GroupPost(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
-    group_date_pay = models.ForeignKey("GroupDatePay", on_delete=models.CASCADE, null=True, blank=True)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, null=True, blank=True)
+    group_date = models.ForeignKey("GroupDate", on_delete=models.CASCADE, null=True, blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -134,8 +160,8 @@ class GroupPost(models.Model):
 
 class SoloPost(models.Model):
     solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
-    solo_date_pay = models.ForeignKey("SoloDatePay", on_delete=models.CASCADE, null=True, blank=True)
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, null=True, blank=True)
+    solo_date = models.ForeignKey("SoloDate", on_delete=models.CASCADE, null=True, blank=True)
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -302,32 +328,6 @@ class SoloMainPhoto(models.Model):
         return "/media/default/default_photo_300.png"
 
 
-class GroupDatePay(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True)
-    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
-    date = models.DateField(default=None, null=True, blank=True)
-
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('group', 'date',)
-
-
-class SoloDatePay(models.Model):
-    solo = models.ForeignKey(Solo, on_delete=models.SET_NULL, null=True, blank=True)
-    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
-    date = models.DateField(default=None, null=True, blank=True)
-
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = ('solo', 'date',)
-
-
 class Member(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True)
     solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True)
@@ -392,7 +392,3 @@ class PayLog(models.Model):
 
     class Meta:
         unique_together = ('wallet', 'post',)
-
-
-class TestDec(models.Model):
-    decimal = models.DecimalField(max_digits=12, decimal_places=2, default=0)

@@ -20,18 +20,37 @@ urlpatterns = [
     re_path(r'^create/new/$', views.create_new, name="create_new"),
     re_path(r'^create/group/post/(?P<uuid>([0-9a-f]{32}))/$', views.create_group_post, name="create_group_post"),
     re_path(r'^create/solo/post/(?P<uuid>([0-9a-f]{32}))/$', views.create_solo_post, name="create_solo_post"),
+
+    re_path(r'^update/group/post/(?P<uuid>([0-9a-f]{32}))/$', views.update_group_post, name="update_group_post"),
+    re_path(r'^update/solo/post/(?P<uuid>([0-9a-f]{32}))/$', views.update_solo_post, name="update_solo_post"),
     # --------------------------------------------------------------------------------
     re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
             name='re_create_search'),
 
     re_path(r'^re/create/check/server/time/$', base_ajax_views.re_create_check_server_time,
             name='re_create_check_server_time'),
+
+
     re_path(r'^re/create/group/post/$', base_ajax_views.re_create_group_post,
             name='re_create_group_post'),
-    re_path(r'^re/create/solo/post/$', base_ajax_views.re_create_solo_post,
-            name='re_create_solo_post'),
     re_path(r'^re/create/group/post/complete/$', base_ajax_views.re_create_group_post_complete,
             name='re_create_group_post_complete'),
+
+
+    re_path(r'^re/create/solo/post/$', base_ajax_views.re_create_solo_post,
+            name='re_create_solo_post'),
+    re_path(r'^re/create/solo/post/complete/$', base_ajax_views.re_create_solo_post_complete,
+            name='re_create_solo_post_complete'),
+
+    re_path(r'^re/update/group/post/$', base_ajax_views.re_update_group_post,
+            name='re_create_group_post'),
+    re_path(r'^re/update/group/post/complete/$', base_ajax_views.re_update_group_post_complete,
+            name='re_create_group_post_complete'),
+
+    re_path(r'^re/update/solo/post/$', base_ajax_views.re_update_solo_post,
+            name='re_create_solo_post'),
+    re_path(r'^re/update/solo/post/complete/$', base_ajax_views.re_update_solo_post_complete,
+            name='re_create_solo_post_complete'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),
@@ -118,18 +137,8 @@ urlpatterns = [
     re_path(r'^re_settings/ajax/$', auth_ajax_views.re_settings, name='re_settings'),
     re_path(r'^re_settings/ajax/upload_user_photo/$', auth_ajax_views.upload_user_photo, name='re_upload_user_photo'),
     # re_path(r'^re/create/new/$', base_ajax_views.re_create_new, name='re_create_new'),
-    re_path(r'^re/create/new/upload_photo/$', base_ajax_views.re_create_new_upload_photo,
-            name='re_create_new_upload_photo'),
-    re_path(r'^re/create/new/remove_photo/$', base_ajax_views.re_create_new_remove_photo,
-            name='re_create_new_remove_photo'),
-    re_path(r'^re/create/new/text/$', base_ajax_views.re_create_new_text,
-            name='re_create_new_text'),
-    re_path(r'^re/create/new/chat_photo/$', base_ajax_views.re_create_new_chat_photo,
-            name='re_create_new_chat_photo'),
     re_path(r'^re/post/update/$', base_ajax_views.re_post_update,
             name='re_post_update'),
-    re_path(r'^re/post/update/profile/name/$', base_ajax_views.re_post_update_profile_name,
-            name='re_post_update_profile_name'),
 
     re_path(r'^re/home/feed/$', base_ajax_views.re_home_feed,
             name='re_home_feed'),

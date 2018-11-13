@@ -32,7 +32,10 @@ from .models import *
 from django.contrib.auth import update_session_auth_hash
 from django.utils.html import escape, _js_escapes, normalize_newlines
 from object.numbers import *
+from decimal import Decimal
 
+from django.db.models import F
+from django.utils.timezone import localdate
 
 # Create your models here.
 # 좋아요 비공개 할 수 있게
@@ -3164,7 +3167,6 @@ def re_create_group_post(request):
                 return JsonResponse({'res': 1, 'output': output})
         return JsonResponse({'res': 2})
 
-from decimal import Decimal
 
 @ensure_csrf_cookie
 def re_create_group_post_complete(request):
@@ -3193,25 +3195,21 @@ def re_create_group_post_complete(request):
                 if wallet.gross < gross:
                     return JsonResponse({'res': 0})
 
-                from django.db.models import F
-                from django.utils.timezone import localdate
-
                 text = text.strip()
                 if text == '':
                     text = None
                 id = uuid.uuid4().hex
-
 
                 try:
                     with transaction.atomic():
                         post = Post.objects.create(gross=gross, user=request.user, uuid=id)
                         post_text = PostText.objects.create(post=post, text=text)
                         local_date = localdate()
-                        group_date_pay, created = GroupDatePay.objects.get_or_create(group=group, date=local_date)
+                        group_date, created = GroupDate.objects.get_or_create(group=group, date=local_date)
 
-                        group_date_pay.gross = F('gross') + gross
-                        group_date_pay.save()
-                        group_post = GroupPost.objects.create(post=post, group=group, group_date_pay=group_date_pay)
+                        group_date.gross = F('gross') + gross
+                        group_date.save()
+                        group_post = GroupPost.objects.create(post=post, group=group, group_date=group_date)
                         pay_log = PayLog.objects.create(post=post, gross=gross, uuid=uuid.uuid4().hex, wallet=wallet)
                         wallet.gross = F('gross') - gross
                         wallet.save()
@@ -3224,25 +3222,185 @@ def re_create_group_post_complete(request):
                 return JsonResponse({'res': 1, 'id': id})
         return JsonResponse({'res': 2})
 
+
 @ensure_csrf_cookie
 def re_create_solo_post(request):
     if request.method == "POST":
         if request.is_ajax():
             if request.user.is_authenticated:
-                group_id = request.POST.get('group_id', None)
-                group = None
+                solo_id = request.POST.get('solo_id', None)
+                solo = None
                 try:
-                    group = Group.objects.get(uuid=group_id)
+                    solo = Solo.objects.get(uuid=solo_id)
                 except Exception as e:
                     return JsonResponse({'res': 0})
-                from django.utils import timezone
-                print(str(timezone.now()))
                 output = {
-                    'main_name': group.groupmainname.group_name.name,
-                    'main_photo': group.groupmainphoto.file_300_url(),
-
+                    'main_name': solo.solomainname.solo_name.name,
+                    'main_photo': solo.solomainphoto.file_300_url(),
+                    'wallet': request.user.wallet.gross,
                 }
 
+                return JsonResponse({'res': 1, 'output': output})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_create_solo_post_complete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                solo_id = request.POST.get('solo_id', None)
+                gross = request.POST.get('gross', None)
+                text = request.POST.get('text', None)
+                gross = Decimal(gross)
+                solo = None
+                try:
+                    solo = Solo.objects.get(uuid=solo_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                wallet = None
+
+                try:
+                    wallet = Wallet.objects.get(user=request.user)
+                except Exception as e:
+
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                if wallet.gross < gross:
+                    return JsonResponse({'res': 0})
+
+
+                text = text.strip()
+                if text == '':
+                    text = None
+                id = uuid.uuid4().hex
+
+                try:
+                    with transaction.atomic():
+                        post = Post.objects.create(gross=gross, user=request.user, uuid=id)
+                        post_text = PostText.objects.create(post=post, text=text)
+                        local_date = localdate()
+                        solo_date, created = SoloDate.objects.get_or_create(solo=solo, date=local_date)
+
+                        solo_date.gross = F('gross') + gross
+                        solo_date.save()
+                        solo_post = SoloPost.objects.create(post=post, solo=solo, group_date=solo_date)
+                        pay_log = PayLog.objects.create(post=post, gross=gross, uuid=uuid.uuid4().hex, wallet=wallet)
+                        wallet.gross = F('gross') - gross
+                        wallet.save()
+
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                return JsonResponse({'res': 1, 'id': id})
+        return JsonResponse({'res': 2})
+
+# update start
+
+@ensure_csrf_cookie
+def re_update_group_post(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                id = request.POST.get('id', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                post_text = None
+                try:
+                    post_text = PostText.objects.filter(post=post).last()
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                output = {
+                    'main_name': post.grouppost.group.groupmainname.group_name.name,
+                    'main_photo': post.grouppost.group.groupmainphoto.file_300_url(),
+                    'gross': post.gross,
+                    'date': post.grouppost.group_date.date,
+                    'text': post_text.text
+                }
+
+                return JsonResponse({'res': 1, 'output': output})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_update_group_post_complete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                id = request.POST.get('id', None)
+                text = request.POST.get('text', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                text = text.strip()
+                if text == '':
+                    text = None
+                if post.posttext_set.last().text == text:
+                    pass
+                else:
+                    post_text = PostText.objects.create(post=post, text=text)
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
-#localhost, http:///change/new/, 이런거 확인. 그리고 줄임 주소 변경 여부 확인. get_current_url 이용
+
+
+@ensure_csrf_cookie
+def re_update_solo_post(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                id = request.POST.get('id', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+                post_text = None
+                try:
+                    post_text = PostText.objects.filter(post=post).last()
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                output = {
+                    'main_name': post.solopost.solo.solomainname.solo_name.name,
+                    'main_photo': post.solopost.solo.solomainphoto.file_300_url(),
+                    'gross': post.gross,
+                    'date': post.solopost.solo_date.date,
+                    'text': post_text.text
+                }
+
+                return JsonResponse({'res': 1, 'output': output})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_update_solo_post_complete(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            if request.user.is_authenticated:
+                id = request.POST.get('id', None)
+                text = request.POST.get('text', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                text = text.strip()
+                if text == '':
+                    text = None
+                if post.posttext_set.last().text == text:
+                    pass
+                else:
+                    post_text = PostText.objects.create(post=post, text=text)
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})

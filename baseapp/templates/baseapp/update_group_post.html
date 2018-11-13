@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Demo</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
+
+    {% load static from staticfiles %}
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/nav_badge.js' %}"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    {% if user.is_authenticated %}
+    {% else %}
+    {% endif %}
+
+</head>
+<body class="light_background_color height_100">
+{% include 'baseapp/_navbar.html' %}
+
+{% include 'others/bootstrap_tester.html' %}
+<!--이거 제대로 작동 안 한다 확인해야 한다.-->
+{% if user.is_authenticated %}
+    <div class="hidden" id="user_id">{{ user.username }}</div>
+{% else %}
+    <div class="hidden" id="user_id"></div>
+{% endif %}
+    <div class="hidden" id="id">{{ id }}</div>
+
+<div class="container-fluid margin_top_50">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+            <div class="row" id="content">
+                <div class="row div_base">
+                    <div align="center">
+                        <img class="update_post_img" id="update_post_img" src="">
+                    </div>
+                    <br>
+                    <div class="update_post_name" id="update_post_name" align="center"></div>
+                    <br>
+                    <div>
+                        <textarea class="update_post_textarea" id="update_post_textarea" maxlength="5000"></textarea>
+                    </div>
+
+                    <br>
+                    <div class="update_post_gross_wrapper"><span class="update_post_gross" id="update_post_gross"></span> $</div>
+
+                    <div class="update_post_server_date" align="right" id="server_date">
+                    </div>
+                    <a href=""><div class="update_post_complete clickable" id="update_post_complete" align="center">complete</div></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+<script>
+    $(function () {
+        $('#update_post_complete').click(function (e) {
+            e.preventDefault()
+            $.ajax({
+                url:'/re/update/group/post/complete/', type:'post', dataType:'json', cache:false,
+                data:{
+                    id: $('#id').html(),
+                    text: $.trim($('#update_post_textarea').val())
+                },
+                success:function (data) {
+                    if (data.res === 1){
+                        location.reload()
+                    }
+                }
+            });
+
+        })
+        $.ajax({
+            url:'/re/update/group/post/', type:'post', dataType:'json', cache:false,
+            data:{
+                id: $('#id').html(),
+            },
+            success:function (data) {
+                if (data.res === 1){
+                    $('#update_post_img').attr('src', data.output.main_photo)
+                    $('#update_post_name').html(data.output.main_name)
+                    $('#update_post_gross').html(data.output.gross)
+                    $('#server_date').html(data.output.date)
+                    $('#update_post_textarea').val(data.output.text)
+                }
+            }
+        });
+
+
+    });
+
+</script>
+</html>

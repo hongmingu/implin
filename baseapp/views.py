@@ -253,3 +253,29 @@ def create_group_post(request, uuid):
         if not request.user.is_authenticated:
             return redirect(reverse('baseapp:main_create_log_in'))
         return render(request, 'baseapp/create_group_post.html', {'id': uuid})
+
+
+def update_solo_post(request, uuid):
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+        try:
+            post = Post.objects.get(uuid=uuid, user=request.user)
+        except Exception as e:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+        return render(request, 'baseapp/update_solo_post.html', {'id': uuid})
+
+
+def update_group_post(request, uuid):
+    if request.method == "GET":
+        if not request.user.is_authenticated:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+        try:
+            post = Post.objects.get(uuid=uuid, user=request.user)
+        except Exception as e:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+        return render(request, 'baseapp/update_group_post.html', {'id': uuid})

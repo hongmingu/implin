@@ -442,3 +442,12 @@ transform: translateX(10px) translateY(-10px)
         .create_post_name{
             font-size: 16px; font-weight: bold;
         }
+        .update_post_img{
+            height: 300px; width: 300px; border-radius: 3px;
+        }
+        .update_post_name{
+            font-size: 16px; font-weight: bold;
+        }
+        .update_post_textarea{
+            height: 100px!important; resize: none; width: 100%;
+        }

@@ -26,7 +26,7 @@
 {% else %}
     <div class="hidden" id="user_id"></div>
 {% endif %}
-    <div class="hidden" id="group_id">{{ id }}</div>
+    <div class="hidden" id="solo_id">{{ id }}</div>
 
 <div class="container-fluid margin_top_50">
     <div class="row">
@@ -106,12 +106,12 @@ $(document).on('keydown', 'input[pattern]', function(e){
         })
         $('#create_post_complete').click(function (e) {
             e.preventDefault()
+
             var get_value = $('#create_post_input').val()
             if (get_value.replace(/ /g,'')==='') {
                 $('#create_post_note').html('minimum: 1.00')
                 return false
             }
-
             var get_fixed = Number(get_value).toFixed(2)
             var current_value = $('#create_post_current_wallet').html()
             var current_fixed = Number(current_value).toFixed(2)
@@ -125,16 +125,16 @@ $(document).on('keydown', 'input[pattern]', function(e){
                 return false;
             }
             $.ajax({
-                url:'/re/create/group/post/complete/', type:'post', dataType:'json', cache:false,
+                url:'/re/create/solo/post/complete/', type:'post', dataType:'json', cache:false,
                 data:{
-                    group_id: $('#group_id').html(),
+                    solo_id: $('#solo_id').html(),
                     gross: get_fixed,
                     text: $.trim($('#create_post_textarea').val())
                 },
                 success:function (data) {
                     if (data.res === 1){
                         var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                        var path = scheme + window.location.host + "/update/group/post/" + data.id + "/";
+                        var path = scheme + window.location.host + "/update/solo/post/" + data.id + "/";
                         location.href = path
                     }
                 }
@@ -142,18 +142,21 @@ $(document).on('keydown', 'input[pattern]', function(e){
 
         })
             $.ajax({
-                url:'/re/create/group/post/', type:'post', dataType:'json', cache:false,
+                url:'/re/create/solo/post/', type:'post', dataType:'json', cache:false,
                 data:{
-                    group_id: $('#group_id').html(),
+                    solo_id: $('#solo_id').html(),
                 },
                 success:function (data) {
                     if (data.res === 1){
                         $('#create_post_img').attr('src', data.output.main_photo)
                         $('#create_post_name').html(data.output.main_name)
                         $('#create_post_current_wallet').html(data.output.wallet)
+
                     }
                 }
             });
+
+
 
     });
 
