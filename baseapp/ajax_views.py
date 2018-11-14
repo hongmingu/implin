@@ -1498,80 +1498,6 @@ def re_profile_follower(request):
 
 
 @ensure_csrf_cookie
-def re_profile_post(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                chosen_user_id = request.POST.get('chosen_user_id', None)
-                last_id = request.POST.get('last_post_id', None)
-                user = None
-                try:
-                    user = User.objects.get(username=chosen_user_id)
-                except User.DoesNotExist:
-                    pass
-                master = False
-                if user == request.user:
-                    master = True
-                posts = None
-
-                if master:
-                    if last_id == '':
-                        posts = Post.objects.filter((Q(user=user))).order_by('-post_chat_created').distinct()[:21]
-                    else:
-                        last_post = None
-                        try:
-                            last_post = Post.objects.get(uuid=last_id)
-                        except Exception as e:
-                            print(e)
-                            pass
-                        if last_post is not None:
-                            posts = Post.objects.filter((Q(user=user)) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(pk=last_post.pk).order_by('-post_chat_created').distinct()[:21]
-                        else:
-                            posts = Post.objects.filter(Q(user=user)).order_by('-post_chat_created').distinct()[:21]
-                else:
-                    if last_id == '':
-                        posts = Post.objects.filter((Q(user=user) & Q(is_open=True))).order_by('-post_chat_created').distinct()[:21]
-                    else:
-                        last_post = None
-                        try:
-                            last_post = Post.objects.get(uuid=last_id)
-                        except Exception as e:
-                            print(e)
-                            pass
-                        if last_post is not None:
-                            posts = Post.objects.filter((Q(user=user)) & Q(is_open=True) & Q(post_chat_created__lte=last_post.post_chat_created)).exclude(pk=last_post.pk).order_by('-post_chat_created').distinct()[:21]
-                        else:
-                            posts = Post.objects.filter(Q(user=user) & Q(is_open=True)).order_by('-post_chat_created').distinct()[:21]
-                # 이제 리스트 만드는 코드가 필요하다. #########
-
-                # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
-                ################################
-                output = []
-                count = 0
-                last = None
-                sub_output = None
-                post_follow = None
-                for post in posts:
-                    count = count + 1
-                    if count == 20:
-                        last = post.uuid
-                    post_follow = True
-                    if Follow.objects.filter(user=request.user, follow=post.user).exists():
-                        post_follow = False
-                    sub_output = {
-                        'id': post.uuid,
-                        'created': post.created,
-                        'post_follow': post_follow
-                    }
-
-                    output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'set': output, 'last': last, 'master': master})
-
-        return JsonResponse({'res': 2})
-
-
-@ensure_csrf_cookie
 def re_profile_post_delete(request):
     if request.method == "POST":
         if request.user.is_authenticated:
@@ -3286,7 +3212,7 @@ def re_create_solo_post_complete(request):
 
                         solo_date.gross = F('gross') + gross
                         solo_date.save()
-                        solo_post = SoloPost.objects.create(post=post, solo=solo, group_date=solo_date)
+                        solo_post = SoloPost.objects.create(post=post, solo=solo, solo_date=solo_date)
                         pay_log = PayLog.objects.create(post=post, gross=gross, uuid=uuid.uuid4().hex, wallet=wallet)
                         wallet.gross = F('gross') - gross
                         wallet.save()
@@ -3404,3 +3330,63 @@ def re_update_solo_post_complete(request):
                     post_text = PostText.objects.create(post=post, text=text)
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
+
+
+
+@ensure_csrf_cookie
+def re_profile_post(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                chosen_user_id = request.POST.get('chosen_user_id', None)
+                last_id = request.POST.get('last_post_id', None)
+                user = None
+                try:
+                    user = User.objects.get(username=chosen_user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+                posts = None
+
+                if last_id == '':
+                    posts = Post.objects.filter(Q(user=user)).order_by('-created').distinct()[:20]
+                else:
+                    last_post = None
+                    try:
+                        last_post = Post.objects.get(uuid=last_id)
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+                    if last_post is not None:
+                        posts = Post.objects.filter(
+                            Q(user=user) & Q(pk_lt=last_post.pk)).order_by('-created').distinct()[:20]
+
+                # 이제 리스트 만드는 코드가 필요하다. #########
+
+                # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
+                ################################
+                output = []
+                count = 0
+                last = None
+                sub_output = None
+                obj_type = None
+                for post in posts:
+                    count = count + 1
+                    if count == 20:
+                        last = post.uuid
+
+                    obj_type = 'solo'
+                    try:
+                        type_check = post.solopost
+                    except Exception as e:
+                        obj_type = 'group'
+
+                    sub_output = {
+                        'id': post.uuid,
+                        'obj_type': obj_type
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'set': output, 'last': last})
+
+        return JsonResponse({'res': 2})
+

@@ -11,30 +11,6 @@ from django.utils.timezone import now, timedelta
 
 # Create your views here.
 
-def user_profile(request, user_username):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            user = None
-            try:
-                chosen_user = User.objects.get(userusername__username=user_username)
-            except:
-                return render(request, '404.html')
-            if chosen_user is not None:
-                following = None
-                if Follow.objects.filter(user=request.user, follow=chosen_user).exists():
-                    following = True
-
-                return render(request, 'baseapp/user_profile.html', {'chosen_user': chosen_user, 'following': following})
-        else:
-            user = None
-            try:
-                chosen_user = User.objects.get(userusername__username=user_username)
-            except:
-                return render(request, '404.html')
-            if chosen_user is not None:
-                following = None
-                return render(request, 'baseapp/user_profile.html',
-                              {'chosen_user': chosen_user, 'following': following})
 
 
 def post_update(request, uuid):
@@ -279,3 +255,29 @@ def update_group_post(request, uuid):
             return redirect(reverse('baseapp:main_create_log_in'))
 
         return render(request, 'baseapp/update_group_post.html', {'id': uuid})
+
+
+def user_profile(request, user_username):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            user = None
+            try:
+                chosen_user = User.objects.get(userusername__username=user_username)
+            except:
+                return render(request, '404.html')
+            if chosen_user is not None:
+                following = None
+                if Follow.objects.filter(user=request.user, follow=chosen_user).exists():
+                    following = True
+
+                return render(request, 'baseapp/user_profile.html', {'chosen_user': chosen_user, 'following': following})
+        else:
+            user = None
+            try:
+                chosen_user = User.objects.get(userusername__username=user_username)
+            except:
+                return render(request, '404.html')
+            if chosen_user is not None:
+                following = None
+                return render(request, 'baseapp/user_profile.html',
+                              {'chosen_user': chosen_user, 'following': following})

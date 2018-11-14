@@ -9,12 +9,8 @@
     <script src="{% static 'js/navbar.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
     <script src="{% static 'js/nav_badge.js' %}"></script>
-    <script src="{% static 'js/date_differ.js' %}"></script>
-    <script src="{% static 'js/profile_populate.js' %}"></script>
     <script src="{% static 'js/modal_resize.js' %}"></script>
     <script src="{% static 'js/modal_feed_menu.js' %}"></script>
-    <script src="{% static 'js/modal_opens.js' %}"></script>
-    <script src="{% static 'js/modal_profile_reading.js' %}"></script>
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
     {% else %}
@@ -34,34 +30,13 @@
 {% include 'others/bootstrap_tester.html' %}
 <div class="hidden" id="page_kind">user</div>
 
-    <div class="hidden" id="chosen_user_id">{{ chosen_user.username }}</div>
-    <div class="hidden" id="next_id"></div>
-    <div class="hidden" id="last_post_id"></div>
-<div class="hidden" id="post_to_delete"></div>
-
-
-<div class="hidden" id="post_last_id"></div>
-
-<div class="hidden" id="clicked_post_id"></div>
-
-<div class="hidden" id="reading_post_id"></div>
-<div class="hidden" id="reading_post_profile_photo"></div>
-<div class="hidden" id="reading_post_user_id"></div>
-<div class="hidden" id="reading_post_profile_name"></div>
-<div class="hidden" id="reading_post_chat_last_id"></div>
-<div class="hidden" id="reading_post_chat_before_id"></div>
-<div class="hidden" id="reading_post_chat_next_id"></div>
-<div class="hidden" id="post_liking_next_id"></div>
-<div class="hidden" id="post_follow_next_id"></div>
-<div class="hidden" id="post_chat_liking_next_id"></div>
-<div class="hidden" id="post_chat_rest_liking_next_id"></div>
-<div class="hidden" id="clicked_post_chat_id"></div>
-<div class="hidden" id="clicked_post_chat_rest_id"></div>
+<div class="hidden" id="chosen_user_id">{{ chosen_user.username }}</div>
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
 {% else %}
     <div class="hidden" id="user_id"></div>
 {% endif %}
+<div class="hidden" id="last_post_id"></div>
 <!--page info end -->
 
 <div class="container-fluid margin_top_50">
@@ -98,12 +73,10 @@
                     </a>
 
                 {% endif %}
-                    <a href="/accounts/settings/">
-                        <div class="margin_top_20 light_background_color hidden" align="center" id="change_profile">
-                            <span class="user_change_profile clickable">change profile</span>
-                        </div>
-                    </a>
+
                 </div>
+                <div id="user_profile_post_list"></div>
+                <a href=""><div class="user_profile_more_load hidden" id="user_profile_more_load" align="center">more load</div></a>
             </div>
         </div>
     </div>
@@ -145,8 +118,6 @@
     </div>
 </div>
 {% include 'baseapp/_modal_need_login.html' %}
-{% include 'baseapp/_modal_reading.html' %}
-{% include 'baseapp/_modal_post.html' %}
 {% include 'baseapp/_modal_post_delete.html' %}
   <!-- Hidden 으로 데이터 저장해놓고 modal on show 랑 hide 에서 그 데이터 불러와서 모달 채우게 하자. 그리고 임플린은 친구 중심이고
   피드가 존재하게 되었기 때문에 팔로우가 부가적으로 존재하는 것 뿐이다. -->
@@ -155,6 +126,7 @@
 </body>
 <script>
     $(function () {
+
             $('#post_delete').click(function (e) {
                 e.preventDefault()
               $.ajax({
@@ -174,11 +146,9 @@
 
             $("#modal_post_delete").on("shown.bs.modal", function () {
 
-    }).on("hidden.bs.modal", function () {
-
-                        $('#post_to_delete').html('')
-
-        })
+            }).on("hidden.bs.modal", function () {
+                    $('#post_to_delete').html('')
+            })
     });
     $(function () {
 
@@ -188,6 +158,7 @@
                 last_post_id: $('#last_post_id').html()
             },
             success:function (data) {
+            console.log(data)
                 var _modifier = ''
                 $.each(data.set, function (key, value) {
 
@@ -196,7 +167,7 @@
                     }
                     var appender = '<div id="post_wrapper_'+value.id+'"><div class="row div_base profile_post_div" id="post_div_'+value.id+'">' +
                         '<script defer>' +
-                        '    profile_populate("'+value.id+'")' +
+                        '    post_populate("'+value.id+'")' +
                         '<'+'/script></div>' + _modifier + '</div>'
                         //'console.log($("#post_div_'+value.id+'").attr("data-u"))' +
                     var jq_appender = $(appender)
@@ -205,9 +176,9 @@
                         $('#post_to_delete').html(value.id)
                         $('#modal_post_delete').modal('show')
                     })
-                    $('#content').append(jq_appender)
+                    $('#user_profile_post_list').append(jq_appender)
                 })
-                    if (data.next === null){
+                    if (data.last === null){
                         $('#profile_post_more_load').addClass('hidden')
                     } else {
                         $('#profile_post_more_load').removeClass('hidden')
@@ -263,17 +234,17 @@ $(function () {
             })
         })
 
-        $("#modal_following").on("shown.bs.modal", function () {
-    var height = $(window).height();
-    $('.modal_follow_wrapper').css('max-height', height-120);
-    $(window).on('resize', function(){
+    $("#modal_following").on("shown.bs.modal", function () {
+        var height = $(window).height();
+        $('.modal_follow_wrapper').css('max-height', height-120);
+        $(window).on('resize', function(){
+            if($(window).height() != height){
+                height = $(window).height();
+                $('.modal_follow_wrapper').css('max-height', height-120);
+            }
+        });
 
-        if($(window).height() != height){
-            height = $(window).height();
-            $('.modal_follow_wrapper').css('max-height', height-120);
-        }
-    });
-            var chosen_user_id = $('#chosen_user_id').html()
+        var chosen_user_id = $('#chosen_user_id').html()
 
             $.ajax({url:'/re/profile/following/', type:'post', dataType:'json', cache:false,
                 data:{
@@ -291,10 +262,8 @@ $(function () {
                         })
                     }
                     if (data.next === null){
-                        $('#next_id').html('')
                         $('#modal_following_more').addClass('hidden')
                     } else {
-                        $('#next_id').html(data.next)
                         $('#modal_following_more').removeClass('hidden')
                     }
 
@@ -302,7 +271,6 @@ $(function () {
             })
         }).on("hidden.bs.modal", function () {
             $('#modal_following_list').empty()
-            $('#next_id').html('')
         });
 
         $('#modal_following_more').click(function (e) {

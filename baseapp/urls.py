@@ -23,6 +23,9 @@ urlpatterns = [
 
     re_path(r'^update/group/post/(?P<uuid>([0-9a-f]{32}))/$', views.update_group_post, name="update_group_post"),
     re_path(r'^update/solo/post/(?P<uuid>([0-9a-f]{32}))/$', views.update_solo_post, name="update_solo_post"),
+
+    re_path(r'^(?P<user_username>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/$',
+            views.user_profile, name='user_profile'),
     # --------------------------------------------------------------------------------
     re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
             name='re_create_search'),
@@ -51,6 +54,9 @@ urlpatterns = [
             name='re_create_solo_post'),
     re_path(r'^re/update/solo/post/complete/$', base_ajax_views.re_update_solo_post_complete,
             name='re_create_solo_post_complete'),
+
+    re_path(r'^re/profile/post/$', base_ajax_views.re_profile_post,
+            name='re_profile_post'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),
@@ -125,8 +131,6 @@ urlpatterns = [
     re_path(r'^create/new/$', views.create_new, name='create_new'),
     re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
     re_path(r'^note/all/$', views.note_all, name='note_all'),
-    re_path(r'^(?P<user_username>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/$',
-            views.user_profile, name='user_profile'),
 
     re_path(r'^post/update/(?P<uuid>([0-9a-f]{32}))/$', views.post_update, name='post_update'),
     re_path(r'^post/(?P<uuid>([0-9a-f]{32}))/$', views.post, name='post'),
@@ -159,8 +163,6 @@ urlpatterns = [
 
     re_path(r'^re/profile/following/$', base_ajax_views.re_profile_following,
             name='re_profile_following'),
-    re_path(r'^re/profile/post/$', base_ajax_views.re_profile_post,
-            name='re_profile_post'),
     re_path(r'^re/profile/post/delete/$', base_ajax_views.re_profile_post_delete,
             name='re_profile_post_delete'),
 
