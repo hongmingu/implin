@@ -77,10 +77,6 @@ var post_populate = function post_populate(id, obj_type) {
 
                     appender.find('#pop_comment_more_load_'+id).on('click', function (e) {
                         e.preventDefault()
-                        if ($('#user_id').html() === '') {
-                            $('#modal_need_login_pop').modal('show')
-                            return false;
-                        }
                         $.ajax({url:'/re/comment/more/load/', type:'post', dataType:'json', cache:false,
                             data:{
                                 post_id:id,
