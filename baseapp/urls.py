@@ -60,6 +60,12 @@ urlpatterns = [
     re_path(r'^re/post/populate/$', base_ajax_views.re_post_populate,
             name='re_post_populate'),
 
+    re_path(r'^re/comment/add/$', base_ajax_views.re_comment_add,
+            name='re_comment_add'),
+    re_path(r'^re/comment/delete/$', base_ajax_views.re_comment_delete,
+            name='re_comment_delete'),
+    re_path(r'^re/comment/more/load/$', base_ajax_views.re_comment_more_load,
+            name='re_comment_more_load'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),
@@ -152,12 +158,7 @@ urlpatterns = [
 
     re_path(r'^re/user/home/populate/$', base_ajax_views.re_user_home_populate,
             name='re_user_home_populate'),
-    re_path(r'^re/comment/add/$', base_ajax_views.re_comment_add,
-            name='re_comment_add'),
-    re_path(r'^re/comment/delete/$', base_ajax_views.re_comment_delete,
-            name='re_comment_delete'),
-    re_path(r'^re/comment/more/load/$', base_ajax_views.re_comment_more_load,
-            name='re_comment_more_load'),
+
     re_path(r'^re/post/like/$', base_ajax_views.re_post_like,
             name='re_post_like'),
 

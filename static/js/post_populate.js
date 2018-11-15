@@ -19,9 +19,9 @@ var post_populate = function post_populate(id, obj_type) {
 
                     var obj = '<div align="right"><a href="/'+obj_type+'/'+data.output.obj_id+'/"><span class="pop_obj"></span></a></div>'
 
-                    var comment_more_load = '<a href=""><div class="post_comment_more_load hidden" align="center">more load</div></a>'
+                    var comment_more_load = '<a href=""><div class="pop_comment_more_load hidden" id="pop_comment_more_load_'+id+'" align="center">more load</div></a>'
                     if (data.output.comment_count > 3){
-                        comment_more_load = '<a href=""><div class="post_comment_more_load" align="center">more load</div></a>'
+                        comment_more_load = '<a href=""><div class="pop_comment_more_load" id="pop_comment_more_load_'+id+'" align="center">more load</div></a>'
                     }
 
                     var comment_textarea = '<div align="center"><form><div class="input-group input-group-sm">' +
@@ -36,6 +36,7 @@ var post_populate = function post_populate(id, obj_type) {
                     var comments = ''
                     var user_id = $('#user_id').html()
                     var post_user_id = data.output.user_id
+                    var last_comment_id = ''
                     $.each(data.output.comment_output, function (key, value) {
                         var delete_btn = ''
                         if (value.comment_user_id === user_id || value.comment_user_id === post_user_id){
@@ -45,7 +46,9 @@ var post_populate = function post_populate(id, obj_type) {
                             '<div><a href="/'+value.comment_username+'/"><span class="pop_comment_username">'+value.comment_username+'</span></a></div>' +
                             '<div class="pop_comment_content"><span class="pop_comment_text">'+value.comment_text+'</span><span class="pop_comment_created">'+date_differ(value.comment_created)+'</span>'+delete_btn+'</div>' +
                             '</div>'
+                        last_comment_id = value.comment_id
                     })
+                    var last_comment = '<div class="hidden" id="last_comment_'+id+'">'+ last_comment_id +'</div>'
 
                     var heart = ''
                     if (data.output.like === 'true'){
@@ -69,7 +72,81 @@ var post_populate = function post_populate(id, obj_type) {
                         comment_more_load +
                         '<div id="pop_new_comment_list_'+id+'"></div>'+
                         comment_textarea+
+                        last_comment +
                         '</div>')
+
+                    appender.find('#pop_comment_more_load_'+id).on('click', function (e) {
+                        e.preventDefault()
+                        if ($('#user_id').html() === '') {
+                            $('#modal_need_login_pop').modal('show')
+                            return false;
+                        }
+                        $.ajax({url:'/re/comment/more/load/', type:'post', dataType:'json', cache:false,
+                            data:{
+                                post_id:id,
+                                last_comment_id: $('#last_comment_'+id).html(),
+                            },
+                            success:function (s_data) {
+                                if (s_data.res === 1) {
+                                    var _comment = ''
+                                    $.each(s_data.output, function (s_key, s_value) {
+                                        var delete_btn = ''
+                                        if (s_value.comment_user_id === user_id || s_value.comment_user_id === post_user_id){
+                                            delete_btn = '<a href=""><span class="glyphicon glyphicon-remove pop_comment_delete" data-u="'+s_value.comment_id+'"></span></a>'
+                                        }
+                                        _comment = _comment + '<div id="pop_comment_wrapper_'+s_value.comment_id+'">' +
+                                            '<div><a href="/'+s_value.comment_username+'/"><span class="pop_comment_username">'+s_value.comment_username+'</span></a></div>' +
+                                            '<div class="pop_comment_content"><span class="pop_comment_text">'+s_value.comment_text+'</span><span class="pop_comment_created">'+date_differ(s_value.comment_created)+'</span>'+delete_btn+'</div>' +
+                                            '</div>'
+                                    })
+                                    var _comment_appender = $(_comment)
+                                    _comment_appender.find('.pop_comment_delete').on('click', function (e) {
+                                        e.preventDefault()
+                                        var delete_comment_id = $(this).attr('data-u')
+                                        $.ajax({url:'/re/comment/delete/', type:'post', dataType:'json', cache:false,
+                                            data:{
+                                                post_id:id,
+                                                comment_id: delete_comment_id,
+                                            },
+                                            success:function (ss_data) {
+                                                if (ss_data.res === 1) {
+                                                    $('#pop_comment_wrapper_'+delete_comment_id).replaceWith('<div class="h5">removed</div>')
+                                                }
+                                            }
+                                        })
+                                    })
+                                    $('#pop_comment_list_'+id).append(_comment_appender)
+
+                                    if (s_data.last === null){
+                                        if(!($('#pop_comment_more_load_'+id).hasClass('hidden'))){
+                                            $('#pop_comment_more_load_'+id).addClass('hidden')
+                                        }
+                                    } else {
+                                        if($('#pop_comment_more_load_'+id).hasClass('hidden')){
+                                            $('#pop_comment_more_load_'+id).removeClass('hidden')
+                                        }
+                                        $('#last_comment_'+id).html(s_data.last)
+                                    }
+                                }
+                            }
+                        })
+                    })
+
+                    appender.find('.pop_comment_delete').on('click', function (e) {
+                        e.preventDefault()
+                        var delete_comment_id = $(this).attr('data-u')
+                        $.ajax({url:'/re/comment/delete/', type:'post', dataType:'json', cache:false,
+                            data:{
+                                post_id:id,
+                                comment_id: delete_comment_id,
+                            },
+                            success:function (s_data) {
+                                if (s_data.res === 1) {
+                                    $('#pop_comment_wrapper_'+delete_comment_id).replaceWith('<div class="h5">removed</div>')
+                                }
+                            }
+                        })
+                    })
 
                     appender.find('.pop_menu').on('click', function (e) {
                         e.preventDefault()
@@ -105,7 +182,7 @@ var post_populate = function post_populate(id, obj_type) {
                                 success:function (s_data) {
                                     if (s_data.res === 1) {
                                         var _comment_appender = $('<div id="pop_new_comment_wrapper_'+s_data.comment_id+'">' +
-                                            '<div class="pop_new_comment_content"><span class="pop_new_comment_text">'+s_data.comment_text+'</span><a href=""><span class="pop_new_comment_delete" data-u="'+s_data.comment_id+'"></span></a></div>' +
+                                            '<div class="pop_new_comment_content"><span class="pop_new_comment_text">'+s_data.comment_text+'</span><a href=""><span class="glyphicon glyphicon-remove pop_new_comment_delete" data-u="'+s_data.comment_id+'"></span></a></div>' +
                                             '</div>');
 
                                         _comment_appender.find('.pop_new_comment_delete').on('click', function (e) {
@@ -154,7 +231,6 @@ var post_populate = function post_populate(id, obj_type) {
                                 text:text,
                             },
                             success:function (s_data) {
-                            console.log(s_data)
 
                                 if (s_data.res === 1) {
                                     var _comment_appender = $('<div id="pop_new_comment_wrapper_'+s_data.comment_id+'">' +

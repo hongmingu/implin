@@ -470,93 +470,6 @@ def re_home_feed(request):
 
         return JsonResponse({'res': 2})
 
-@ensure_csrf_cookie
-def re_comment_more_load(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                last_comment_id = request.POST.get('last_comment_id', None)
-
-                try:
-                    post = Post.objects.get(uuid=post_id)
-                except Exception:
-                    return JsonResponse({'res': 0})
-
-                post_comment_last = PostComment.objects.get(uuid=last_comment_id)
-
-                post_comments = PostComment.objects.filter(Q(post=post) & Q(created__gt=post_comment_last.created)).order_by('created')[:20]
-
-                post_comment_uuids = [post_comment.uuid for post_comment in post_comments]
-                output = []
-
-                post_comment_end = PostComment.objects.last()
-                post_comment = None
-                end = False
-                if post_comments:
-                    for item in post_comment_uuids:
-                        try:
-                            post_comment = PostComment.objects.get(uuid=item)
-                        except:
-                            pass
-                        if post_comment is not None:
-                            sub_output = {
-                                'comment_user_id': post_comment.user.username,
-                                'comment_username': post_comment.user.userusername.username,
-                                'comment_text': escape(post_comment.text),
-                                'comment_created': post_comment.created,
-                                'comment_uuid': post_comment.uuid,
-                            }
-                            output.append(sub_output)
-                            if post_comment.uuid == post_comment_end.uuid:
-                                end = True
-                else:
-                    output = None
-                    end = True
-                return JsonResponse({'res': 1, 'set': output, 'end': end})
-        else:
-            post_id = request.POST.get('post_id', None)
-            last_comment_id = request.POST.get('last_comment_id', None)
-
-            try:
-                post = Post.objects.get(uuid=post_id)
-            except Exception:
-                return JsonResponse({'res': 0})
-
-            post_comment_last = PostComment.objects.get(uuid=last_comment_id)
-
-            post_comments = PostComment.objects.filter(
-                Q(post=post) & Q(created__gt=post_comment_last.created)).order_by('created')[:20]
-
-            post_comment_uuids = [post_comment.uuid for post_comment in post_comments]
-            output = []
-
-            post_comment_end = PostComment.objects.last()
-            post_comment = None
-            end = False
-            if post_comments:
-                for item in post_comment_uuids:
-                    try:
-                        post_comment = PostComment.objects.get(uuid=item)
-                    except:
-                        pass
-                    if post_comment is not None:
-                        sub_output = {
-                            'comment_user_id': post_comment.user.username,
-                            'comment_username': post_comment.user.userusername.username,
-                            'comment_text': escape(post_comment.text),
-                            'comment_created': post_comment.created,
-                            'comment_uuid': post_comment.uuid,
-                        }
-                        output.append(sub_output)
-                        if post_comment.uuid == post_comment_end.uuid:
-                            end = True
-            else:
-                output = None
-                end = True
-            return JsonResponse({'res': 1, 'set': output, 'end': end})
-
-        return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
 def re_post_like(request):
@@ -3442,4 +3355,46 @@ def re_comment_delete(request):
                 except Exception:
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_comment_more_load(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                post_id = request.POST.get('post_id', None)
+                last_comment_id = request.POST.get('last_comment_id', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=post_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                post_comment_last = None
+                try:
+                    post_comment_last = PostComment.objects.get(uuid=last_comment_id)
+                except Exception as e:
+                    return JsonResponse({'res': 0})
+
+                post_comments = PostComment.objects.filter(post=post, pk__gt=post_comment_last.pk).order_by('created')[:20]
+                output = []
+                last = None
+                count = 0
+
+                for comment in post_comments:
+                    count = count + 1
+                    if count == 20:
+                        last = comment.uuid
+                    sub_output = {
+                        'comment_username': comment.user.userusername.username,
+                        'comment_user_id': comment.user.username,
+                        'comment_text': comment.text,
+                        'comment_id': comment.uuid,
+                        'comment_created': comment.created
+                    }
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'last': last})
+
         return JsonResponse({'res': 2})
