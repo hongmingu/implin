@@ -451,3 +451,9 @@ transform: translateX(10px) translateY(-10px)
         .update_post_textarea{
             height: 100px!important; resize: none; width: 100%;
         }
+        .pop_like_left{
+            display: inline-block;
+        }
+        .pop_like_right{
+            display: inline-block; float: right;
+        }

@@ -57,6 +57,9 @@ urlpatterns = [
 
     re_path(r'^re/profile/post/$', base_ajax_views.re_profile_post,
             name='re_profile_post'),
+    re_path(r'^re/post/populate/$', base_ajax_views.re_post_populate,
+            name='re_post_populate'),
+
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),

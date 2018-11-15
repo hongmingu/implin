@@ -471,80 +471,6 @@ def re_home_feed(request):
         return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
-def re_comment_add(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                text = request.POST.get('comment', None)
-                try:
-                    post = Post.objects.get(uuid=post_id)
-                    # post = Post.objects.last()
-
-                except:
-                    return JsonResponse({'res': 0})
-                try:
-                    with transaction.atomic():
-                        post_comment = PostComment.objects.create(post=post, user=request.user, uuid=uuid.uuid4().hex,
-                                                                  text=text)
-                        from django.db.models import F
-                        post_comment_count = post.postcommentcount
-                        post_comment_count.count = F('count') + 1
-                        post_comment_count.save()
-                        # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
-                except Exception:
-                    return JsonResponse({'res': 0})
-
-                output = []
-                sub_output = {}
-                if post_comment is not None:
-                    sub_output = {
-                            'comment_user_id': post_comment.user.username,
-                            'comment_username': post_comment.user.userusername.username,
-                            'comment_text': escape(post_comment.text),
-                            'comment_created': post_comment.created,
-                            'comment_uuid': post_comment.uuid,
-                        }
-                output.append(sub_output)
-                return JsonResponse({'res': 1, 'set': output})
-
-        return JsonResponse({'res': 2})
-
-
-@ensure_csrf_cookie
-def re_comment_delete(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                comment_id = request.POST.get('comment_id', None)
-                post_id = request.POST.get('post_id', None)
-                try:
-                    # post = Post.objects.last()
-                    post = Post.objects.get(uuid=post_id)
-                except:
-                    return JsonResponse({'res': 0})
-
-                try:
-                    comment = PostComment.objects.get(uuid=comment_id, user=request.user)
-                except:
-                    try:
-                        comment = PostComment.objects.get(uuid=comment_id, post=post, post__user=request.user)
-                    except:
-                        return JsonResponse({'res': 0})
-
-                try:
-                    with transaction.atomic():
-                        comment.delete()
-                        from django.db.models import F
-                        post_comment_count = post.postcommentcount
-                        post_comment_count.count = F('count') - 1
-                        post_comment_count.save()
-                except Exception:
-                    return JsonResponse({'res': 0})
-                return JsonResponse({'res': 1})
-        return JsonResponse({'res': 2})
-
-@ensure_csrf_cookie
 def re_comment_more_load(request):
     if request.method == "POST":
         if request.user.is_authenticated:
@@ -3386,7 +3312,134 @@ def re_profile_post(request):
 
                     output.append(sub_output)
 
-                return JsonResponse({'res': 1, 'set': output, 'last': last})
+                return JsonResponse({'res': 1, 'output': output, 'last': last})
 
         return JsonResponse({'res': 2})
 
+@ensure_csrf_cookie
+def re_post_populate(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                post_id = request.POST.get('post_id', None)
+                obj_type = request.POST.get('obj_type', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=post_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                ################################
+                obj_id = None
+                date = None
+                if obj_type == 'solo':
+                    obj_id = post.solopost.solo.uuid
+                    date = post.solopost.solo_date.date
+                else:
+                    obj_id = post.grouppost.group.uuid
+                    date = post.grouppost.group_date.date
+
+                comment_output = []
+                comments = PostComment.objects.filter(post=post).order_by('created')[:3]
+                for comment in comments:
+                    sub_output = {
+                        'comment_username': comment.user.userusername.username,
+                        'comment_user_id': comment.user.username,
+                        'comment_text': comment.text,
+                        'comment_id': comment.uuid,
+                        'comment_created': comment.created
+                    }
+                    comment_output.append(sub_output)
+
+                like = 'false'
+                if PostLike.objects.filter(post=post, user=request.user).exists():
+                    like = 'true'
+
+                output = {
+                    'user_id': post.user.username,
+                    'username': post.user.userusername.username,
+                    'text': post.posttext_set.last().text,
+                    'gross': post.gross,
+                    'created': post.created,
+                    'date': date,
+                    'like_count': post.postlikecount.count,
+                    'like': like,
+                    'obj_id': obj_id,
+                    'comment_count': post.postcommentcount.count,
+                    'comment_output': comment_output,
+                }
+                # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
+                #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
+
+                return JsonResponse({'res': 1, 'output': output})
+
+        return JsonResponse({'res': 2})
+
+
+
+@ensure_csrf_cookie
+def re_comment_add(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                post_id = request.POST.get('post_id', None)
+                text = request.POST.get('text', None)
+                text = text.strip()
+                try:
+                    post = Post.objects.get(uuid=post_id)
+                    # post = Post.objects.last()
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                try:
+                    with transaction.atomic():
+                        post_comment = PostComment.objects.create(post=post, user=request.user, uuid=uuid.uuid4().hex,
+                                                                  text=text)
+                        from django.db.models import F
+                        post_comment_count = post.postcommentcount
+                        post_comment_count.count = F('count') + 1
+                        post_comment_count.save()
+                        # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                return JsonResponse({'res': 1, 'comment_id': post_comment.uuid, 'comment_text': post_comment.text})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_comment_delete(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                comment_id = request.POST.get('comment_id', None)
+                post_id = request.POST.get('post_id', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=post_id)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+
+                comment = None
+                try:
+                    comment = PostComment.objects.get(uuid=comment_id, post=post, user=request.user)
+                except Exception as e:
+                    try:
+                        comment = PostComment.objects.get(uuid=comment_id, post=post, post__user=request.user)
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+
+                try:
+                    with transaction.atomic():
+                        comment.delete()
+                        from django.db.models import F
+                        post_comment_count = post.postcommentcount
+                        post_comment_count.count = F('count') - 1
+                        post_comment_count.save()
+                except Exception:
+                    return JsonResponse({'res': 0})
+                return JsonResponse({'res': 1})
+        return JsonResponse({'res': 2})
