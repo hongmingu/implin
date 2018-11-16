@@ -471,51 +471,6 @@ def re_home_feed(request):
         return JsonResponse({'res': 2})
 
 
-@ensure_csrf_cookie
-def re_post_like(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                try:
-                    # post = Post.objects.last()
-                    post = Post.objects.get(uuid=post_id)
-                except:
-                    return JsonResponse({'res': 0})
-                try:
-                    post_like = PostLike.objects.get(post=post, user=request.user)
-                except PostLike.DoesNotExist:
-                    post_like = None
-
-                liked = None
-                if post_like is not None:
-                    try:
-                        with transaction.atomic():
-                            post_like.delete()
-                            from django.db.models import F
-                            post_like_count = post.postlikecount
-                            post_like_count.count = F('count') - 1
-                            post_like_count.save()
-                            liked = False
-                            # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
-                    except Exception:
-                        return JsonResponse({'res': 0})
-                else:
-                    try:
-                        with transaction.atomic():
-                            post_like = PostLike.objects.create(post=post, user=request.user)
-                            from django.db.models import F
-                            post_like_count = post.postlikecount
-                            post_like_count.count = F('count') + 1
-                            post_like_count.save()
-                            liked = True
-                            # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
-                    except Exception:
-                        return JsonResponse({'res': 0})
-
-                return JsonResponse({'res': 1, 'liked': liked})
-
-        return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
 def re_user_home_populate(request):
@@ -1191,149 +1146,6 @@ def re_post_chat_rest_delete(request):
         return JsonResponse({'res': 2})
 
 
-@ensure_csrf_cookie
-def re_profile_follow(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                chosen_user_id = request.POST.get('user_id', None)
-                chosen_user = None
-                try:
-                    chosen_user = User.objects.get(username=chosen_user_id)
-                except User.DoesNotExist:
-                    return JsonResponse({'res': 0})
-
-                if chosen_user is not None:
-                    # 어이없는 스스로 팔로우 방지
-                    if chosen_user == request.user:
-                        return JsonResponse({'res': 0})
-                    follow = None
-                    try:
-                        follow = Follow.objects.get(follow=chosen_user, user=request.user)
-                    except Follow.DoesNotExist:
-                        pass
-                    result = None
-                    if follow is not None:
-                        try:
-                            with transaction.atomic():
-                                follow.delete()
-
-                                from django.db.models import F
-                                following_count = request.user.followingcount
-                                following_count.count = F('count') - 1
-                                following_count.save()
-                                follower_count = chosen_user.followercount
-                                follower_count.count = F('count') - 1
-                                follower_count.save()
-                                result = False
-
-                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
-                        except Exception:
-                            return JsonResponse({'res': 0})
-                    else:
-                        try:
-                            with transaction.atomic():
-                                follow = Follow.objects.create(follow=chosen_user, user=request.user)
-                                from django.db.models import F
-                                following_count = request.user.followingcount
-                                following_count.count = F('count') + 1
-                                following_count.save()
-                                follower_count = chosen_user.followercount
-                                follower_count.count = F('count') + 1
-                                follower_count.save()
-                                result = True
-
-                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
-                        except Exception:
-                            return JsonResponse({'res': 0})
-                    return JsonResponse({'res': 1, 'result': result})
-
-                return JsonResponse({'res': 2})
-
-        return JsonResponse({'res': 2})
-
-
-@ensure_csrf_cookie
-def re_profile_following(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                user_id = request.POST.get('user_id', None)
-                next_id = request.POST.get('next_id', None)
-                user = None
-                try:
-                    user = User.objects.get(username=user_id)
-                except User.DoesNotExist:
-                    pass
-
-                next = None
-                output = []
-                if user is not None:
-                    if next_id == '':
-                        followings = Follow.objects.filter(user=user).order_by('created')[:31]
-                    else:
-                        try:
-                            last_following = Follow.objects.get(follow__username=next_id, user=user)
-                        except:
-                            return JsonResponse({'res': 0})
-                        followings = Follow.objects.filter(Q(user=user) & Q(pk__gte=last_following.pk)).order_by('created')[:31]
-                    count = 0
-                    for follow in followings:
-                        count = count+1
-                        if count == 31:
-                            next = follow.follow.username
-                            break
-                        sub_output = {
-                            'username': follow.follow.userusername.username,
-                            'photo': follow.follow.userphoto.file_50_url(),
-                        }
-                        output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'set': output, 'next':next})
-
-        return JsonResponse({'res': 2})
-
-
-@ensure_csrf_cookie
-def re_profile_follower(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                user_id = request.POST.get('user_id', None)
-                next_id = request.POST.get('next_id', None)
-                user = None
-                try:
-                    user = User.objects.get(username=user_id)
-                except User.DoesNotExist:
-                    pass
-
-                next = None
-                output = []
-                if user is not None:
-                    if next_id == '':
-                        followers = Follow.objects.filter(follow=user).order_by('created')[:31]
-                    else:
-                        try:
-
-                            last_follower = Follow.objects.get(follow=user, user__username=next_id)
-                        except:
-                            return JsonResponse({'res': 0})
-                        followers = Follow.objects.filter(Q(follow=user) & Q(pk__gte=last_follower.pk)).order_by('created')[:31]
-                    count = 0
-                    for follow in followers:
-                        count = count+1
-                        if count == 31:
-                            next = follow.user.username
-                            break
-                        sub_output = {
-                            'username': follow.user.userusername.username,
-                            'photo': follow.user.userphoto.file_50_url(),
-                        }
-                        output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'set': output, 'next':next})
-
-        return JsonResponse({'res': 2})
 
 
 @ensure_csrf_cookie
@@ -1504,46 +1316,6 @@ def re_profile_populate(request):
 
         return JsonResponse({'res': 2})
 
-@ensure_csrf_cookie
-def re_post_like_list(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                next_id = request.POST.get('next_id', None)
-                post = None
-                try:
-                    post = Post.objects.get(uuid=post_id)
-                except:
-                    return JsonResponse({'res': 1})
-
-                next = None
-                output = []
-                if post is not None:
-                    if next_id == '':
-                        likes = PostLike.objects.filter(post=post).order_by('created')[:31]
-                    else:
-                        try:
-
-                            last_like = PostLike.objects.get(post=post, user__username=next_id)
-                        except:
-                            return JsonResponse({'res': 0})
-                        likes = PostLike.objects.filter(Q(post=post) & Q(pk__gte=last_like.pk)).order_by('created')[:31]
-                    count = 0
-                    for like in likes:
-                        count = count+1
-                        if count == 31:
-                            next = like.user.username
-                            break
-                        sub_output = {
-                            'username': like.user.userusername.username,
-                            'photo': like.user.userphoto.file_50_url(),
-                        }
-                        output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'set': output, 'next': next})
-
-        return JsonResponse({'res': 2})
 
 
 @ensure_csrf_cookie
@@ -3361,40 +3133,274 @@ def re_comment_delete(request):
 @ensure_csrf_cookie
 def re_comment_more_load(request):
     if request.method == "POST":
+        # comment more load 에선 로그인이 필요없게 하였다.
+        if request.is_ajax():
+            post_id = request.POST.get('post_id', None)
+            last_comment_id = request.POST.get('last_comment_id', None)
+            post = None
+            try:
+                post = Post.objects.get(uuid=post_id)
+            except Exception as e:
+                return JsonResponse({'res': 0})
+
+            post_comment_last = None
+            try:
+                post_comment_last = PostComment.objects.get(uuid=last_comment_id)
+            except Exception as e:
+                return JsonResponse({'res': 0})
+
+            post_comments = PostComment.objects.filter(post=post, pk__gt=post_comment_last.pk).order_by('created')[:20]
+            output = []
+            last = None
+            count = 0
+
+            for comment in post_comments:
+                count = count + 1
+                if count == 20:
+                    last = comment.uuid
+                sub_output = {
+                    'comment_username': comment.user.userusername.username,
+                    'comment_user_id': comment.user.username,
+                    'comment_text': comment.text,
+                    'comment_id': comment.uuid,
+                    'comment_created': comment.created
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1, 'output': output, 'last': last})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_post_like(request):
+    if request.method == "POST":
         if request.user.is_authenticated:
             if request.is_ajax():
                 post_id = request.POST.get('post_id', None)
-                last_comment_id = request.POST.get('last_comment_id', None)
+
                 post = None
                 try:
                     post = Post.objects.get(uuid=post_id)
                 except Exception as e:
                     return JsonResponse({'res': 0})
 
-                post_comment_last = None
+                post_like = None
                 try:
-                    post_comment_last = PostComment.objects.get(uuid=last_comment_id)
+                    post_like = PostLike.objects.get(post=post, user=request.user)
                 except Exception as e:
+                    pass
+
+                liked = None
+                if post_like is not None:
+                    try:
+                        with transaction.atomic():
+                            post_like.delete()
+                            from django.db.models import F
+                            post_like_count = post.postlikecount
+                            post_like_count.count = F('count') - 1
+                            post_like_count.save()
+                            liked = 'false'
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+                else:
+                    try:
+                        with transaction.atomic():
+                            post_like = PostLike.objects.create(post=post, user=request.user)
+                            from django.db.models import F
+                            post_like_count = post.postlikecount
+                            post_like_count.count = F('count') + 1
+                            post_like_count.save()
+                            liked = 'true'
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+
+                return JsonResponse({'res': 1, 'liked': liked})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_post_like_list(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                post_id = request.POST.get('post_id', None)
+                next_id = request.POST.get('next_id', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=post_id)
+                except Exception as e:
+                    return JsonResponse({'res': 1})
+
+                next = None
+                output = []
+                if post is not None:
+                    if next_id == '':
+                        likes = PostLike.objects.filter(post=post).order_by('created')[:31]
+                    else:
+                        try:
+                            last_like = PostLike.objects.get(post=post, user__username=next_id)
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                        likes = PostLike.objects.filter(Q(post=post) & Q(pk__gte=last_like.pk)).order_by('created')[:31]
+
+                    count = 0
+                    for like in likes:
+                        count = count+1
+                        if count == 31:
+                            next = like.user.username
+                            break
+                        sub_output = {
+                            'username': like.user.userusername.username,
+                            'photo': like.user.userphoto.file_50_url(),
+                        }
+                        output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'next': next})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_follow_add(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                chosen_user_id = request.POST.get('user_id', None)
+                chosen_user = None
+                try:
+                    chosen_user = User.objects.get(username=chosen_user_id)
+                except User.DoesNotExist:
                     return JsonResponse({'res': 0})
 
-                post_comments = PostComment.objects.filter(post=post, pk__gt=post_comment_last.pk).order_by('created')[:20]
+                if chosen_user is not None:
+                    # 어이없는 스스로 팔로우 방지
+                    if chosen_user == request.user:
+                        return JsonResponse({'res': 0})
+                    follow = None
+                    try:
+                        follow = Follow.objects.get(follow=chosen_user, user=request.user)
+                    except Follow.DoesNotExist:
+                        pass
+                    result = None
+                    if follow is not None:
+                        try:
+                            with transaction.atomic():
+                                follow.delete()
+
+                                from django.db.models import F
+                                following_count = request.user.followingcount
+                                following_count.count = F('count') - 1
+                                following_count.save()
+                                follower_count = chosen_user.followercount
+                                follower_count.count = F('count') - 1
+                                follower_count.save()
+                                result = False
+
+                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
+                        except Exception:
+                            return JsonResponse({'res': 0})
+                    else:
+                        try:
+                            with transaction.atomic():
+                                follow = Follow.objects.create(follow=chosen_user, user=request.user)
+                                from django.db.models import F
+                                following_count = request.user.followingcount
+                                following_count.count = F('count') + 1
+                                following_count.save()
+                                follower_count = chosen_user.followercount
+                                follower_count.count = F('count') + 1
+                                follower_count.save()
+                                result = True
+
+                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
+                        except Exception:
+                            return JsonResponse({'res': 0})
+                    return JsonResponse({'res': 1, 'result': result})
+
+                return JsonResponse({'res': 2})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_following_list(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                user_id = request.POST.get('user_id', None)
+                next_id = request.POST.get('next_user_id', None)
+                user = None
+                try:
+                    user = User.objects.get(username=user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+
+
+                next = None
                 output = []
-                last = None
-                count = 0
+                if user is not None:
+                    if next_id == '':
+                        followings = Follow.objects.filter(user=user).order_by('created')[:31]
+                    else:
+                        try:
+                            last_following = Follow.objects.get(follow__username=next_id, user=user)
+                        except:
+                            return JsonResponse({'res': 0})
+                        followings = Follow.objects.filter(Q(user=user) & Q(pk__gte=last_following.pk)).order_by('created')[:31]
+                    count = 0
+                    for follow in followings:
+                        count = count+1
+                        if count == 31:
+                            next = follow.follow.username
+                            break
+                        sub_output = {
+                            'username': follow.follow.userusername.username,
+                            'photo': follow.follow.userphoto.file_50_url(),
+                        }
+                        output.append(sub_output)
 
-                for comment in post_comments:
-                    count = count + 1
-                    if count == 20:
-                        last = comment.uuid
-                    sub_output = {
-                        'comment_username': comment.user.userusername.username,
-                        'comment_user_id': comment.user.username,
-                        'comment_text': comment.text,
-                        'comment_id': comment.uuid,
-                        'comment_created': comment.created
-                    }
-                    output.append(sub_output)
+                return JsonResponse({'res': 1, 'output': output, 'next':next})
 
-                return JsonResponse({'res': 1, 'output': output, 'last': last})
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_follower_list(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                user_id = request.POST.get('user_id', None)
+                next_id = request.POST.get('next_user_id', None)
+                user = None
+                try:
+                    user = User.objects.get(username=user_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+
+                next = None
+                output = []
+                if user is not None:
+                    if next_id == '':
+                        followers = Follow.objects.filter(follow=user).order_by('created')[:31]
+                    else:
+                        try:
+                            last_follower = Follow.objects.get(follow=user, user__username=next_id)
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                        followers = Follow.objects.filter(Q(follow=user) & Q(pk__gte=last_follower.pk)).order_by('created')[:31]
+                    count = 0
+                    for follow in followers:
+                        count = count+1
+                        if count == 31:
+                            next = follow.user.username
+                            break
+                        sub_output = {
+                            'username': follow.user.userusername.username,
+                            'photo': follow.user.userphoto.file_50_url(),
+                        }
+                        output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'next': next})
 
         return JsonResponse({'res': 2})

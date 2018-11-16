@@ -66,6 +66,19 @@ urlpatterns = [
             name='re_comment_delete'),
     re_path(r'^re/comment/more/load/$', base_ajax_views.re_comment_more_load,
             name='re_comment_more_load'),
+
+    re_path(r'^re/post/like/$', base_ajax_views.re_post_like,
+            name='re_post_like'),
+    re_path(r'^re/post/like/list/$', base_ajax_views.re_post_like_list,
+            name='re_post_like_list'),
+
+    re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
+            name='re_follow_add'),
+    re_path(r'^re/following/list/$', base_ajax_views.re_following_list,
+            name='re_following_list'),
+    re_path(r'^re/follower/list/$', base_ajax_views.re_follower_list,
+            name='re_follower_list'),
+
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),
@@ -159,23 +172,12 @@ urlpatterns = [
     re_path(r'^re/user/home/populate/$', base_ajax_views.re_user_home_populate,
             name='re_user_home_populate'),
 
-    re_path(r'^re/post/like/$', base_ajax_views.re_post_like,
-            name='re_post_like'),
 
-    re_path(r'^re/profile/follow/$', base_ajax_views.re_profile_follow,
-            name='re_profile_follow'),
-
-    re_path(r'^re/profile/following/$', base_ajax_views.re_profile_following,
-            name='re_profile_following'),
     re_path(r'^re/profile/post/delete/$', base_ajax_views.re_profile_post_delete,
             name='re_profile_post_delete'),
 
     re_path(r'^re/profile/populate/$', base_ajax_views.re_profile_populate,
             name='re_profile_populate'),
-    re_path(r'^re/profile/follower/$', base_ajax_views.re_profile_follower,
-            name='re_profile_follower'),
-    re_path(r'^re/post/like/list/$', base_ajax_views.re_post_like_list,
-            name='re_post_like_list'),
 
     re_path(r'^re/explore/feed/$', base_ajax_views.re_explore_feed,
             name='re_explore_feed'),

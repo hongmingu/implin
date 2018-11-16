@@ -52,9 +52,9 @@ var post_populate = function post_populate(id, obj_type) {
 
                     var heart = ''
                     if (data.output.like === 'true'){
-                        heart = '<a href=""><span class="pop_heart">♥</span></a>'
+                        heart = '<a href=""><span class="pop_heart" id="pop_heart_'+id+'">♥</span></a>'
                     } else {
-                        heart = '<a href=""><span class="pop_heart">♡</span></a>'
+                        heart = '<a href=""><span class="pop_heart" id="pop_heart_'+id+'">♡</span></a>'
                     }
                     // 여기에 코멘트들 작업
                     // 코멘트들 작업시 x버튼 클릭하면 지워지게 하는 것 작업.
@@ -66,7 +66,7 @@ var post_populate = function post_populate(id, obj_type) {
                         text +
                         '<div align="right"><span class="pop_gross">'+data.output.gross+'</span><span class="pop_dollar">$</span></div>'+
                         '<div align="right"><span class="pop_date">'+data.output.date+'</span><span class="pop_created">'+date_differ(data.output.created)+'</span></div>'+
-                        '<div><div class="pop_like_left"><span class="pop_like_black_heart">♥</span><span class="pop_like_count">'+data.output.like_count+'</span></div><div class="pop_like_right" align="right">'+heart+'</div></div>'+
+                        '<div><div class="pop_like_left"><span class="pop_like_black_heart">♥</span><a href=""><span class="pop_like_count" id="pop_like_count_'+id+'">'+data.output.like_count+'</span></a></div><div class="pop_like_right" align="right">'+heart+'</div></div>'+
                         '<div><span class="pop_comment">comment</span><span class="pop_comment_count">'+data.output.comment_count+'</span></div>'+
                         '<div id="pop_comment_list_'+id+'">'+comments+'</div>'+//여기서 이것의 차일드 중 마지막 값의 uuid 를 이용하여 이것 다음 코멘트를
                         comment_more_load +
@@ -74,6 +74,43 @@ var post_populate = function post_populate(id, obj_type) {
                         comment_textarea+
                         last_comment +
                         '</div>')
+                    appender.find('.pop_like_count').on('click', function (e) {
+                        e.preventDefault()
+                        $('#clicked_post_id').html(id)
+                        $('#modal_post_liking').modal('show')
+                    })
+
+                    appender.find('.pop_heart').on('click', function (e) {
+                        e.preventDefault()
+                        if ($('#user_id').html() === '') {
+                            $('#modal_need_login_pop').modal('show')
+                            return false;
+                        }
+                        $.ajax({url:'/re/post/like/', type:'post', dataType:'json', cache:false,
+                            data:{
+                                post_id: id,
+                            },
+                            success:function (s_data) {
+                                if (s_data.res === 1) {
+                                    var current_count = parseInt($('#pop_like_count_'+id).html())
+                                    if (s_data.liked === 'true'){
+                                        if ($('#pop_heart_'+id).html()!=='♥'){
+                                            $('#pop_heart_'+id).html('♥')
+                                        }
+                                        $('#pop_like_count_'+id).html(current_count + 1)
+                                    } else if (s_data.liked === 'false'){
+                                        if ($('#pop_heart_'+id).html()!=='♡'){
+                                            $('#pop_heart_'+id).html('♡')
+                                        }
+                                        $('#pop_like_count_'+id).html(current_count - 1)
+                                    }
+
+
+                                }
+                            }
+                        })
+
+                    })
 
                     appender.find('#pop_comment_more_load_'+id).on('click', function (e) {
                         e.preventDefault()
@@ -130,6 +167,10 @@ var post_populate = function post_populate(id, obj_type) {
 
                     appender.find('.pop_comment_delete').on('click', function (e) {
                         e.preventDefault()
+                        if ($('#user_id').html() === '') {
+                            $('#modal_need_login_pop').modal('show')
+                            return false;
+                        }
                         var delete_comment_id = $(this).attr('data-u')
                         $.ajax({url:'/re/comment/delete/', type:'post', dataType:'json', cache:false,
                             data:{
@@ -290,3 +331,78 @@ $(function () {
         location.href=path
     })
 })
+
+$(function () {
+    $("#modal_post_liking").on("shown.bs.modal", function () {
+        var height = $(window).height();
+        $('.modal-body').css('max-height', height-120);
+        $(window).on('resize', function(){
+
+            if($(window).height() != height){
+                height = $(window).height();
+                $('.modal-body').css('max-height', height-120);
+            }
+        });
+        var post_id = $('#clicked_post_id').html()
+
+        $.ajax({url:'/re/post/like/list/', type:'post', dataType:'json', cache:false,
+            data:{
+                post_id: post_id,
+                next_id: $('#post_liking_next_id').html()
+            },
+            success:function (data) {
+                if (data.res === 1){
+                    $.each(data.output, function (key, value) {
+                        var appender = '<div class="modal_unit_wrapper"><a href="/'+value.username+'/">\n' +
+                            '<img class="modal_img" src="'+value.photo+'">\n' +
+                            '<span class="modal_username">'+value.username+'</span>\n' +
+                            '</a></div>'
+                        $('#modal_post_liking_list').append(appender)
+                    })
+                }
+                if (data.next === null){
+                    $('#post_liking_next_id').html('')
+                    $('#modal_post_liking_more').addClass('hidden')
+                } else {
+                    $('#post_liking_next_id').html(data.next)
+                    $('#modal_post_liking_more').removeClass('hidden')
+                }
+
+            }
+        })
+    }).on("hidden.bs.modal", function () {
+        $('#modal_post_liking_list').empty()
+        $('#post_liking_next_id').html('')
+        $('#clicked_post_id').html('')
+    });
+
+    $('#modal_post_liking_more').click(function (e) {
+        e.preventDefault()
+        $.ajax({url:'/re/post/like/list/', type:'post', dataType:'json', cache:false,
+            data:{
+                post_id: post_id,
+                next_id: $('#post_liking_next_id').html()
+            },
+            success:function (data) {
+                if (data.res === 1){
+                    $.each(data.output, function (key, value) {
+                        var appender = '<div class="modal_unit_wrapper"><a href="/'+value.username+'/">\n' +
+                            '<img class="modal_img" src="'+value.photo+'">\n' +
+                            '<span class="modal_username">'+value.username+'</span>\n' +
+                            '</a></div>'
+                        $('#modal_post_liking_list').append(appender)
+                    })
+                }
+                if (data.next === null){
+                    $('#post_liking_next_id').html('')
+                    $('#modal_post_liking_more').addClass('hidden')
+                } else {
+                    $('#post_liking_next_id').html(data.next)
+                    $('#modal_post_liking_more').removeClass('hidden')
+                }
+
+            }
+        })
+    })
+})
+// more load 구현
