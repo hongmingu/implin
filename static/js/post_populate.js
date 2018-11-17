@@ -187,10 +187,6 @@ var post_populate = function post_populate(id, obj_type) {
 
                     appender.find('.pop_menu').on('click', function (e) {
                         e.preventDefault()
-                        if ($('#user_id').html() === '') {
-                            $('#modal_need_login_pop').modal('show')
-                            return false;
-                        }
                         $('#clicked_post_id').html(id)
                         $('#modal_pop_menu').modal('show')
                     })
