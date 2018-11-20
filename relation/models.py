@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.conf import settings
 from authapp.models import *
+from object.models import *
 
 
 class Follow(models.Model):
@@ -33,6 +34,50 @@ class FollowerCount(models.Model):
 
     def __str__(self):
         return "Follower Count of: %s" % self.user.userusername.username
+
+
+class SoloFollow(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_solo_following')
+    solo = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_solo_followed')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "user: %s, follow: %s" % (self.user.userusername.username, self.pk)
+
+    class Meta:
+        unique_together = ('user', 'solo',)
+
+
+class SoloFollowerCount(models.Model):
+    solo = models.OneToOneField(Solo, on_delete=models.CASCADE)
+    count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return "Follower Count of: %s" % self.pk
+
+
+class GroupFollow(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_group_following')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, null=True, blank=True, related_name='is_group_followed')
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "user: %s, follow: %s" % (self.user.userusername.username, self.pk)
+
+    class Meta:
+        unique_together = ('user', 'group',)
+
+
+class GroupFollowerCount(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE)
+    count = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return "Follower Count of: %s" % self.pk
+
+
 '''
 
 class Blocking(models.Model):

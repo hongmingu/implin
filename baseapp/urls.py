@@ -26,6 +26,9 @@ urlpatterns = [
 
     re_path(r'^(?P<user_username>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/$',
             views.user_profile, name='user_profile'),
+    re_path(r'^solo/(?P<uuid>([0-9a-f]{32}))/$', views.solo_profile, name="solo_profile"),
+    re_path(r'^group/(?P<uuid>([0-9a-f]{32}))/$', views.group_profile, name="group_profile"),
+
     # --------------------------------------------------------------------------------
     re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
             name='re_create_search'),

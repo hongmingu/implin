@@ -1761,7 +1761,9 @@ def re_group_register(request):
                         group_name = GroupName.objects.create(name=name, group=group)
                         group_main_name = GroupMainName.objects.create(group_name=group_name, group=group)
                         group_main_photo = GroupMainPhoto.objects.create(group=group)
-                except Exception:
+                        group_follower_count = GroupFollowerCount.objects.create(group=group)
+
+                except Exception as e:
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
@@ -1813,8 +1815,9 @@ def re_solo_register(request):
                         solo_name = SoloName.objects.create(name=name, solo=solo)
                         solo_main_name = SoloMainName.objects.create(solo_name=solo_name, solo=solo)
                         solo_main_photo = SoloMainPhoto.objects.create(solo=solo)
+                        solo_follower_count = SoloFollowerCount.objects.create(solo=solo)
 
-                except Exception:
+                except Exception as e:
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})

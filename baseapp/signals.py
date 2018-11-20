@@ -14,78 +14,7 @@ KINDS_CHOICES = (
     (POSTCHAT_PHOTO, "photo"),
 )
 
-
-# notice follow
-
-@receiver(post_save, sender=Follow)
-def created_follow(sender, instance, created, **kwargs):
-    if created:
-        if instance.user == instance.follow:
-            return
-        try:
-            with transaction.atomic():
-                notice = Notice.objects.create(user=instance.follow, kind=FOLLOW)
-                notice_follow = NoticeFollow.objects.create(notice=notice, follow=instance)
-                notice_count = instance.follow.noticecount
-                notice_count.count = F('count') + 1
-                notice_count.save()
-        except Exception as e:
-            print(e)
-            pass
-
-
-@receiver(post_delete, sender=NoticeFollow)#이걸 pre_delete로 해야하나?
-def deleted_notice_follow(sender, instance, **kwargs):
-    try:
-        if instance.notice:
-            try:
-                with transaction.atomic():
-                    if instance.notice.checked is False:
-                        notice_count = instance.notice.user.noticecount
-                        notice_count.count = F('count') - 1
-                        notice_count.save()
-                    instance.notice.delete()
-            except Exception as e:
-                print(e)
-                pass
-    except:
-        pass
-# notice post_comment
-
-@receiver(post_save, sender=PostComment)
-def created_post_comment(sender, instance, created, **kwargs):
-    if created:
-        if instance.user == instance.post.user:
-            return
-        try:
-            with transaction.atomic():
-                notice = Notice.objects.create(user=instance.post.user, kind=POST_COMMENT)
-                notice_post_comment = NoticePostComment.objects.create(notice=notice, post_comment=instance)
-                notice_count = instance.post.user.noticecount
-                notice_count.count = F('count') + 1
-                notice_count.save()
-        except Exception:
-            pass
-
-
-@receiver(post_delete, sender=NoticePostComment)
-def deleted_notice_post_comment(sender, instance, **kwargs):
-    try:
-        if instance.notice:
-            try:
-                with transaction.atomic():
-                    if instance.notice.checked is False:
-                        notice_count = instance.notice.user.noticecount
-                        notice_count.count = F('count') - 1
-                        notice_count.save()
-                    instance.notice.delete()
-            except Exception:
-                pass
-    except:
-        pass
-
-
-# notice post_like
+'''
 @receiver(post_save, sender=PostLike)
 def created_post_like(sender, instance, created, **kwargs):
     if created:
@@ -103,7 +32,7 @@ def created_post_like(sender, instance, created, **kwargs):
             pass
 
 
-@receiver(post_delete, sender=NoticePostLike)#이걸 pre_delete로 해야하나?
+@receiver(post_delete, sender=NoticePostLike)
 def deleted_notice_post_like(sender, instance, **kwargs):
     try:
         if instance.notice:
@@ -120,6 +49,11 @@ def deleted_notice_post_like(sender, instance, **kwargs):
     except:
         pass
 
+'''
+
+# ======================================================================================================================
+
+
 @receiver(post_save, sender=Post)
 def created_post(sender, instance, created, **kwargs):
     if created:
@@ -130,6 +64,7 @@ def created_post(sender, instance, created, **kwargs):
         except Exception as e:
             print(e)
             pass
+
 
 
 from paypal.standard.models import ST_PP_COMPLETED

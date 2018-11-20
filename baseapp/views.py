@@ -281,3 +281,57 @@ def user_profile(request, user_username):
                 following = None
                 return render(request, 'baseapp/user_profile.html',
                               {'chosen_user': chosen_user, 'following': following})
+
+
+def solo_profile(request, uuid):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            solo = None
+            try:
+                solo = Solo.objects.get(uuid=uuid)
+            except Exception as e:
+                return render(request, '404.html')
+            if solo is not None:
+                following = None
+                if SoloFollow.objects.filter(user=request.user, solo=solo).exists():
+                    following = True
+
+                return render(request, 'baseapp/user_profile.html',
+                              {'solo': solo, 'following': following})
+        else:
+            solo = None
+            try:
+                solo = Solo.objects.get(uuid=uuid)
+            except Exception as e:
+                return render(request, '404.html')
+            if solo is not None:
+                following = None
+                return render(request, 'baseapp/user_profile.html',
+                              {'solo': solo, 'following': following})
+
+
+def group_profile(request, uuid):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            group = None
+            try:
+                group = Group.objects.get(uuid=uuid)
+            except Exception as e:
+                return render(request, '404.html')
+            if group is not None:
+                following = None
+                if GroupFollow.objects.filter(user=request.user, group=group).exists():
+                    following = True
+
+                return render(request, 'baseapp/group_profile.html',
+                              {'group': group, 'following': following})
+        else:
+            group = None
+            try:
+                group = Solo.objects.get(uuid=uuid)
+            except Exception as e:
+                return render(request, '404.html')
+            if group is not None:
+                following = None
+                return render(request, 'baseapp/group_profile.html',
+                              {'group': group, 'following': following})
