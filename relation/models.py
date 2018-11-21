@@ -38,7 +38,7 @@ class FollowerCount(models.Model):
 
 class SoloFollow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_solo_following')
-    solo = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True, related_name='is_solo_followed')
+    solo = models.ForeignKey(Solo, on_delete=models.CASCADE, null=True, blank=True, related_name='is_solo_followed')
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 

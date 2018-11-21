@@ -81,7 +81,11 @@ urlpatterns = [
             name='re_following_list'),
     re_path(r'^re/follower/list/$', base_ajax_views.re_follower_list,
             name='re_follower_list'),
+    re_path(r'^re/solo/follow/$', base_ajax_views.re_solo_follow,
+            name='re_solo_follow'),
 
+    re_path(r'^re/group/follow/$', base_ajax_views.re_group_follow,
+            name='re_group_follow'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),

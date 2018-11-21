@@ -3020,12 +3020,15 @@ def re_post_populate(request):
                 ################################
                 obj_id = None
                 date = None
+                obj_name = None
                 if obj_type == 'solo':
                     obj_id = post.solopost.solo.uuid
                     date = post.solopost.solo_date.date
+                    obj_name = post.solopost.solo.solomainname.solo_name.name
                 else:
                     obj_id = post.grouppost.group.uuid
                     date = post.grouppost.group_date.date
+                    obj_name = post.grouppost.group.groupmainname.group_name.name
 
                 comment_output = []
                 comments = PostComment.objects.filter(post=post).order_by('created')[:3]
@@ -3053,6 +3056,7 @@ def re_post_populate(request):
                     'like_count': post.postlikecount.count,
                     'like': like,
                     'obj_id': obj_id,
+                    'obj_name': obj_name,
                     'comment_count': post.postcommentcount.count,
                     'comment_output': comment_output,
                 }
@@ -3405,5 +3409,107 @@ def re_follower_list(request):
                         output.append(sub_output)
 
                 return JsonResponse({'res': 1, 'output': output, 'next': next})
+
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_solo_follow(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                solo_id = request.POST.get('solo_id', None)
+                solo = None
+                try:
+                    solo = Solo.objects.get(uuid=solo_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+
+                if solo is not None:
+                    follow = None
+                    try:
+                        follow = SoloFollow.objects.get(solo=solo, user=request.user)
+                    except Exception as e:
+                        pass
+                    result = None
+                    if follow is not None:
+                        try:
+                            with transaction.atomic():
+                                follow.delete()
+
+                                from django.db.models import F
+                                follower_count = solo.solofollowercount
+                                follower_count.count = F('count') - 1
+                                follower_count.save()
+                                result = 'cancel'
+
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                    else:
+                        try:
+                            with transaction.atomic():
+                                follow = SoloFollow.objects.create(solo=solo, user=request.user)
+                                from django.db.models import F
+                                follower_count = solo.solofollowercount
+                                follower_count.count = F('count') + 1
+                                follower_count.save()
+                                result = 'follow'
+
+                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                    return JsonResponse({'res': 1, 'result': result})
+
+                return JsonResponse({'res': 2})
+
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_group_follow(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                group_id = request.POST.get('group_id', None)
+                group = None
+                try:
+                    group = Group.objects.get(uuid=group_id)
+                except User.DoesNotExist:
+                    return JsonResponse({'res': 0})
+
+                if group is not None:
+                    follow = None
+                    try:
+                        follow = GroupFollow.objects.get(group=group, user=request.user)
+                    except Exception as e:
+                        pass
+                    result = None
+                    if follow is not None:
+                        try:
+                            with transaction.atomic():
+                                follow.delete()
+
+                                from django.db.models import F
+                                follower_count = group.groupfollowercount
+                                follower_count.count = F('count') - 1
+                                follower_count.save()
+                                result = 'cancel'
+
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                    else:
+                        try:
+                            with transaction.atomic():
+                                follow = GroupFollow.objects.create(group=group, user=request.user)
+                                from django.db.models import F
+                                follower_count = group.groupfollowercount
+                                follower_count.count = F('count') + 1
+                                follower_count.save()
+                                result = 'follow'
+
+                                # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
+                        except Exception as e:
+                            return JsonResponse({'res': 0})
+                    return JsonResponse({'res': 1, 'result': result})
+
+                return JsonResponse({'res': 2})
 
         return JsonResponse({'res': 2})

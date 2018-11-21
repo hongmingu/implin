@@ -17,7 +17,7 @@ var post_populate = function post_populate(id, obj_type) {
                         text = '<div class="pop_text">'+data.output.text+'</div>'
                     }
 
-                    var obj = '<div align="right"><a href="/'+obj_type+'/'+data.output.obj_id+'/"><span class="pop_obj"></span></a></div>'
+                    var obj = '<div align="right"><a href="/'+obj_type+'/'+data.output.obj_id+'/"><span class="pop_obj">'+data.output.obj_name+'</span></a></div>'
 
                     var comment_more_load = '<a href=""><div class="pop_comment_more_load hidden" id="pop_comment_more_load_'+id+'" align="center">more load</div></a>'
                     if (data.output.comment_count > 3){
