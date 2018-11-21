@@ -74,6 +74,9 @@ urlpatterns = [
             name='re_post_like'),
     re_path(r'^re/post/like/list/$', base_ajax_views.re_post_like_list,
             name='re_post_like_list'),
+    re_path(r'^re/profile/post/delete/$', base_ajax_views.re_profile_post_delete,
+            name='re_profile_post_delete'),
+
 
     re_path(r'^re/follow/add/$', base_ajax_views.re_follow_add,
             name='re_follow_add'),
@@ -180,8 +183,7 @@ urlpatterns = [
             name='re_user_home_populate'),
 
 
-    re_path(r'^re/profile/post/delete/$', base_ajax_views.re_profile_post_delete,
-            name='re_profile_post_delete'),
+
 
     re_path(r'^re/profile/populate/$', base_ajax_views.re_profile_populate,
             name='re_profile_populate'),

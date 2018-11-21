@@ -1149,24 +1149,6 @@ def re_post_chat_rest_delete(request):
 
 
 @ensure_csrf_cookie
-def re_profile_post_delete(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                post = None
-                try:
-                    post = Post.objects.get(uuid=post_id, user=request.user)
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
-                if post is not None:
-                    post.delete()
-
-                return JsonResponse({'res': 1})
-
-        return JsonResponse({'res': 2})
-@ensure_csrf_cookie
 def re_profile_populate(request):
     if request.method == "POST":
         if request.user.is_authenticated:
@@ -2572,7 +2554,7 @@ def re_b_admin_solo_edit_default_register(request):
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
         return JsonResponse({'res': 2})
-# 301이면 어디로 가는지 확인하고 http랑 https 다 되면 https를 추천하는 방향으로.
+
 @ensure_csrf_cookie
 def re_create_search(request):
     if request.method == "POST":
@@ -2950,120 +2932,118 @@ def re_update_solo_post_complete(request):
 @ensure_csrf_cookie
 def re_profile_post(request):
     if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                chosen_user_id = request.POST.get('chosen_user_id', None)
-                last_id = request.POST.get('last_post_id', None)
-                user = None
+        if request.is_ajax():
+            chosen_user_id = request.POST.get('chosen_user_id', None)
+            last_id = request.POST.get('last_post_id', None)
+            user = None
+            try:
+                user = User.objects.get(username=chosen_user_id)
+            except User.DoesNotExist:
+                return JsonResponse({'res': 0})
+            posts = None
+
+            if last_id == '':
+                posts = Post.objects.filter(Q(user=user)).order_by('-created').distinct()[:20]
+            else:
+                last_post = None
                 try:
-                    user = User.objects.get(username=chosen_user_id)
-                except User.DoesNotExist:
+                    last_post = Post.objects.get(uuid=last_id)
+                except Exception as e:
                     return JsonResponse({'res': 0})
-                posts = None
+                if last_post is not None:
+                    posts = Post.objects.filter(
+                        Q(user=user) & Q(pk_lt=last_post.pk)).order_by('-created').distinct()[:20]
 
-                if last_id == '':
-                    posts = Post.objects.filter(Q(user=user)).order_by('-created').distinct()[:20]
-                else:
-                    last_post = None
-                    try:
-                        last_post = Post.objects.get(uuid=last_id)
-                    except Exception as e:
-                        return JsonResponse({'res': 0})
-                    if last_post is not None:
-                        posts = Post.objects.filter(
-                            Q(user=user) & Q(pk_lt=last_post.pk)).order_by('-created').distinct()[:20]
+            # 이제 리스트 만드는 코드가 필요하다. #########
 
-                # 이제 리스트 만드는 코드가 필요하다. #########
+            # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
+            ################################
+            output = []
+            count = 0
+            last = None
+            sub_output = None
+            obj_type = None
+            for post in posts:
+                count = count + 1
+                if count == 20:
+                    last = post.uuid
 
-                # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
-                ################################
-                output = []
-                count = 0
-                last = None
-                sub_output = None
-                obj_type = None
-                for post in posts:
-                    count = count + 1
-                    if count == 20:
-                        last = post.uuid
+                obj_type = 'solo'
+                try:
+                    type_check = post.solopost
+                except Exception as e:
+                    obj_type = 'group'
 
-                    obj_type = 'solo'
-                    try:
-                        type_check = post.solopost
-                    except Exception as e:
-                        obj_type = 'group'
+                sub_output = {
+                    'id': post.uuid,
+                    'obj_type': obj_type
+                }
 
-                    sub_output = {
-                        'id': post.uuid,
-                        'obj_type': obj_type
-                    }
+                output.append(sub_output)
 
-                    output.append(sub_output)
-
-                return JsonResponse({'res': 1, 'output': output, 'last': last})
+            return JsonResponse({'res': 1, 'output': output, 'last': last})
 
         return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
 def re_post_populate(request):
     if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                obj_type = request.POST.get('obj_type', None)
-                post = None
-                try:
-                    post = Post.objects.get(uuid=post_id)
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
-                ################################
-                obj_id = None
-                date = None
-                obj_name = None
-                if obj_type == 'solo':
-                    obj_id = post.solopost.solo.uuid
-                    date = post.solopost.solo_date.date
-                    obj_name = post.solopost.solo.solomainname.solo_name.name
-                else:
-                    obj_id = post.grouppost.group.uuid
-                    date = post.grouppost.group_date.date
-                    obj_name = post.grouppost.group.groupmainname.group_name.name
+        if request.is_ajax():
+            post_id = request.POST.get('post_id', None)
+            obj_type = request.POST.get('obj_type', None)
+            post = None
+            try:
+                post = Post.objects.get(uuid=post_id)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'res': 0})
+            ################################
+            obj_id = None
+            date = None
+            obj_name = None
+            if obj_type == 'solo':
+                obj_id = post.solopost.solo.uuid
+                date = post.solopost.solo_date.date
+                obj_name = post.solopost.solo.solomainname.solo_name.name
+            else:
+                obj_id = post.grouppost.group.uuid
+                date = post.grouppost.group_date.date
+                obj_name = post.grouppost.group.groupmainname.group_name.name
 
-                comment_output = []
-                comments = PostComment.objects.filter(post=post).order_by('created')[:3]
-                for comment in comments:
-                    sub_output = {
-                        'comment_username': comment.user.userusername.username,
-                        'comment_user_id': comment.user.username,
-                        'comment_text': comment.text,
-                        'comment_id': comment.uuid,
-                        'comment_created': comment.created
-                    }
-                    comment_output.append(sub_output)
-
-                like = 'false'
-                if PostLike.objects.filter(post=post, user=request.user).exists():
-                    like = 'true'
-
-                output = {
-                    'user_id': post.user.username,
-                    'username': post.user.userusername.username,
-                    'text': post.posttext_set.last().text,
-                    'gross': post.gross,
-                    'created': post.created,
-                    'date': date,
-                    'like_count': post.postlikecount.count,
-                    'like': like,
-                    'obj_id': obj_id,
-                    'obj_name': obj_name,
-                    'comment_count': post.postcommentcount.count,
-                    'comment_output': comment_output,
+            comment_output = []
+            comments = PostComment.objects.filter(post=post).order_by('created')[:3]
+            for comment in comments:
+                sub_output = {
+                    'comment_username': comment.user.userusername.username,
+                    'comment_user_id': comment.user.username,
+                    'comment_text': comment.text,
+                    'comment_id': comment.uuid,
+                    'comment_created': comment.created
                 }
-                # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
-                #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
+                comment_output.append(sub_output)
 
-                return JsonResponse({'res': 1, 'output': output})
+            like = 'false'
+            if PostLike.objects.filter(post=post, user=request.user).exists():
+                like = 'true'
+
+            output = {
+                'user_id': post.user.username,
+                'username': post.user.userusername.username,
+                'text': post.posttext_set.last().text,
+                'gross': post.gross,
+                'created': post.created,
+                'date': date,
+                'like_count': post.postlikecount.count,
+                'like': like,
+                'obj_id': obj_id,
+                'obj_name': obj_name,
+                'comment_count': post.postcommentcount.count,
+                'comment_output': comment_output,
+            }
+            # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
+            #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
+
+            return JsonResponse({'res': 1, 'output': output})
 
         return JsonResponse({'res': 2})
 
@@ -3511,5 +3491,25 @@ def re_group_follow(request):
                     return JsonResponse({'res': 1, 'result': result})
 
                 return JsonResponse({'res': 2})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_profile_post_delete(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                post_id = request.POST.get('post_id', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=post_id, user=request.user)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                if post is not None:
+                    post.delete()
+
+                return JsonResponse({'res': 1})
 
         return JsonResponse({'res': 2})

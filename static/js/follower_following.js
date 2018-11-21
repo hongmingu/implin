@@ -29,7 +29,7 @@ $(function () {
             },
             success: function (data) {
                 if (data.result === true) {
-                    $('#follow_text').html('now following <span class="glyphicon glyphicon-ok"></span>')
+                    $('#follow_text').html('following <span class="glyphicon glyphicon-ok"></span>')
                     var count_follower = parseInt($('#count_follower').html()) + 1
                     $('#count_follower').html(count_follower)
                 } else {
