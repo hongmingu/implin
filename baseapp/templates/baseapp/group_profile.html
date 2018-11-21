@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Demo</title>
+    {% include 'others/header_static.html' %}
+    {% include 'others/favicon.html' %}
+
+    {% load static from staticfiles %}
+    <script src="{% static 'js/navbar.js' %}"></script>
+    <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/nav_badge.js' %}"></script>
+    <script src="{% static 'js/post_populate.js' %}"></script>
+    <script src="{% static 'js/follower_following.js' %}"></script>
+    <script src="{% static 'js/date_differ.js' %}"></script>
+    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
+    {% if user.is_authenticated %}
+    {% else %}
+    {% endif %}
+
+    <style>
+    </style>
+
+
+</head>
+<body class="light_background_color height_100">
+<!--navbar start-->
+{% include 'baseapp/_navbar.html' %}
+
+<!--navbar end-->
+<!--page info-->
+{% include 'others/bootstrap_tester.html' %}
+<div class="hidden" id="page_kind">user</div>
+
+<div class="hidden" id="group_id">{{ group.uuid }}</div>
+{% if user.is_authenticated %}
+    <div class="hidden" id="user_id">{{ user.username }}</div>
+{% else %}
+    <div class="hidden" id="user_id"></div>
+{% endif %}
+
+<!--page info end -->
+
+<div class="container-fluid margin_top_50">
+    <div class="row">
+        <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
+            <div class="row" id="content">
+                <div class="row div_base" id="chat_base">
+                    <div align="center">
+                        <img class="img_300_300" id="img_300"
+                             src="{{ group.groupmainphoto.file_300_url }}">
+                    </div>
+
+                    <div align="center"><span>{{ group.groupmainname.group_name.name }}</span></div>
+
+                    <div align="center"><span>followers: </span><span>{{ group.groupfollowercount.count }}</span></div>
+
+                {% if following == None %}
+                    <a href="">
+                        <div class="hidden" align="center" id="follow">
+                            <span class="clickable" id="follow_text"><span class="now_unfollow">follow</span></span>
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="">
+                        <div class="hidden" align="center" id="follow">
+                            <span class="clickable" id="follow_text"><span class="now_following">now following <span class="glyphicon glyphicon-ok"></span></span></span>
+                        </div>
+                    </a>
+                {% endif %}
+                <div align="center">go to read posts</div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'baseapp/_modal_post_delete.html' %}
+{% include 'baseapp/_modal_populate.html' %}
+{% include 'baseapp/_modal_follow.html' %}
+
+  <!-- Hidden 으로 데이터 저장해놓고 modal on show 랑 hide 에서 그 데이터 불러와서 모달 채우게 하자. 그리고 임플린은 친구 중심이고
+  피드가 존재하게 되었기 때문에 팔로우가 부가적으로 존재하는 것 뿐이다. -->
+
+
+</body>
+<script>
+    $(function () {
+
+            $('#post_delete').click(function (e) {
+                e.preventDefault()
+              $.ajax({
+                  url: '/re/profile/post/delete/', type: 'post', dataType: 'json', cache: false,
+                  data: {
+                      post_id: $('#post_to_delete').html(),
+                  },
+                  success: function (data) {
+                    if(data.res === 1){
+                        $('#post_wrapper_'+$('#post_to_delete').html()).replaceWith('<div>post removed</div>')
+                        $('#modal_post_delete').modal('hide')
+                    }
+                  }
+              })
+
+            })
+
+            $("#modal_post_delete").on("shown.bs.modal", function () {
+
+            }).on("hidden.bs.modal", function () {
+                    $('#post_to_delete').html('')
+            })
+    });
+    $(function () {
+        $('#follow').click(function (e) {
+            e.preventDefault()
+            $.ajax({url:'/re/group/follow/', type:'post', dataType:'json', cache:false,
+                data:{
+                    group_id: $('#group_id').html(),
+                },
+                success:function (data) {
+                    console.log(data)
+                    if(data.res === 1){
+                        if(data.result === 'follow'){
+                            $('#follow_text').html('<span class="now_following">now following <span class="glyphicon glyphicon-ok"></span></span>')
+                        } else if (data.result === 'cancel'){
+                            $('#follow_text').html('<span class="now_unfollow">follow</span>')
+                        }
+                    }
+
+                }
+            })
+        })
+
+    })
+
+</script>
+
+</html>
