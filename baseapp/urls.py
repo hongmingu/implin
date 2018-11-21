@@ -173,20 +173,6 @@ urlpatterns = [
     re_path(r'^re_settings/ajax/$', auth_ajax_views.re_settings, name='re_settings'),
     re_path(r'^re_settings/ajax/upload_user_photo/$', auth_ajax_views.upload_user_photo, name='re_upload_user_photo'),
     # re_path(r'^re/create/new/$', base_ajax_views.re_create_new, name='re_create_new'),
-    re_path(r'^re/post/update/$', base_ajax_views.re_post_update,
-            name='re_post_update'),
-
-    re_path(r'^re/home/feed/$', base_ajax_views.re_home_feed,
-            name='re_home_feed'),
-
-    re_path(r'^re/user/home/populate/$', base_ajax_views.re_user_home_populate,
-            name='re_user_home_populate'),
-
-
-
-
-    re_path(r'^re/profile/populate/$', base_ajax_views.re_profile_populate,
-            name='re_profile_populate'),
 
     re_path(r'^re/explore/feed/$', base_ajax_views.re_explore_feed,
             name='re_explore_feed'),

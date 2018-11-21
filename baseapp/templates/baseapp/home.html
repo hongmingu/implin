@@ -8,9 +8,9 @@
     {% load static from staticfiles %}
     <script src="{% static 'js/navbar.js' %}"></script>
     <script src="{% static 'js/nav_badge.js' %}"></script>
+    <script src="{% static 'js/nav_badge_populate.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
 
-    <script src="{% static 'js/nav_badge_populate.js' %}"></script>
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
     {% else %}
@@ -39,14 +39,14 @@
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
 
+                <div class="row div_base">
+                {{ localdate|date:'Y-m-d'}}
+                </div>
             </div>
         </div>
     </div>
 </div>
 </body>
-<script>
-</script>
-
 <script>
 </script>
 

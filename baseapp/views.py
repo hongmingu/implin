@@ -102,7 +102,37 @@ def search_post(request):
 def home(request):
     if request.method == "GET":
 
-        return render(request, 'baseapp/home.html', )
+        from django.utils.timezone import localdate
+        from django.utils.dateparse import parse_date
+        from datetime import datetime, timedelta
+
+        group_date = GroupDate.objects.all().last()
+        ex_date = '2018-11-21'
+        print(ex_date.split('-')[0])
+        print(ex_date.split('-')[1])
+        print(ex_date.split('-')[2])
+        date_obj = datetime(int(ex_date.split('-')[0]),
+                            int(ex_date.split('-')[1]),
+                            int(ex_date.split('-')[2]))
+        result_obj = date_obj-timedelta(days=1)
+
+        result_new = str(result_obj).split(' ')[0]
+        print(parse_date(result_new))
+        print(str(result_obj))
+        try:
+            date_1 = datetime.strptime('2018-05-0aa1', '%Y-%m-%d')
+        except Exception as e:
+            print('nono')
+        date_2 = datetime.strptime('2018-06-02', '%Y-%m-%d')
+        date_3 = datetime.strptime('2018-06-04', '%Y-%m-%d')
+
+        if date_2 < date_3:
+            print('true')
+        print(date_3)
+        print(date_2)
+
+#https://docs.djangoproject.com/en/2.1/ref/utils/#module-django.utils.dateparse
+        return render(request, 'baseapp/home.html', {'localdate': parse_date('2018-1-1')})
 
 def b_admin(request):
     if request.method == "GET":

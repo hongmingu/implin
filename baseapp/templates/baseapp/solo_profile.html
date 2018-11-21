@@ -51,7 +51,7 @@
 
                     <div align="center"><span>{{ solo.solomainname.solo_name.name }}</span></div>
 
-                    <div align="center"><span>followers: </span><span>{{ solo.solofollowercount.count }}</span></div>
+                    <div align="center"><span>followers: </span><span id="follower_count">{{ solo.solofollowercount.count }}</span></div>
 
                 {% if following == None %}
                     <a href="">
@@ -62,7 +62,7 @@
                 {% else %}
                     <a href="">
                         <div class="hidden" align="center" id="follow">
-                            <span class="clickable" id="follow_text"><span class="now_following">now following <span class="glyphicon glyphicon-ok"></span></span></span>
+                            <span class="clickable" id="follow_text"><span class="now_following">following <span class="glyphicon glyphicon-ok"></span></span></span>
                         </div>
                     </a>
                 {% endif %}
@@ -121,9 +121,14 @@
                     console.log(data)
                     if(data.res === 1){
                         if(data.result === 'follow'){
-                            $('#follow_text').html('<span class="now_following">now following <span class="glyphicon glyphicon-ok"></span></span>')
+                            $('#follow_text').html('<span class="now_following">following <span class="glyphicon glyphicon-ok"></span></span>')
+                            var count = $('#follower_count').html()
+                            $('#follower_count').html(parseInt(count)+1)
+
                         } else if (data.result === 'cancel'){
                             $('#follow_text').html('<span class="now_unfollow">follow</span>')
+                            var count = $('#follower_count').html()
+                            $('#follower_count').html(parseInt(count)-1)
                         }
                     }
 
