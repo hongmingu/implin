@@ -2161,9 +2161,8 @@ def re_home_list(request):
         if request.user.is_authenticated:
             day = request.POST.get('day', None)
 
-            qs1 = SoloDate.objects.filter(date=day).order_by('gross')[:3]
-
-            qs2 = GroupDate.objects.filter(date=day).order_by('gross')[:3]
+            qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:3]
+            qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:3]
 
             # qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
             from itertools import chain
@@ -2172,37 +2171,106 @@ def re_home_list(request):
             result_list = sorted(
                 chain(qs1, qs2),
                 key=attrgetter('gross'),
-                reverse=True)
-            print(result_list)
+                reverse=True
+            )
             # descending order
             # result_list = sorted(
             #     chain(queryset1, queryset2),
             #     key=attrgetter('date_created'),
             #     reverse=True)
 
-            output = []
+            all_output = []
             for item in result_list:
-                kind = ''
+                obj_type = ''
                 main_name = None
                 main_photo = None
+                obj_id = None
+                posts = []
                 if str(item).startswith('group'):
-                    kind = 'group'
+                    obj_type = 'group'
                     main_name = item.group.groupmainname.group_name.name
                     main_photo = item.group.groupmainphoto.file_50_url()
+                    obj_id = item.group.uuid
+                    group_posts = GroupPost.objects.filter(group_date=item).order_by('-post__gross')[:3]
+                    for s_item in group_posts:
+                        ss_output ={
+                            'username': s_item.post.user.userusername.username,
+                            'gross': s_item.post.gross,
+                            'text': s_item.post.posttext_set.last().text,
+                        }
+                        posts.append(ss_output)
                 elif str(item).startswith('solo'):
-                    kind = 'solo'
+                    obj_type = 'solo'
                     main_name = item.solo.solomainname.solo_name.name
                     main_photo = item.solo.solomainphoto.file_50_url()
+                    obj_id = item.solo.uuid
+                    solo_posts = SoloPost.objects.filter(solo_date=item).order_by('-post__gross')[:3]
+                    for s_item in solo_posts:
+                        ss_output ={
+                            'username': s_item.post.user.userusername.username,
+                            'gross': s_item.post.gross,
+                            'text': s_item.post.posttext_set.last().text,
+                        }
+                        posts.append(ss_output)
                 sub_output = {
-                    'kind': kind,
+                    'obj_type': obj_type,
                     'main_name': main_name,
                     'main_photo': main_photo,
-                    'gross': item.gross
-
+                    'gross': item.gross,
+                    'obj_id': obj_id,
+                    'posts': posts,
                 }
-                output.append(sub_output)
+                all_output.append(sub_output)
+
+            solo_output = []
+            for item in qs1:
+                posts = []
+                solo_posts = SoloPost.objects.filter(solo_date=item).order_by('-post__gross')[:3]
+
+                for s_item in solo_posts:
+                    ss_output = {
+                        'username': s_item.post.user.userusername.username,
+                        'gross': s_item.post.gross,
+                        'text': s_item.post.posttext_set.last().text,
+                    }
+                    posts.append(ss_output)
+
+                sub_output = {
+                    'obj_type': 'solo',
+                    'main_name': item.solo.solomainname.solo_name.name,
+                    'main_photo': item.solo.solomainphoto.file_50_url(),
+                    'gross': item.gross,
+                    'obj_id': item.solo.uuid,
+                    'posts': posts
+                }
+                solo_output.append(sub_output)
+
+            group_output = []
+            for item in qs2:
+                posts = []
+                group_posts = GroupPost.objects.filter(group_date=item).order_by('-post__gross')[:3]
+
+                for s_item in group_posts:
+                    ss_output = {
+                        'username': s_item.post.user.userusername.username,
+                        'gross': s_item.post.gross,
+                        'text': s_item.post.posttext_set.last().text,
+                    }
+                    posts.append(ss_output)
+
+                sub_output = {
+                    'obj_type': 'group',
+                    'main_name': item.group.groupmainname.group_name.name,
+                    'main_photo': item.group.groupmainphoto.file_50_url(),
+                    'gross': item.gross,
+                    'obj_id': item.group.uuid,
+                    'posts': posts
+                }
+                group_output.append(sub_output)
 
             return JsonResponse({'res': 1,
-                                 'output': output})
+                                 'all_output': all_output,
+                                 'group_output': group_output,
+                                 'solo_output': solo_output})
 
         return JsonResponse({'res': 2})
