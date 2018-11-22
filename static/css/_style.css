@@ -560,3 +560,23 @@ a:active {
     display: inline-block;
     float: right;
 }
+
+
+.home_day{
+    font-size: 48px;
+}
+.home_left{
+    font-size: 48px; font-weight: bold;
+}
+.home_right{
+    font-size: 48px; font-weight: bold;
+}
+.home_right_space{
+    margin-right: 48px;
+}
+.home_all{
+    font-size: 24px;
+}
+.home_today_wrapper{
+    height: 30px;
+}

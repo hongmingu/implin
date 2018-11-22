@@ -127,6 +127,9 @@ class GroupDate(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return "group date: %s, %s" % (self.pk, self.pk)
+
     class Meta:
         unique_together = ('group', 'date',)
 
@@ -139,6 +142,9 @@ class SoloDate(models.Model):
 
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "solo date: %s, %s" % (self.pk, self.pk)
 
     class Meta:
         unique_together = ('solo', 'date',)

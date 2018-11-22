@@ -2153,3 +2153,56 @@ def re_profile_post_delete(request):
                 return JsonResponse({'res': 1})
 
         return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_home_list(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            day = request.POST.get('day', None)
+
+            qs1 = SoloDate.objects.filter(date=day).order_by('gross')[:3]
+
+            qs2 = GroupDate.objects.filter(date=day).order_by('gross')[:3]
+
+            # qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
+            from itertools import chain
+            from operator import attrgetter
+            # ascending oreder
+            result_list = sorted(
+                chain(qs1, qs2),
+                key=attrgetter('gross'),
+                reverse=True)
+            print(result_list)
+            # descending order
+            # result_list = sorted(
+            #     chain(queryset1, queryset2),
+            #     key=attrgetter('date_created'),
+            #     reverse=True)
+
+            output = []
+            for item in result_list:
+                kind = ''
+                main_name = None
+                main_photo = None
+                if str(item).startswith('group'):
+                    kind = 'group'
+                    main_name = item.group.groupmainname.group_name.name
+                    main_photo = item.group.groupmainphoto.file_50_url()
+                elif str(item).startswith('solo'):
+                    kind = 'solo'
+                    main_name = item.solo.solomainname.solo_name.name
+                    main_photo = item.solo.solomainphoto.file_50_url()
+                sub_output = {
+                    'kind': kind,
+                    'main_name': main_name,
+                    'main_photo': main_photo,
+                    'gross': item.gross
+
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output})
+
+        return JsonResponse({'res': 2})

@@ -10,6 +10,7 @@
     <script src="{% static 'js/nav_badge.js' %}"></script>
     <script src="{% static 'js/nav_badge_populate.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
+    <script src="{% static 'js/home_list.js' %}"></script>
 
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
@@ -33,6 +34,10 @@
     <div class="hidden" id="user_id"></div>
 {% endif %}
 <!--page info end -->
+<div class="hidden" id="day">{{ day }}</div>
+<div class="hidden" id="today">{{ today }}</div>
+<div class="hidden" id="tomorrow">{{ tomorrow }}</div>
+<div class="hidden" id="yesterday">{{ yesterday }}</div>
 
 <div class="container-fluid margin_top_50">
     <div class="row">
@@ -40,15 +45,30 @@
             <div class="row">
 
                 <div class="row div_base">
-                {{ localdate|date:'Y-m-d'}}
+                    <div align="center">
+                        <a href="/?d={{ yesterday }}"><span class="home_left">＜</span></a>
+                        <span class="home_day">{{ day }}</span>
+                        {% if tomorrow == '' %}
+                        <span class="home_right_space"></span>
+                            <div class="home_today_wrapper" align="center"></div>
+                        {% else %}
+                        <a href="/?d={{ tomorrow }}"><span class="home_right">＞</span></a>
+                            <div class="home_today_wrapper" align="center">
+                                <a href="/"><span class="home_today">today</span></a>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                    <div>
+                        <div class="home_all">All</div>
+                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
 </body>
-<script>
-</script>
 
 
 </html>

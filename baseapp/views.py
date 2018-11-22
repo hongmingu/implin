@@ -99,6 +99,7 @@ def search_post(request):
         word['q'] = q
         return render(request, 'baseapp/user_search_post.html', {'word': word})
 
+
 def home(request):
     if request.method == "GET":
 
@@ -106,33 +107,62 @@ def home(request):
         from django.utils.dateparse import parse_date
         from datetime import datetime, timedelta
 
-        group_date = GroupDate.objects.all().last()
-        ex_date = '2018-11-21'
-        print(ex_date.split('-')[0])
-        print(ex_date.split('-')[1])
-        print(ex_date.split('-')[2])
-        date_obj = datetime(int(ex_date.split('-')[0]),
-                            int(ex_date.split('-')[1]),
-                            int(ex_date.split('-')[2]))
-        result_obj = date_obj-timedelta(days=1)
+        d = request.GET.get('d', None)
+        if d is None:
+            if not request.get_full_path() == '/':
+                return redirect(reverse('baseapp:home'))
 
-        result_new = str(result_obj).split(' ')[0]
-        print(parse_date(result_new))
-        print(str(result_obj))
-        try:
-            date_1 = datetime.strptime('2018-05-0aa1', '%Y-%m-%d')
-        except Exception as e:
-            print('nono')
-        date_2 = datetime.strptime('2018-06-02', '%Y-%m-%d')
-        date_3 = datetime.strptime('2018-06-04', '%Y-%m-%d')
+            today_str = str(localdate())
+            today_obj = datetime(int(today_str.split('-')[0]),
+                                 int(today_str.split('-')[1]),
+                                 int(today_str.split('-')[2]))
 
-        if date_2 < date_3:
-            print('true')
-        print(date_3)
-        print(date_2)
+            yesterday_obj = today_obj - timedelta(days=1)
+            yesterday_str = str(yesterday_obj).split(' ')[0]
 
-#https://docs.djangoproject.com/en/2.1/ref/utils/#module-django.utils.dateparse
-        return render(request, 'baseapp/home.html', {'localdate': parse_date('2018-1-1')})
+            return render(request, 'baseapp/home.html', {'day': today_str,
+                                                         'yesterday': yesterday_str,
+                                                         'today': today_str,
+                                                         'tomorrow': ''})
+        else:
+            date = parse_date(d)
+            if date is None:
+                return redirect(reverse('baseapp:home'))
+            else:
+                today_str = str(localdate())
+                day_str = str(date)
+                if today_str == day_str:
+                    return redirect(reverse('baseapp:home'))
+
+                origin_str = '2018-11-01'
+                date_1 = None
+                date_2 = None
+                date_3 = None
+
+                try:
+                    date_1 = datetime.strptime(origin_str, '%Y-%m-%d')
+                    date_2 = datetime.strptime(day_str, '%Y-%m-%d')
+                    date_3 = datetime.strptime(today_str, '%Y-%m-%d')
+                except Exception as e:
+                    return redirect(reverse('baseapp:home'))
+
+                if not date_1 <= date_2 <= date_3:
+                    return redirect(reverse('baseapp:home'))
+
+                day_obj = datetime(int(day_str.split('-')[0]),
+                                   int(day_str.split('-')[1]),
+                                   int(day_str.split('-')[2]))
+
+                yesterday_obj = day_obj - timedelta(days=1)
+                yesterday_str = str(yesterday_obj).split(' ')[0]
+
+                tomorrow_obj = day_obj + timedelta(days=1)
+                tomorrow_str = str(tomorrow_obj).split(' ')[0]
+
+                return render(request, 'baseapp/home.html', {'day': day_str,
+                                                             'yesterday': yesterday_str,
+                                                             'today': today_str,
+                                                             'tomorrow': tomorrow_str})
 
 def b_admin(request):
     if request.method == "GET":
