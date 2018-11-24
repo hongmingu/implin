@@ -580,3 +580,26 @@ a:active {
 .home_today_wrapper{
     height: 30px;
 }
+
+
+.home_rank_wrapper{
+    width: 60px; float: left
+}
+.home_rank_1{
+    font-size: 60px;
+}
+.home_rank_2{
+    font-size: 48px;
+}
+.home_rank_3{
+    font-size: 36px;
+}
+.home_obj_img_wrapper{
+    float: left; width: 50px;
+}
+.home_obj_img{
+    width: 50px; height: 50px;
+}
+.home_obj_wrapper{
+    min-height: 50px;
+}
