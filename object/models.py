@@ -98,6 +98,9 @@ class Group(models.Model):
     def __str__(self):
         return "group name: %s, desc: %s" % (self.name, self.description)
 
+    def get_main_name(self):
+        return self.groupmainname.group_name.name
+
     class Meta:
         unique_together = ('name', 'description',)
 
@@ -114,6 +117,9 @@ class Solo(models.Model):
     def __str__(self):
         return "solo name: %s, desc: %s" % (self.name, self.description)
 
+    def get_main_name(self):
+        return self.solomainname.solo_name.name
+
     class Meta:
         unique_together = ('name', 'description',)
 
@@ -128,7 +134,7 @@ class GroupDate(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "group date: %s, %s" % (self.pk, self.pk)
+        return "group date: %s, %s" % (self.pk, self.updated)
 
     class Meta:
         unique_together = ('group', 'date',)
@@ -144,7 +150,7 @@ class SoloDate(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "solo date: %s, %s" % (self.pk, self.pk)
+        return "solo date: %s, %s" % (self.pk, self.updated)
 
     class Meta:
         unique_together = ('solo', 'date',)

@@ -2155,24 +2155,33 @@ def re_profile_post_delete(request):
         return JsonResponse({'res': 2})
 
 
+
+
+
 @ensure_csrf_cookie
-def re_home_list(request):
+def re_home_rank(request):
     if request.method == "POST":
-        if request.user.is_authenticated:
+        if request.is_ajax():
             day = request.POST.get('day', None)
 
             qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:3]
             qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:3]
-
             # qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
             from itertools import chain
             from operator import attrgetter
             # ascending oreder
+            # result_list = sorted(
+            #     chain(qs1, qs2),
+            #     key=attrgetter('gross'),
+            #     reverse=True
+            # )
+
             result_list = sorted(
                 chain(qs1, qs2),
-                key=attrgetter('gross'),
+                key=lambda x: (x.gross, -x.updated.timestamp(), -x.created.timestamp()),
                 reverse=True
             )
+            result_list = result_list[:3]
             # descending order
             # result_list = sorted(
             #     chain(queryset1, queryset2),
@@ -2272,5 +2281,181 @@ def re_home_list(request):
                                  'all_output': all_output,
                                  'group_output': group_output,
                                  'solo_output': solo_output})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_all_rank(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            day = request.POST.get('day', None)
+
+            qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:100]
+            qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:100]
+            # qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
+            from itertools import chain
+            from operator import attrgetter
+            # ascending oreder
+            # result_list = sorted(
+            #     chain(qs1, qs2),
+            #     key=attrgetter('gross'),
+            #     reverse=True
+            # )
+
+            result_list = sorted(
+                chain(qs1, qs2),
+                key=lambda x: (x.gross, -x.updated.timestamp(), -x.created.timestamp()),
+                reverse=True
+            )
+            result_list = result_list[:100]
+            # descending order
+            # result_list = sorted(
+            #     chain(queryset1, queryset2),
+            #     key=attrgetter('date_created'),
+            #     reverse=True)
+
+            output = []
+            for item in result_list:
+                obj_type = ''
+                main_name = None
+                main_photo = None
+                obj_id = None
+                posts = []
+                if str(item).startswith('group'):
+                    obj_type = 'group'
+                    main_name = item.group.groupmainname.group_name.name
+                    main_photo = item.group.groupmainphoto.file_50_url()
+                    obj_id = item.group.uuid
+                    group_posts = GroupPost.objects.filter(group_date=item).order_by('-post__gross')[:3]
+                    for s_item in group_posts:
+                        ss_output ={
+                            'username': s_item.post.user.userusername.username,
+                            'gross': s_item.post.gross,
+                            'text': s_item.post.posttext_set.last().text,
+                        }
+                        posts.append(ss_output)
+                elif str(item).startswith('solo'):
+                    obj_type = 'solo'
+                    main_name = item.solo.solomainname.solo_name.name
+                    main_photo = item.solo.solomainphoto.file_50_url()
+                    obj_id = item.solo.uuid
+                    solo_posts = SoloPost.objects.filter(solo_date=item).order_by('-post__gross')[:3]
+                    for s_item in solo_posts:
+                        ss_output ={
+                            'username': s_item.post.user.userusername.username,
+                            'gross': s_item.post.gross,
+                            'text': s_item.post.posttext_set.last().text,
+                        }
+                        posts.append(ss_output)
+                sub_output = {
+                    'obj_type': obj_type,
+                    'main_name': main_name,
+                    'main_photo': main_photo,
+                    'gross': item.gross,
+                    'obj_id': obj_id,
+                    'posts': posts,
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_solo_rank(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            day = request.POST.get('day', None)
+            print(day)
+
+            qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:100]
+
+            output = []
+            for item in qs1:
+                posts = []
+                solo_posts = SoloPost.objects.filter(solo_date=item).order_by('-post__gross')[:3]
+
+                for s_item in solo_posts:
+                    ss_output = {
+                        'username': s_item.post.user.userusername.username,
+                        'gross': s_item.post.gross,
+                        'text': s_item.post.posttext_set.last().text,
+                    }
+                    posts.append(ss_output)
+
+                sub_output = {
+                    'obj_type': 'solo',
+                    'main_name': item.solo.solomainname.solo_name.name,
+                    'main_photo': item.solo.solomainphoto.file_50_url(),
+                    'gross': item.gross,
+                    'obj_id': item.solo.uuid,
+                    'posts': posts
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output})
+
+        return JsonResponse({'res': 2})
+
+
+@ensure_csrf_cookie
+def re_group_rank(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            day = request.POST.get('day', None)
+
+            qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:100]
+
+            output = []
+            for item in qs2:
+                posts = []
+                group_posts = GroupPost.objects.filter(group_date=item).order_by('-post__gross')[:3]
+
+                for s_item in group_posts:
+                    ss_output = {
+                        'username': s_item.post.user.userusername.username,
+                        'gross': s_item.post.gross,
+                        'text': s_item.post.posttext_set.last().text,
+                    }
+                    posts.append(ss_output)
+
+                sub_output = {
+                    'obj_type': 'group',
+                    'main_name': item.group.groupmainname.group_name.name,
+                    'main_photo': item.group.groupmainphoto.file_50_url(),
+                    'gross': item.gross,
+                    'obj_id': item.group.uuid,
+                    'posts': posts
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output})
+
+        return JsonResponse({'res': 2})
+
+# home 이건 뭐건 rank 에서 그 object 누르면 /solo/post/uuid/ 여기로 가는 거 그리고 post 누르면 그 /post/uuid 로 가는거 구현
+
+
+@ensure_csrf_cookie
+def re_solo(request, uuid):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                post_id = request.POST.get('post_id', None)
+                post = None
+                try:
+                    post = Post.objects.get(uuid=post_id, user=request.user)
+                except Exception as e:
+                    print(e)
+                    return JsonResponse({'res': 0})
+                if post is not None:
+                    post.delete()
+
+                return JsonResponse({'res': 1})
 
         return JsonResponse({'res': 2})

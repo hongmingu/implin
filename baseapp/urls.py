@@ -11,6 +11,9 @@ urlpatterns = [
     re_path(r'^user/accounts/$', authviews.main_create_log_in, name='main_create_log_in'),
 
     re_path(r'^$', views.home, name='home'),
+    re_path(r'^solo/$', views.solo_home, name="solo_home"),
+    re_path(r'^group/$', views.group_home, name="group_home"),
+    re_path(r'^all/$', views.all_home, name="all_home"),
 
     re_path(r'^pay/charge/$', views.pay_charge, name='pay_charge'),
     re_path(r'^pay/return/$', views.pay_return, name="pay_return"),
@@ -26,8 +29,11 @@ urlpatterns = [
 
     re_path(r'^(?P<user_username>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/$',
             views.user_profile, name='user_profile'),
-    re_path(r'^solo/(?P<uuid>([0-9a-f]{32}))/$', views.solo_profile, name="solo_profile"),
-    re_path(r'^group/(?P<uuid>([0-9a-f]{32}))/$', views.group_profile, name="group_profile"),
+    re_path(r'^solo/profile/(?P<uuid>([0-9a-f]{32}))/$', views.solo_profile, name="solo_profile"),
+    re_path(r'^group/profile/(?P<uuid>([0-9a-f]{32}))/$', views.group_profile, name="group_profile"),
+
+    re_path(r'^solo/(?P<uuid>([0-9a-f]{32}))/$', views.solo_posts, name="solo_posts"),
+    re_path(r'^group/(?P<uuid>([0-9a-f]{32}))/$', views.group_posts, name="group_posts"),
 
     # --------------------------------------------------------------------------------
     re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
@@ -91,8 +97,14 @@ urlpatterns = [
             name='re_group_follow'),
     # --------------------------------------------------------------------------------
 
-    re_path(r'^re/home/list/$', base_ajax_views.re_home_list,
-            name='re_home_list'),
+    re_path(r'^re/home/rank/$', base_ajax_views.re_home_rank,
+            name='re_home_rank'),
+    re_path(r'^re/solo/rank/$', base_ajax_views.re_solo_rank,
+            name='re_solo_rank'),
+    re_path(r'^re/group/rank/$', base_ajax_views.re_group_rank,
+            name='re_group_rank'),
+    re_path(r'^re/all/rank/$', base_ajax_views.re_all_rank,
+            name='re_all_rank'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),

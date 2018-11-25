@@ -574,25 +574,33 @@ a:active {
 .home_right_space{
     margin-right: 48px;
 }
-.home_all{
+.home_name{
     font-size: 24px;
+}
+.home_more{
+    font-size: 14px; float: right; margin-top: 14px;
 }
 .home_today_wrapper{
     height: 30px;
 }
-
+.home_today{
+    font-size: 20px; border-radius: 3px; background-color: #8e97ed; padding: 3px;
+}
+.home_list_name_wrapper{
+    background-color: whitesmoke;
+}
 
 .home_rank_wrapper{
-    width: 60px; float: left
+    width: 60px; float: left; min-height: 60px; padding-right: 10px;
 }
 .home_rank_1{
     font-size: 60px;
 }
 .home_rank_2{
-    font-size: 48px;
+    font-size: 40px;
 }
 .home_rank_3{
-    font-size: 36px;
+    font-size: 24px;
 }
 .home_obj_img_wrapper{
     float: left; width: 50px;
@@ -601,5 +609,100 @@ a:active {
     width: 50px; height: 50px;
 }
 .home_obj_wrapper{
-    min-height: 50px;
+    min-height: 50px; padding: 10px;
+}
+.home_rank_obj_wrapper{
+    min-height: 85px;
+}
+.home_post_wrapper{
+    margin-left: 70px; margin-right: 10px;
+}
+.home_obj_name{
+    font-size: 14px; font-weight: bold; margin-left: 10px;
+}
+.home_post_username_text_wrapper{
+    max-height: 20px;
+    float: left;
+}
+.home_post_username{
+    font-size: 12px; font-weight: bold;
+}
+.home_post_gross{
+    font-size: 11px; font-weight: bold; float: right;
+}
+
+
+
+
+.gen_day{
+    font-size: 48px;
+}
+.gen_left{
+    font-size: 48px; font-weight: bold;
+}
+.gen_right{
+    font-size: 48px; font-weight: bold;
+}
+.gen_right_space{
+    margin-right: 48px;
+}
+.gen_name{
+    font-size: 24px;
+}
+.gen_more{
+    font-size: 14px; float: right; margin-top: 12px; padding: 2px;
+}
+.gen_today_wrapper{
+    height: 30px;
+}
+.gen_today{
+    font-size: 20px; border-radius: 3px; background-color: #8e97ed; padding: 3px;
+}
+.gen_list_name_wrapper{
+    background-color: whitesmoke;
+}
+
+.gen_rank_wrapper{
+    width: 60px; float: left; min-height: 60px; padding-right: 10px;
+}
+.gen_rank_1{
+    font-size: 60px;
+}
+.gen_rank_2{
+    font-size: 40px;
+}
+.gen_rank_3{
+    font-size: 24px;
+}
+
+.gen_rank_other{
+    font-size: 12px;
+}
+.gen_obj_img_wrapper{
+    float: left; width: 50px;
+}
+.gen_obj_img{
+    width: 50px; height: 50px;
+}
+.gen_obj_wrapper{
+    min-height: 50px; padding: 10px;
+}
+.gen_rank_obj_wrapper{
+    min-height: 85px;
+}
+.gen_post_wrapper{
+    margin-left: 70px; margin-right: 10px;
+}
+.gen_obj_name{
+    font-size: 14px; font-weight: bold; margin-left: 10px;
+}
+.gen_post_username_text_wrapper{
+    max-height: 20px;
+    float: left;
+}
+.gen_post_username{
+    font-size: 12px; font-weight: bold;
+}
+.gen_post_gross{
+    font-size: 11px; font-weight: bold; float: right;
 }
