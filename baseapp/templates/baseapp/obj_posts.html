@@ -11,7 +11,8 @@
     <script src="{% static 'js/nav_badge.js' %}"></script>
     <script src="{% static 'js/date_differ.js' %}"></script>
 
-    <script src="{% static 'js/post_populate.js' %}"></script>
+    <script src="{% static 'js/obj_post_populate.js' %}"></script>
+    <script src="{% static 'js/obj_posts.js' %}"></script>
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
     {% else %}
@@ -35,25 +36,30 @@
     <div class="hidden" id="user_id"></div>
 {% endif %}
 
+<div class="hidden" id="obj_type">{{ obj_type }}</div>
+<div class="hidden" id="obj_id">{{ id }}</div>
+<div class="hidden" id="end_id"></div>
+
 <!--page info end -->
 
 <div class="container-fluid margin_top_50">
     <div class="row">
         <div class="col-xs-12 col-sm-offset-3 col-sm-6 col-md-offset-4 col-md-4">
             <div class="row">
-                <div class="row div_base" id="post_wrapper_{{ id }}">
-                    <script defer>
-                        post_populate("{{ id }}", "{{ obj_type }}")
-                    </script>
+                <div class="row div_base">
+                    <div><span class="obj_name">{{ obj.get_main_name }}</span></div>
                 </div>
 
+                <div id="post_list"></div>
+
+                <a href=""><div class="obj_more_load hidden" id="obj_more_load">more_load</div></a>
 
             </div>
         </div>
     </div>
 </div>
 
-{% include 'baseapp/_modal_populate.html' %}
+{% include 'baseapp/_modal_obj_populate.html' %}
 
   <!-- obj date 의 경우엔 1,2,3등 포스트가보이게한다(누적은 신경안씀), group_date 는 따로 만들 필요가 없다.
   group post 도 필요없다. 그냥 group rank by date 만 만들자. 누적을 이용해서 . 그러면 된다. -->

@@ -15,7 +15,9 @@ $(function () {
                     } else {
                         rank = '<div class="gen_rank_wrapper" align="right"><span class="gen_rank_other">' + (parseInt(key) + 1) + '</span></div>'
                     }
-                    var obj = '<div class="gen_obj_wrapper">' +
+                    var obj_path = '/' + value.obj_type + '/' + value.obj_id + '/'
+
+                    var obj = '<a href="'+obj_path+'"><div class="gen_obj_wrapper">' +
                         '<div class="gen_obj_img_wrapper">' +
                         '<img class="gen_obj_img" src="' + value.main_photo + '">' +
                         '</div>' +
@@ -27,12 +29,12 @@ $(function () {
                         '<span class="gen_obj_gross">' + value.gross + '</span>' +
                         '</div>' +
                         '</div>' + //gen_obj_content_wrapper
-                        '</div>'  //gen_obj_wrapper
+                        '</div></a>'  //gen_obj_wrapper
                     var posts = ''
                     $.each(value.posts, function (key, value) {
-                        posts = posts + '<div class="gen_post_wrapper">' +
+                        posts = posts + '<a href="/post/'+value.post_id+'/"><div class="gen_post_wrapper clickable">' +
                             '<span class="gen_post_username">' + value.username + '</span><span class="gen_post_gross">' + value.gross + '</span>' +
-                            '</div>'
+                            '</div></a>'
                     })
 
                     var appender = '<div class="gen_rank_obj_wrapper">' +

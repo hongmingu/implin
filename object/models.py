@@ -18,7 +18,16 @@ class Post(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "Post pk: %s, user: %s" % (self.pk, self.user.userusername.username)
+        solo_post = None
+        try:
+            solo_post = self.solopost
+        except Exception as e:
+            pass
+        if solo_post is not None:
+            return "solo - Post pk: %s, user: %s" % (self.pk, self.user.userusername.username)
+        else:
+            return "group - Post pk: %s, user: %s" % (self.pk, self.user.userusername.username)
+
 
     def get_absolute_url(self):
         from django.urls import reverse

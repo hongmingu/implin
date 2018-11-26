@@ -52,7 +52,7 @@
 
                     <div align="center"><span>{{ group.groupmainname.group_name.name }}</span></div>
 
-                    <div align="center"><span>followers: </span><span>{{ group.groupfollowercount.count }}</span></div>
+                    <div align="center"><span>followers: </span><span id="follower_count">{{ group.groupfollowercount.count }}</span></div>
 
                 {% if following == None %}
                     <a href="">
@@ -67,7 +67,7 @@
                         </div>
                     </a>
                 {% endif %}
-                <div align="center">go to read posts</div>
+                <a href="/group/{{ group.uuid }}/"><div align="center">go to read posts</div></a>
 
                 </div>
 

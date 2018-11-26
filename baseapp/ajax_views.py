@@ -2206,6 +2206,7 @@ def re_home_rank(request):
                             'username': s_item.post.user.userusername.username,
                             'gross': s_item.post.gross,
                             'text': s_item.post.posttext_set.last().text,
+                            'post_id': s_item.post.uuid
                         }
                         posts.append(ss_output)
                 elif str(item).startswith('solo'):
@@ -2219,6 +2220,7 @@ def re_home_rank(request):
                             'username': s_item.post.user.userusername.username,
                             'gross': s_item.post.gross,
                             'text': s_item.post.posttext_set.last().text,
+                            'post_id': s_item.post.uuid
                         }
                         posts.append(ss_output)
                 sub_output = {
@@ -2241,6 +2243,7 @@ def re_home_rank(request):
                         'username': s_item.post.user.userusername.username,
                         'gross': s_item.post.gross,
                         'text': s_item.post.posttext_set.last().text,
+                        'post_id': s_item.post.uuid
                     }
                     posts.append(ss_output)
 
@@ -2264,6 +2267,7 @@ def re_home_rank(request):
                         'username': s_item.post.user.userusername.username,
                         'gross': s_item.post.gross,
                         'text': s_item.post.posttext_set.last().text,
+                        'post_id': s_item.post.uuid
                     }
                     posts.append(ss_output)
 
@@ -2333,6 +2337,7 @@ def re_all_rank(request):
                             'username': s_item.post.user.userusername.username,
                             'gross': s_item.post.gross,
                             'text': s_item.post.posttext_set.last().text,
+                            'post_id': s_item.post.uuid
                         }
                         posts.append(ss_output)
                 elif str(item).startswith('solo'):
@@ -2346,6 +2351,7 @@ def re_all_rank(request):
                             'username': s_item.post.user.userusername.username,
                             'gross': s_item.post.gross,
                             'text': s_item.post.posttext_set.last().text,
+                            'post_id': s_item.post.uuid
                         }
                         posts.append(ss_output)
                 sub_output = {
@@ -2383,6 +2389,7 @@ def re_solo_rank(request):
                         'username': s_item.post.user.userusername.username,
                         'gross': s_item.post.gross,
                         'text': s_item.post.posttext_set.last().text,
+                        'post_id': s_item.post.uuid
                     }
                     posts.append(ss_output)
 
@@ -2420,6 +2427,7 @@ def re_group_rank(request):
                         'username': s_item.post.user.userusername.username,
                         'gross': s_item.post.gross,
                         'text': s_item.post.posttext_set.last().text,
+                        'post_id': s_item.post.uuid
                     }
                     posts.append(ss_output)
 
@@ -2442,20 +2450,78 @@ def re_group_rank(request):
 
 
 @ensure_csrf_cookie
-def re_solo(request, uuid):
+def re_solo_posts(request):
     if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                post = None
-                try:
-                    post = Post.objects.get(uuid=post_id, user=request.user)
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
-                if post is not None:
-                    post.delete()
+        if request.is_ajax():
+            obj_id = request.POST.get('obj_id', None)
+            end_id = request.POST.get('end_id', None)
+            solo = None
+            try:
+                solo = Solo.objects.get(uuid=obj_id)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'res': 0})
 
-                return JsonResponse({'res': 1})
+            if solo is not None:
+
+                if end_id == '':
+                    posts = Post.objects.filter(solopost__solo=solo).order_by('-created')[:30]
+                else:
+                    try:
+                        end_post = Post.objects.get(uuid=end_id)
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+                    posts = Post.objects.filter(solopost__solo=solo, pk__lt=end_post.pk).order_by('-created')[:30]
+
+                output = []
+                count = 0
+                end = None
+                for post in posts:
+                    count = count + 1
+                    if count == 30:
+                        end = post.uuid
+                    output.append(post.uuid)
+
+                return JsonResponse({'res': 1, 'output': output, 'end': end})
+
+            return JsonResponse({'res': 2})
+
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_group_posts(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            obj_id = request.POST.get('obj_id', None)
+            end_id = request.POST.get('end_id', None)
+            group = None
+            try:
+                group = Group.objects.get(uuid=obj_id)
+            except Exception as e:
+                print(e)
+                return JsonResponse({'res': 0})
+            if group is not None:
+
+                if end_id == '':
+                    posts = Post.objects.filter(grouppost__group=group).order_by('-created')[:30]
+                else:
+                    try:
+                        end_post = Post.objects.get(uuid=end_id)
+                    except Exception as e:
+                        return JsonResponse({'res': 0})
+                    posts = Post.objects.filter(grouppost__group=group, pk__lt=end_post.pk).order_by('-created')[:30]
+
+                output = []
+                count = 0
+                end = None
+                for post in posts:
+                    count = count + 1
+                    if count == 30:
+                        end = post.uuid
+                    output.append(post.uuid)
+
+                return JsonResponse({'res': 1, 'output': output, 'end': end})
+
+            return JsonResponse({'res': 2})
 
         return JsonResponse({'res': 2})

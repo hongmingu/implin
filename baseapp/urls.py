@@ -32,6 +32,8 @@ urlpatterns = [
     re_path(r'^solo/profile/(?P<uuid>([0-9a-f]{32}))/$', views.solo_profile, name="solo_profile"),
     re_path(r'^group/profile/(?P<uuid>([0-9a-f]{32}))/$', views.group_profile, name="group_profile"),
 
+    re_path(r'^post/(?P<uuid>([0-9a-f]{32}))/$', views.post, name='post'),
+
     re_path(r'^solo/(?P<uuid>([0-9a-f]{32}))/$', views.solo_posts, name="solo_posts"),
     re_path(r'^group/(?P<uuid>([0-9a-f]{32}))/$', views.group_posts, name="group_posts"),
 
@@ -105,6 +107,11 @@ urlpatterns = [
             name='re_group_rank'),
     re_path(r'^re/all/rank/$', base_ajax_views.re_all_rank,
             name='re_all_rank'),
+
+    re_path(r'^re/solo/posts/$', base_ajax_views.re_solo_posts,
+            name='re_solo_posts'),
+    re_path(r'^re/group/posts/$', base_ajax_views.re_group_posts,
+            name='re_group_posts'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^b/admin/$', views.b_admin, name='b_admin'),
@@ -181,7 +188,6 @@ urlpatterns = [
     re_path(r'^note/all/$', views.note_all, name='note_all'),
 
     re_path(r'^post/update/(?P<uuid>([0-9a-f]{32}))/$', views.post_update, name='post_update'),
-    re_path(r'^post/(?P<uuid>([0-9a-f]{32}))/$', views.post, name='post'),
     re_path(r'^search/all/$', views.search_all, name='search_all'),
     re_path(r'^search/user/$', views.search_user, name='search_user'),
     re_path(r'^search/post/$', views.search_post, name='search_post'),

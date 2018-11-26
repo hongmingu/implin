@@ -37,19 +37,6 @@ def post_update(request, uuid):
 
             return render(request, 'baseapp/post_update.html', {'post': post, 'just_created': just_created})
 
-def post(request, uuid):
-    if request.method == "GET":
-        post = None
-        try:
-            post = Post.objects.get(uuid=uuid)
-        except:
-            return render(request, '404.html')
-        if post is not None:
-            id_data = {}
-            id_data['id'] = uuid
-            return render(request, 'baseapp/post.html', {'id_data': id_data, 'post': post})
-
-        return render(request, 'baseapp/post.html', )
 
 
 def explore_feed(request):
@@ -342,7 +329,7 @@ def solo_posts(request, uuid):
         except Exception as e:
             return render(request, '404.html')
         if solo is not None:
-            return render(request, 'baseapp/obj_feed.html',
+            return render(request, 'baseapp/obj_posts.html',
                           {'obj': solo, 'obj_type': 'solo', 'id': uuid})
 
 
@@ -354,7 +341,7 @@ def group_posts(request, uuid):
         except Exception as e:
             return render(request, '404.html')
         if group is not None:
-            return render(request, 'baseapp/obj_feed.html',
+            return render(request, 'baseapp/obj_posts.html',
                           {'obj': group, 'obj_type': 'group', 'id': uuid})
 
 
@@ -638,3 +625,19 @@ def all_home(request):
                                                              'today': today_str,
                                                              'tomorrow': tomorrow_str})
 
+
+def post(request, uuid):
+    if request.method == "GET":
+        post = None
+        try:
+            post = Post.objects.get(uuid=uuid)
+        except Exception as e:
+            return render(request, '404.html')
+        if post is not None:
+            if str(post).startswith('solo'):
+                obj_type = 'solo'
+            else:
+                obj_type = 'group'
+            return render(request, 'baseapp/post.html', {'id': uuid, 'post': post, 'obj_type': obj_type})
+
+        return render(request, 'baseapp/post.html', )

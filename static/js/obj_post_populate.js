@@ -1,4 +1,4 @@
-var post_populate = function post_populate(id, obj_type) {
+var obj_post_populate = function obj_post_populate(id, obj_type) {
     $(function () {
         $.ajax({
             url: '/re/post/populate/', type: 'post', dataType: 'json', cache: false,
@@ -17,7 +17,7 @@ var post_populate = function post_populate(id, obj_type) {
                         text = '<div class="pop_text">'+data.output.text+'</div>'
                     }
 
-                    var obj = '<div align="right"><a href="/'+obj_type+'/profile/'+data.output.obj_id+'/"><span class="pop_obj">'+data.output.obj_name+'</span></a></div>'
+                    var obj = ''
 
                     var comment_more_load = '<a href=""><div class="pop_comment_more_load hidden" id="pop_comment_more_load_'+id+'" align="center">more load</div></a>'
                     if (data.output.comment_count > 3){
@@ -155,7 +155,6 @@ var post_populate = function post_populate(id, obj_type) {
                                             $('#pop_comment_more_load_'+id).addClass('hidden')
                                         }
                                         $('#last_comment_'+id).html('')
-
                                     } else {
                                         if($('#pop_comment_more_load_'+id).hasClass('hidden')){
                                             $('#pop_comment_more_load_'+id).removeClass('hidden')
