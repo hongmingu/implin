@@ -633,9 +633,9 @@ def search_all(request):
 
 def search_user(request):
     if request.method == "GET":
+        q = request.GET.get('q', None)
         if q is None:
             q = ''
-        q = request.GET.get('q', None)
         word = q
         return render(request, 'baseapp/user_search_user.html', {'word': word})
 
