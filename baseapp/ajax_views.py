@@ -1480,7 +1480,6 @@ def re_post_populate(request):
     if request.method == "POST":
         if request.is_ajax():
             post_id = request.POST.get('post_id', None)
-            print(post_id)
             obj_type = request.POST.get('obj_type', None)
             post = None
             try:
@@ -2440,7 +2439,7 @@ def re_search_all(request):
                     'member': member_list
 
                 }
-                solo_output.append(sub_output)
+                group_output.append(sub_output)
             posts = Post.objects.filter(Q(user__userusername__username__icontains=search_word)
                                         | Q(posttext__text__icontains=search_word)
                                         | Q(solopost__solo__soloname__name__icontains=search_word)
