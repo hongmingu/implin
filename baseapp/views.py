@@ -629,7 +629,7 @@ def search_all(request):
         if q is None:
             q = ''
         word = q
-        return render(request, 'baseapp/user_search_all.html', {'word': word})
+        return render(request, 'baseapp/search_all.html', {'word': word})
 
 def search_user(request):
     if request.method == "GET":
@@ -637,7 +637,7 @@ def search_user(request):
         if q is None:
             q = ''
         word = q
-        return render(request, 'baseapp/user_search_user.html', {'word': word})
+        return render(request, 'baseapp/search_user.html', {'word': word})
 
 def search_post(request):
     if request.method == "GET":
@@ -645,4 +645,4 @@ def search_post(request):
         if q is None:
             q = ''
         word = q
-        return render(request, 'baseapp/user_search_post.html', {'word': word})
+        return render(request, 'baseapp/search_post.html', {'word': word})

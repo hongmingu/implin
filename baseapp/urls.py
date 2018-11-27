@@ -39,8 +39,8 @@ urlpatterns = [
 
     re_path(r'^search/all/$', views.search_all, name='search_all'),
     re_path(r'^search/user/$', views.search_user, name='search_user'),
-    re_path(r'^search/person/$', views.search_person, name='search_person'),
-    re_path(r'^search/group/$', views.search_group, name='search_group'),
+    # re_path(r'^search/person/$', views.search_person, name='search_person'),
+    # re_path(r'^search/group/$', views.search_group, name='search_group'),
     re_path(r'^search/post/$', views.search_post, name='search_post'),
 
     # --------------------------------------------------------------------------------
