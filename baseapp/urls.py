@@ -37,6 +37,12 @@ urlpatterns = [
     re_path(r'^solo/(?P<uuid>([0-9a-f]{32}))/$', views.solo_posts, name="solo_posts"),
     re_path(r'^group/(?P<uuid>([0-9a-f]{32}))/$', views.group_posts, name="group_posts"),
 
+    re_path(r'^search/all/$', views.search_all, name='search_all'),
+    re_path(r'^search/user/$', views.search_user, name='search_user'),
+    re_path(r'^search/person/$', views.search_person, name='search_person'),
+    re_path(r'^search/group/$', views.search_group, name='search_group'),
+    re_path(r'^search/post/$', views.search_post, name='search_post'),
+
     # --------------------------------------------------------------------------------
     re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
             name='re_create_search'),
@@ -187,10 +193,6 @@ urlpatterns = [
     re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
     re_path(r'^note/all/$', views.note_all, name='note_all'),
 
-    re_path(r'^post/update/(?P<uuid>([0-9a-f]{32}))/$', views.post_update, name='post_update'),
-    re_path(r'^search/all/$', views.search_all, name='search_all'),
-    re_path(r'^search/user/$', views.search_user, name='search_user'),
-    re_path(r'^search/post/$', views.search_post, name='search_post'),
 
     re_path(r'^re_settings/ajax/$', auth_ajax_views.re_settings, name='re_settings'),
     re_path(r'^re_settings/ajax/upload_user_photo/$', auth_ajax_views.upload_user_photo, name='re_upload_user_photo'),

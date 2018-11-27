@@ -65,27 +65,6 @@ def note_all(request):
             return redirect(reverse('baseapp:main_create_log_in'))
 
 
-def search_all(request):
-    if request.method == "GET":
-        q = request.GET.get('q', None)
-        word = {}
-        word['q'] = q
-        return render(request, 'baseapp/user_search_all.html', {'word': word})
-
-def search_user(request):
-    if request.method == "GET":
-        q = request.GET.get('q', None)
-        word = {}
-        word['q'] = q
-        return render(request, 'baseapp/user_search_user.html', {'word': word})
-
-def search_post(request):
-    if request.method == "GET":
-        q = request.GET.get('q', None)
-        word = {}
-        word['q'] = q
-        return render(request, 'baseapp/user_search_post.html', {'word': word})
-
 
 def b_admin(request):
     if request.method == "GET":
@@ -641,3 +620,29 @@ def post(request, uuid):
             return render(request, 'baseapp/post.html', {'id': uuid, 'post': post, 'obj_type': obj_type})
 
         return render(request, 'baseapp/post.html', )
+
+
+
+def search_all(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        if q is None:
+            q = ''
+        word = q
+        return render(request, 'baseapp/user_search_all.html', {'word': word})
+
+def search_user(request):
+    if request.method == "GET":
+        if q is None:
+            q = ''
+        q = request.GET.get('q', None)
+        word = q
+        return render(request, 'baseapp/user_search_user.html', {'word': word})
+
+def search_post(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        if q is None:
+            q = ''
+        word = q
+        return render(request, 'baseapp/user_search_post.html', {'word': word})
