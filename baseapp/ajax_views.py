@@ -2474,7 +2474,7 @@ def re_search_all(request):
 
         return JsonResponse({'res': 2})
 
-
+# 로그인시 검색가능 아닌거 가능 그런거 찾아야한다.
 @ensure_csrf_cookie
 def re_search_user(request):
     if request.method == "POST":
@@ -2645,8 +2645,6 @@ def re_search_post(request):
                 count = count + 1
                 if count == step:
                     end = post.uuid
-                    break
-
                 sub_output = {
                     'id': post.uuid,
                 }
