@@ -2390,13 +2390,13 @@ def re_search_all(request):
             for user in users:
                 sub_output = {
                     'username': user.userusername.username,
-                    'user_text_name': user.usertextname.name,
+                    'user_text_name': escape(user.usertextname.name),
                 }
 
                 user_output.append(sub_output)
             from django.db.models.functions import Length
 
-            solos = Solo.objects.filter(soloname__name__icontains=search_word).order_by(Length('name').asc())[:10]
+            solos = Solo.objects.filter(soloname__name__icontains=search_word).order_by(Length('name').asc(), 'pk')[:10]
             solo_output = []
 
             for item in solos:
@@ -2418,7 +2418,7 @@ def re_search_all(request):
                 }
                 solo_output.append(sub_output)
 
-            groups = Group.objects.filter(groupname__name__icontains=search_word).order_by(Length('name').asc())[:10]
+            groups = Group.objects.filter(groupname__name__icontains=search_word).order_by(Length('name').asc(), 'pk')[:10]
             group_output = []
 
             for item in groups:
@@ -2468,50 +2468,142 @@ def re_search_all(request):
         return JsonResponse({'res': 2})
 
 
-
-
 @ensure_csrf_cookie
 def re_search_user(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
-            next_id = request.POST.get('next_id', None)
-            if next_id == '':
+            end_id = request.POST.get('end_id', None)
+            if end_id == '':
                 users = User.objects.filter(Q(userusername__username__icontains=search_word)
-                                            | Q(usertextname__name__icontains=search_word)).order_by('-noticecount__created').distinct()[:31]
+                                            | Q(usertextname__name__icontains=search_word)).order_by(
+                    '-userusername__created').distinct()[:20]
             else:
-                next_user = None
+                end_user = None
                 try:
-                    next_user = User.objects.get(username=next_id)
+                    end_user = User.objects.get(username=end_id)
                 except Exception as e:
                     print(e)
                     return JsonResponse({'res': 0})
 
                 users = User.objects.filter((Q(userusername__username__icontains=search_word)
-                                            | Q(usertextname__name__icontains=search_word)) & Q(noticecount__created__lte=next_user.noticecount.created)).exclude(pk=next_user.pk).order_by(
-                    '-noticecount__created').distinct()[:31]
-            user_output = []
-            users_count = 0
-            user_next = None
+                                            | Q(usertextname__name__icontains=search_word))
+                                            & Q(pk__lt=end_user.pk)).order_by(
+                    '-userusername__created').distinct()[:20]
+            output = []
+            count = 0
+            end = None
             for user in users:
-                users_count = users_count + 1
-                if users_count == 31:
-                    user_next = user.username
-                    break
+                count = count + 1
+                if count == 30:
+                    end = user.username
                 sub_output = {
                     'username': user.userusername.username,
                     'user_photo': user.userphoto.file_50_url(),
                     'user_text_name': escape(user.usertextname.name),
                 }
 
-                user_output.append(sub_output)
+                output.append(sub_output)
 
             return JsonResponse({'res': 1,
-                                 'user_set': user_output,
-                                 'user_next': user_next})
+                                 'output': output,
+                                 'end': end})
 
         return JsonResponse({'res': 2})
 
+# from django.db.models import TextField
+#
+# TextField.register_lookup(Length)
+
+from django.db.models.functions import Length
+
+@ensure_csrf_cookie
+def re_search_solo(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            search_word = request.POST.get('search_word', None)
+            order = request.POST.get('order', None)
+            order = int(order)
+            order_step = 10
+
+            objs = Solo.objects.filter(Q(soloname__name__icontains=search_word)
+                                       | Q(description__icontains=search_word)).order_by(
+                Length('name').asc(), 'pk')[order:order+order_step]
+            end = 'false'
+            print(objs.count())
+            if objs.count() < order_step:
+                end = 'true'
+
+            output = []
+            for item in objs:
+                member_list = []
+                kind = 'solo'
+                main_name = item.solomainname.solo_name.name
+                main_photo = item.solomainphoto.file_50_url()
+                members = Member.objects.filter(solo=item)
+                for i in members:
+                    member_list.append(i.group.groupmainname.group_name.name)
+
+                sub_output = {
+                    'kind': kind,
+                    'main_name': main_name,
+                    'main_photo': main_photo,
+                    'id': item.uuid,
+                    'member': member_list
+
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output,
+                                 'order': order+order_step,
+                                 'end': end})
+
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_search_group(request):
+    if request.method == "POST":
+        if request.is_ajax():
+            search_word = request.POST.get('search_word', None)
+            order = request.POST.get('order', None)
+            order = int(order)
+            order_step = 10
+
+            objs = Group.objects.filter(Q(groupname__name__icontains=search_word)
+                                       | Q(description__icontains=search_word)).order_by(
+                Length('name').asc(), 'pk')[order:order+order_step]
+            end = 'false'
+            print(objs.count())
+            if objs.count() < order_step:
+                end = 'true'
+
+            output = []
+            for item in objs:
+                member_list = []
+                kind = 'group'
+                main_name = item.groupmainname.group_name.name
+                main_photo = item.groupmainphoto.file_50_url()
+                members = Member.objects.filter(group=item)
+                for i in members:
+                    member_list.append(i.solo.solomainname.solo_name.name)
+
+                sub_output = {
+                    'kind': kind,
+                    'main_name': main_name,
+                    'main_photo': main_photo,
+                    'id': item.uuid,
+                    'member': member_list
+
+                }
+                output.append(sub_output)
+
+            return JsonResponse({'res': 1,
+                                 'output': output,
+                                 'order': order+order_step,
+                                 'end': end})
+
+        return JsonResponse({'res': 2})
 
 @ensure_csrf_cookie
 def re_search_post(request):

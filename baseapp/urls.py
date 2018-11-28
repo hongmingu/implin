@@ -39,7 +39,7 @@ urlpatterns = [
 
     re_path(r'^search/all/$', views.search_all, name='search_all'),
     re_path(r'^search/user/$', views.search_user, name='search_user'),
-    # re_path(r'^search/person/$', views.search_person, name='search_person'),
+    re_path(r'^search/solo/$', views.search_solo, name='search_solo'),
     # re_path(r'^search/group/$', views.search_group, name='search_group'),
     re_path(r'^search/post/$', views.search_post, name='search_post'),
 
@@ -212,7 +212,8 @@ urlpatterns = [
             name='re_search_user'),
     re_path(r'^re/search/post/$', base_ajax_views.re_search_post,
             name='re_search_post'),
-
+    re_path(r'^re/search/solo/$', base_ajax_views.re_search_solo,
+            name='re_search_solo'),
 
     # re_path(r'^email/key/send/$', views.email_key_send, name='email_key_send'),
     # re_path(r'^email/key/confirm/(?P<uid>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',

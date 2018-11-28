@@ -52,7 +52,7 @@
 <script>
     $(function () {
         if($('#search_word').html()===''){
-            $('#content_user').append('<div class="h3">No results</div>')
+            $('#content_user').append('<div class="h4">no results</div>')
         } else {
             $.ajax({url:'/re/search/user/', type:'post', dataType:'json', cache:false,
                 data:{

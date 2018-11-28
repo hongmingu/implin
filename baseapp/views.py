@@ -646,3 +646,10 @@ def search_post(request):
             q = ''
         word = q
         return render(request, 'baseapp/search_post.html', {'word': word})
+def search_solo(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        if q is None:
+            q = ''
+        word = q
+        return render(request, 'baseapp/search_solo.html', {'word': word})
