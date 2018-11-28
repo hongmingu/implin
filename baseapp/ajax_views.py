@@ -2383,9 +2383,10 @@ def re_search_all(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
+            user_step = 5
             users = User.objects.filter(Q(userusername__username__icontains=search_word)
                                         | Q(usertextname__name__icontains=search_word)).order_by(
-                '-userusername__created').distinct()[:5]
+                '-userusername__created').distinct()[:user_step]
             user_output = []
             for user in users:
                 sub_output = {
@@ -2396,7 +2397,9 @@ def re_search_all(request):
                 user_output.append(sub_output)
             from django.db.models.functions import Length
 
-            solos = Solo.objects.filter(soloname__name__icontains=search_word).order_by(Length('name').asc(), 'pk')[:10]
+            obj_step = 10
+            solos = Solo.objects.filter(
+                soloname__name__icontains=search_word).order_by(Length('name').asc(), 'pk')[:obj_step]
             solo_output = []
 
             for item in solos:
@@ -2418,7 +2421,8 @@ def re_search_all(request):
                 }
                 solo_output.append(sub_output)
 
-            groups = Group.objects.filter(groupname__name__icontains=search_word).order_by(Length('name').asc(), 'pk')[:10]
+            groups = Group.objects.filter(
+                groupname__name__icontains=search_word).order_by(Length('name').asc(), 'pk')[:obj_step]
             group_output = []
 
             for item in groups:
@@ -2440,11 +2444,14 @@ def re_search_all(request):
 
                 }
                 group_output.append(sub_output)
+
+            post_step = 5
             posts = Post.objects.filter(Q(user__userusername__username__icontains=search_word)
                                         | Q(posttext__text__icontains=search_word)
                                         | Q(solopost__solo__soloname__name__icontains=search_word)
                                         | Q(grouppost__group__groupname__name__icontains=search_word)
-                                        | Q(user__usertextname__name__icontains=search_word)).order_by('created').distinct()[:10]
+                                        | Q(user__usertextname__name__icontains=search_word)).order_by(
+                'created').distinct()[:post_step]
 
             post_output = []
             for post in posts:
@@ -2474,10 +2481,11 @@ def re_search_user(request):
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
             end_id = request.POST.get('end_id', None)
+            step = 20
             if end_id == '':
                 users = User.objects.filter(Q(userusername__username__icontains=search_word)
                                             | Q(usertextname__name__icontains=search_word)).order_by(
-                    '-userusername__created').distinct()[:20]
+                    '-userusername__created').distinct()[:step]
             else:
                 end_user = None
                 try:
@@ -2489,13 +2497,13 @@ def re_search_user(request):
                 users = User.objects.filter((Q(userusername__username__icontains=search_word)
                                             | Q(usertextname__name__icontains=search_word))
                                             & Q(pk__lt=end_user.pk)).order_by(
-                    '-userusername__created').distinct()[:20]
+                    '-userusername__created').distinct()[:step]
             output = []
             count = 0
             end = None
             for user in users:
                 count = count + 1
-                if count == 30:
+                if count == step:
                     end = user.username
                 sub_output = {
                     'username': user.userusername.username,
@@ -2524,14 +2532,13 @@ def re_search_solo(request):
             search_word = request.POST.get('search_word', None)
             order = request.POST.get('order', None)
             order = int(order)
-            order_step = 10
+            step = 10
 
             objs = Solo.objects.filter(Q(soloname__name__icontains=search_word)
                                        | Q(description__icontains=search_word)).order_by(
-                Length('name').asc(), 'pk')[order:order+order_step]
+                Length('name').asc(), 'pk')[order:order+step]
             end = 'false'
-            print(objs.count())
-            if objs.count() < order_step:
+            if objs.count() < step:
                 end = 'true'
 
             output = []
@@ -2556,7 +2563,7 @@ def re_search_solo(request):
 
             return JsonResponse({'res': 1,
                                  'output': output,
-                                 'order': order+order_step,
+                                 'order': order+step,
                                  'end': end})
 
         return JsonResponse({'res': 2})
@@ -2568,14 +2575,14 @@ def re_search_group(request):
             search_word = request.POST.get('search_word', None)
             order = request.POST.get('order', None)
             order = int(order)
-            order_step = 10
+            step = 10
 
             objs = Group.objects.filter(Q(groupname__name__icontains=search_word)
                                        | Q(description__icontains=search_word)).order_by(
-                Length('name').asc(), 'pk')[order:order+order_step]
+                Length('name').asc(), 'pk')[order:order+step]
             end = 'false'
             print(objs.count())
-            if objs.count() < order_step:
+            if objs.count() < step:
                 end = 'true'
 
             output = []
@@ -2600,54 +2607,54 @@ def re_search_group(request):
 
             return JsonResponse({'res': 1,
                                  'output': output,
-                                 'order': order+order_step,
+                                 'order': order+step,
                                  'end': end})
 
         return JsonResponse({'res': 2})
+
 
 @ensure_csrf_cookie
 def re_search_post(request):
     if request.method == "POST":
         if request.is_ajax():
             search_word = request.POST.get('search_word', None)
-            next_id = request.POST.get('next_id', None)
-            if next_id == '':
+            end_id = request.POST.get('end_id', None)
+            step = 10
+            if end_id == '':
                 posts = Post.objects.filter(Q(user__userusername__username__icontains=search_word)
-                                            | Q(title__icontains=search_word)
-                                            | Q(description__icontains=search_word)
+                                            | Q(posttext__text__icontains=search_word)
                                             | Q(user__usertextname__name__icontains=search_word)).order_by(
-                    '-post_chat_created').distinct()[:2]
+                    '-created').distinct()[:step]
             else:
-                next_post = None
+                end_post = None
                 try:
-                    next_post = Post.objects.get(uuid=next_id)
+                    end_post = Post.objects.get(uuid=end_id)
                 except Exception as e:
                     print(e)
                     return JsonResponse({'res': 0})
 
-                posts = Post.objects.filter((Q(user__userusername__username__icontains=search_word)
-                                            | Q(title__icontains=search_word)
-                                            | Q(description__icontains=search_word)
-                                            | Q(user__usertextname__name__icontains=search_word))
-                                            & Q(post_chat_created__lte=next_post.post_chat_created)).order_by('-post_chat_created').distinct()[:2]
+                posts = Post.objects.filter(((Q(user__userusername__username__icontains=search_word)
+                                            | Q(posttext__text__icontains=search_word)
+                                            | Q(user__usertextname__name__icontains=search_word)))
+                                            & Q(pk__lt=end_post.pk)).order_by('-created').distinct()[:step]
 
-            post_output = []
-            posts_count = 0
-            post_next = None
+            output = []
+            count = 0
+            end = None
             for post in posts:
-                posts_count = posts_count + 1
-                if posts_count == 2:
-                    post_next = post.uuid
+                count = count + 1
+                if count == step:
+                    end = post.uuid
                     break
 
                 sub_output = {
                     'id': post.uuid,
                 }
 
-                post_output.append(sub_output)
+                output.append(sub_output)
             return JsonResponse({'res': 1,
-                                 'post_set': post_output,
-                                 'post_next': post_next})
+                                 'output': output,
+                                 'end': end})
 
         return JsonResponse({'res': 2})
 
