@@ -39,14 +39,6 @@ def post_update(request, uuid):
 
 
 
-def explore_feed(request):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            return render(request, 'baseapp/user_feed.html')
-        else:
-            return redirect(reverse('baseapp:main_create_log_in'))
-
-
 
 def b_admin(request):
     if request.method == "GET":
@@ -646,8 +638,6 @@ def search_post(request):
         return render(request, 'baseapp/search_post.html', {'word': word})
 
 
-
-
 def note_all(request):
     if request.method == "GET":
         if request.user.is_authenticated:
@@ -662,5 +652,13 @@ def note_all(request):
                 print(e)
                 pass
             return render(request, 'baseapp/note_all.html')
+        else:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+
+def follow_feed(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return render(request, 'baseapp/follow_feed.html')
         else:
             return redirect(reverse('baseapp:main_create_log_in'))
