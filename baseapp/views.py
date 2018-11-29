@@ -47,24 +47,6 @@ def explore_feed(request):
             return redirect(reverse('baseapp:main_create_log_in'))
 
 
-def note_all(request):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            try:
-                with transaction.atomic():
-                    notices_update = Notice.objects.filter(Q(user=request.user) & Q(checked=False)).update(
-                        checked=True)
-                    notice_count = request.user.noticecount
-                    notice_count.count = 0
-                    notice_count.save()
-            except Exception as e:
-                print(e)
-                pass
-            return render(request, 'baseapp/user_note.html')
-        else:
-            return redirect(reverse('baseapp:main_create_log_in'))
-
-
 
 def b_admin(request):
     if request.method == "GET":
@@ -639,13 +621,6 @@ def search_user(request):
         word = q
         return render(request, 'baseapp/search_user.html', {'word': word})
 
-def search_post(request):
-    if request.method == "GET":
-        q = request.GET.get('q', None)
-        if q is None:
-            q = ''
-        word = q
-        return render(request, 'baseapp/search_post.html', {'word': word})
 def search_solo(request):
     if request.method == "GET":
         q = request.GET.get('q', None)
@@ -653,3 +628,39 @@ def search_solo(request):
             q = ''
         word = q
         return render(request, 'baseapp/search_solo.html', {'word': word})
+
+def search_group(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        if q is None:
+            q = ''
+        word = q
+        return render(request, 'baseapp/search_group.html', {'word': word})
+
+def search_post(request):
+    if request.method == "GET":
+        q = request.GET.get('q', None)
+        if q is None:
+            q = ''
+        word = q
+        return render(request, 'baseapp/search_post.html', {'word': word})
+
+
+
+
+def note_all(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            try:
+                with transaction.atomic():
+                    notices_update = Notice.objects.filter(Q(user=request.user) & Q(checked=False)).update(
+                        checked=True)
+                    notice_count = request.user.noticecount
+                    notice_count.count = 0
+                    notice_count.save()
+            except Exception as e:
+                print(e)
+                pass
+            return render(request, 'baseapp/note_all.html')
+        else:
+            return redirect(reverse('baseapp:main_create_log_in'))

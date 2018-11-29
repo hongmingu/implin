@@ -14,21 +14,13 @@ from django.utils.html import escape, _js_escapes, normalize_newlines
 # private , public은 나중에 한다. 귀찮다.
 
 FOLLOW = 1001
-POST_FOLLOW = 2001
 POST_COMMENT = 2002
 POST_LIKE = 2003
-POST_CHAT_LIKE = 3001
-POST_CHAT_REST = 4001
-POST_CHAT_REST_LIKE = 4002
 
 KINDS_CHOICES = (
     (FOLLOW, "follow"),
-    (POST_FOLLOW, "post_follow"),
     (POST_COMMENT, "post_comment"),
     (POST_LIKE, "post_like"),
-    (POST_CHAT_LIKE, "post_chat_like"),
-    (POST_CHAT_REST, "post_chat_rest"),
-    (POST_CHAT_REST_LIKE, "post_chat_rest_like"),
 )
 
 
@@ -56,17 +48,6 @@ class Notice(models.Model):
                 result = {'username': get_result.user.userusername.username,
                           'user_photo': get_result.user.userphoto.file_50_url()}
             return result
-        elif self.kind == POST_FOLLOW:
-            try:
-                get_result = self.noticepostfollow.post_follow
-            except Exception as e:
-                print(e)
-                pass
-            if get_result is not None:
-                result = {'post_id': get_result.post.uuid,
-                          'username': get_result.user.userusername.username,
-                          'user_photo': get_result.user.userphoto.file_50_url()}
-            return result
         elif self.kind == POST_COMMENT:
             try:
                 get_result = self.noticepostcomment.post_comment
@@ -92,52 +73,7 @@ class Notice(models.Model):
                     'user_photo': get_result.user.userphoto.file_50_url()
                 }
             return result
-        elif self.kind == POST_CHAT_LIKE:
-            try:
-                get_result = self.noticepostchatlike.post_chat_like
-            except Exception as e:
-                print(e)
-                pass
-            if get_result is not None:
-                result = {
-                    'post_chat_id': get_result.post_chat.uuid,
-                    'username': get_result.user.userusername.username,
-                    'user_photo': get_result.user.userphoto.file_50_url(),
-                    'post_id': get_result.post_chat.post.uuid,
-                }
-            return result
-        elif self.kind == POST_CHAT_REST:
-            try:
-                get_result = self.noticepostchatrest.post_chat_rest
-            except Exception as e:
-                print(e)
-                pass
-            if get_result is not None:
-                result = {
-                    'post_chat_rest_id': get_result.uuid,
-                    'post_chat_id': get_result.post_chat.uuid,
-                    'post_id': get_result.post_chat.post.uuid,
-                    'username': get_result.user.userusername.username,
-                    'user_photo': get_result.user.userphoto.file_50_url(),
-                    'post_chat_rest_text': escape(get_result.text)[0:10],
-                }
-            return result
-        elif self.kind == POST_CHAT_REST_LIKE:
-            try:
-                get_result = self.noticepostchatrestlike.post_chat_rest_like
-            except Exception as e:
-                print(e)
-                pass
-            if get_result is not None:
-                result = {
-                    'post_chat_rest_id': get_result.post_chat_rest_message.uuid,
-                    'post_chat_id': get_result.post_chat_rest_message.post_chat.uuid,
-                    'post_id': get_result.post_chat_rest_message.post_chat.post.uuid,
-                    'username': get_result.user.userusername.username,
-                    'user_photo': get_result.user.userphoto.file_50_url(),
-                    'post_chat_rest_text': escape(get_result.post_chat_rest_message.text)[0:10],
-                }
-            return result
+
         return None
 
 
@@ -159,7 +95,6 @@ class NoticeFollow(models.Model):
 
     def __str__(self):
         return "Notice_pk: %s, follow_user: %s" % (self.notice.pk, self.follow.user.userusername.username)
-
 
 
 class NoticePostComment(models.Model):

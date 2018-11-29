@@ -40,8 +40,11 @@ urlpatterns = [
     re_path(r'^search/all/$', views.search_all, name='search_all'),
     re_path(r'^search/user/$', views.search_user, name='search_user'),
     re_path(r'^search/solo/$', views.search_solo, name='search_solo'),
-    # re_path(r'^search/group/$', views.search_group, name='search_group'),
+    re_path(r'^search/group/$', views.search_group, name='search_group'),
     re_path(r'^search/post/$', views.search_post, name='search_post'),
+
+    re_path(r'^note/all/$', views.note_all, name='note_all'),
+
 
     # --------------------------------------------------------------------------------
     re_path(r'^re/create/search/$', base_ajax_views.re_create_search,
@@ -103,6 +106,18 @@ urlpatterns = [
 
     re_path(r'^re/group/follow/$', base_ajax_views.re_group_follow,
             name='re_group_follow'),
+
+    re_path(r'^re/search/all/$', base_ajax_views.re_search_all,
+            name='re_search_all'),
+    re_path(r'^re/search/user/$', base_ajax_views.re_search_user,
+            name='re_search_user'),
+    re_path(r'^re/search/post/$', base_ajax_views.re_search_post,
+            name='re_search_post'),
+    re_path(r'^re/search/solo/$', base_ajax_views.re_search_solo,
+            name='re_search_solo'),
+
+    re_path(r'^re/note/all/$', base_ajax_views.re_note_all,
+            name='re_note_all'),
     # --------------------------------------------------------------------------------
 
     re_path(r'^re/home/rank/$', base_ajax_views.re_home_rank,
@@ -191,9 +206,6 @@ urlpatterns = [
 
     re_path(r'^create/new/$', views.create_new, name='create_new'),
     re_path(r'^explore/feed/$', views.explore_feed, name='explore_feed'),
-    re_path(r'^note/all/$', views.note_all, name='note_all'),
-
-
     re_path(r'^re_settings/ajax/$', auth_ajax_views.re_settings, name='re_settings'),
     re_path(r'^re_settings/ajax/upload_user_photo/$', auth_ajax_views.upload_user_photo, name='re_upload_user_photo'),
     # re_path(r'^re/create/new/$', base_ajax_views.re_create_new, name='re_create_new'),
@@ -201,19 +213,9 @@ urlpatterns = [
     re_path(r'^re/explore/feed/$', base_ajax_views.re_explore_feed,
             name='re_explore_feed'),
 
-    re_path(r'^re/note/all/$', base_ajax_views.re_note_all,
-            name='re_note_all'),
     re_path(r'^re/nav/badge/populate/$', base_ajax_views.re_nav_badge_populate,
             name='re_nav_badge_populate'),
 
-    re_path(r'^re/search/all/$', base_ajax_views.re_search_all,
-            name='re_search_all'),
-    re_path(r'^re/search/user/$', base_ajax_views.re_search_user,
-            name='re_search_user'),
-    re_path(r'^re/search/post/$', base_ajax_views.re_search_post,
-            name='re_search_post'),
-    re_path(r'^re/search/solo/$', base_ajax_views.re_search_solo,
-            name='re_search_solo'),
 
     # re_path(r'^email/key/send/$', views.email_key_send, name='email_key_send'),
     # re_path(r'^email/key/confirm/(?P<uid>([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?))/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
