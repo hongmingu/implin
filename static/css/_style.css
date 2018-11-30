@@ -50,12 +50,12 @@
     display: inline-block !important;
 }
 
-.nav_li_last_options {
+.nav_li_last_option {
     float: right;
 }
 
 @media (min-width: 768px) {
-    .navbar-nav > li.nav_li_last_options {
+    .navbar-nav > li.nav_li_last_option {
         float: right;
     }
 }
@@ -184,14 +184,21 @@ a:active {
     color: #2ac31b
 }
 */
-.span_logo1 {
-    color: red;
-    font-family: 'Tauri', sans-serif;
+.logo_text {
+    background: -webkit-linear-gradient(#d22195, #8b00b8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    font-family: 'Noto Serif', serif;
 }
 
-.span_logo2 {
-    color: orange;
-    font-family: 'Tauri', sans-serif;
+.logo_icon {
+    background: -webkit-linear-gradient(#fffc00, gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-right: 4px;
+    margin-left: 4px;
+
 }
 
 .login-form {
