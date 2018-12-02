@@ -41,78 +41,6 @@ from django.utils.timezone import localdate
 # 좋아요 비공개 할 수 있게
 # 챗스톡, 페이지픽, 임플린, 챗카부 순으로 만들자.
 
-@ensure_csrf_cookie
-def re_post_update_profile_name(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                name = request.POST.get('name', None)
-                name = name.strip()
-                post = None
-                try:
-                    post = Post.objects.get(uuid=post_id)
-                except Exception as e:
-                    print(e)
-                    return JsonResponse({'res': 0})
-                if post is not None:
-                    try:
-                        post_profile = PostProfile.objects.get(post=post)
-                    except Exception as e:
-                        print(e)
-                        return JsonResponse({'res': 0})
-                    if post_profile is not None:
-                        post_profile.name = name
-                        post_profile.save()
-
-                return JsonResponse({'res': 1})
-
-        return JsonResponse({'res': 2})
-
-@ensure_csrf_cookie
-def re_post_chat_modify_populate(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                try:
-                    post = Post.objects.get(uuid=post_id)
-                except:
-                    return JsonResponse({'res': 0})
-                post_chat_set = post.postchat_set.all().order_by('-created')[:20]
-                from django.core import serializers
-                post_chat_set = serializers.serialize('python', post_chat_set)
-                actual_data = [PostChat.objects.get(pk=item['pk']).get_value() for item in post_chat_set]
-                output = json.dumps(actual_data)
-                return JsonResponse({'res': 1, 'set': output})
-
-        return JsonResponse({'res': 2})
-
-
-@ensure_csrf_cookie
-def re_post_chat_more_load(request):
-    if request.method == "POST":
-        if request.user.is_authenticated:
-            if request.is_ajax():
-                post_id = request.POST.get('post_id', None)
-                post_chat_id = request.POST.get('post_chat_id', None)
-
-                try:
-                    post = Post.objects.get(uuid=post_id)
-                except:
-                    return JsonResponse({'res': 0})
-                from django.db.models import Q
-                standard_post_chat = PostChat.objects.get(uuid=post_chat_id)
-                post_chat_set = PostChat.objects.filter(
-                    Q(post=post) & Q(created__lt=standard_post_chat.created)).order_by('-created')[:10]
-                from django.core import serializers
-                post_chat_set = serializers.serialize('python', post_chat_set)
-                actual_data = [PostChat.objects.get(pk=item['pk']).get_value() for item in post_chat_set]
-                output = json.dumps(actual_data)
-                return JsonResponse({'res': 1, 'set': output})
-
-        return JsonResponse({'res': 2})
-
 
 
 # ---------------------------------------------------------------------------------------------------------------------------
@@ -1572,10 +1500,6 @@ def re_post_like(request):
                     try:
                         with transaction.atomic():
                             post_like.delete()
-                            from django.db.models import F
-                            post_like_count = post.postlikecount
-                            post_like_count.count = F('count') - 1
-                            post_like_count.save()
                             liked = 'false'
                     except Exception as e:
                         return JsonResponse({'res': 0})
@@ -1583,10 +1507,6 @@ def re_post_like(request):
                     try:
                         with transaction.atomic():
                             post_like = PostLike.objects.create(post=post, user=request.user)
-                            from django.db.models import F
-                            post_like_count = post.postlikecount
-                            post_like_count.count = F('count') + 1
-                            post_like_count.save()
                             liked = 'true'
                     except Exception as e:
                         return JsonResponse({'res': 0})
@@ -1665,13 +1585,6 @@ def re_follow_add(request):
                             with transaction.atomic():
                                 follow.delete()
 
-                                from django.db.models import F
-                                following_count = request.user.followingcount
-                                following_count.count = F('count') - 1
-                                following_count.save()
-                                follower_count = chosen_user.followercount
-                                follower_count.count = F('count') - 1
-                                follower_count.save()
                                 result = False
 
                                 # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
@@ -1681,13 +1594,6 @@ def re_follow_add(request):
                         try:
                             with transaction.atomic():
                                 follow = Follow.objects.create(follow=chosen_user, user=request.user)
-                                from django.db.models import F
-                                following_count = request.user.followingcount
-                                following_count.count = F('count') + 1
-                                following_count.save()
-                                follower_count = chosen_user.followercount
-                                follower_count.count = F('count') + 1
-                                follower_count.save()
                                 result = True
 
                                 # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
@@ -1806,10 +1712,6 @@ def re_solo_follow(request):
                             with transaction.atomic():
                                 follow.delete()
 
-                                from django.db.models import F
-                                follower_count = solo.solofollowercount
-                                follower_count.count = F('count') - 1
-                                follower_count.save()
                                 result = 'cancel'
 
                         except Exception as e:
@@ -1818,10 +1720,6 @@ def re_solo_follow(request):
                         try:
                             with transaction.atomic():
                                 follow = SoloFollow.objects.create(solo=solo, user=request.user)
-                                from django.db.models import F
-                                follower_count = solo.solofollowercount
-                                follower_count.count = F('count') + 1
-                                follower_count.save()
                                 result = 'follow'
 
                                 # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
@@ -1857,10 +1755,6 @@ def re_group_follow(request):
                             with transaction.atomic():
                                 follow.delete()
 
-                                from django.db.models import F
-                                follower_count = group.groupfollowercount
-                                follower_count.count = F('count') - 1
-                                follower_count.save()
                                 result = 'cancel'
 
                         except Exception as e:
@@ -1869,10 +1763,6 @@ def re_group_follow(request):
                         try:
                             with transaction.atomic():
                                 follow = GroupFollow.objects.create(group=group, user=request.user)
-                                from django.db.models import F
-                                follower_count = group.groupfollowercount
-                                follower_count.count = F('count') + 1
-                                follower_count.save()
                                 result = 'follow'
 
                                 # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
