@@ -91,8 +91,6 @@ def deleted_follow(sender, instance, **kwargs):
 @receiver(post_save, sender=SoloFollow)
 def created_solo_follow(sender, instance, created, **kwargs):
     if created:
-        if instance.user == instance.follow:
-            return
         try:
             with transaction.atomic():
                 follower_count = instance.solo.solofollowercount
@@ -118,8 +116,6 @@ def deleted_solo_follow(sender, instance, **kwargs):
 @receiver(post_save, sender=GroupFollow)
 def created_group_follow(sender, instance, created, **kwargs):
     if created:
-        if instance.user == instance.follow:
-            return
         try:
             with transaction.atomic():
 
@@ -160,8 +156,6 @@ def deleted_notice_follow(sender, instance, **kwargs):
 @receiver(post_save, sender=PostComment)
 def created_post_comment(sender, instance, created, **kwargs):
     if created:
-        if instance.user == instance.post.user:
-            return
         try:
             with transaction.atomic():
                 notice = Notice.objects.create(user=instance.post.user, kind=POST_COMMENT, uuid=uuid.uuid4().hex)
@@ -183,8 +177,6 @@ def deleted_notice_post_comment(sender, instance, **kwargs):
 @receiver(post_save, sender=PostLike)
 def created_post_like(sender, instance, created, **kwargs):
     if created:
-        if instance.user == instance.post.user:
-            return
         try:
             with transaction.atomic():
                 notice = Notice.objects.create(user=instance.post.user, kind=POST_LIKE, uuid=uuid.uuid4().hex)
