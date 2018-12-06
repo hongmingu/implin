@@ -602,6 +602,7 @@ def search_all(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_all.html', {'word': word})
 
@@ -610,6 +611,7 @@ def search_user(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_user.html', {'word': word})
 
@@ -618,6 +620,7 @@ def search_solo(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_solo.html', {'word': word})
 
@@ -626,6 +629,7 @@ def search_group(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_group.html', {'word': word})
 
@@ -634,6 +638,7 @@ def search_post(request):
         q = request.GET.get('q', None)
         if q is None:
             q = ''
+        q = q.strip()
         word = q
         return render(request, 'baseapp/search_post.html', {'word': word})
 
