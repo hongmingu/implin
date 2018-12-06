@@ -10,6 +10,7 @@
     <script src="{% static 'js/a_selected.js' %}"></script>
     <script src="{% static 'js/date_differ.js' %}"></script>
     <script src="{% static 'js/follow_feed.js' %}"></script>
+    <script src="{% static 'js/post_populate.js' %}"></script>
 
     <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
     {% if user.is_authenticated %}
@@ -53,7 +54,7 @@
         </div>
     </div>
 </div>
-
+{% include 'baseapp/_modal_populate.html' %}
 </body>
 
 

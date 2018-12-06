@@ -1524,6 +1524,7 @@ def re_post_like_list(request):
                 post_id = request.POST.get('post_id', None)
                 next_id = request.POST.get('next_id', None)
                 post = None
+                step = 31
                 try:
                     post = Post.objects.get(uuid=post_id)
                 except Exception as e:
@@ -1533,18 +1534,18 @@ def re_post_like_list(request):
                 output = []
                 if post is not None:
                     if next_id == '':
-                        likes = PostLike.objects.filter(post=post).order_by('created')[:31]
+                        likes = PostLike.objects.filter(post=post).order_by('created')[:step]
                     else:
                         try:
                             last_like = PostLike.objects.get(post=post, user__username=next_id)
                         except Exception as e:
                             return JsonResponse({'res': 0})
-                        likes = PostLike.objects.filter(Q(post=post) & Q(pk__gte=last_like.pk)).order_by('created')[:31]
+                        likes = PostLike.objects.filter(Q(post=post) & Q(pk__gte=last_like.pk)).order_by('created')[:step]
 
                     count = 0
                     for like in likes:
                         count = count+1
-                        if count == 31:
+                        if count == step:
                             next = like.user.username
                             break
                         sub_output = {
@@ -2194,7 +2195,7 @@ def re_search_all(request):
 
             for item in solos:
                 member_list = []
-                kind = 'solo'
+                obj_type = 'solo'
                 main_name = item.solomainname.solo_name.name
                 main_photo = item.solomainphoto.file_50_url()
                 members = Member.objects.filter(solo=item)
@@ -2202,12 +2203,11 @@ def re_search_all(request):
                     member_list.append(i.group.groupmainname.group_name.name)
 
                 sub_output = {
-                    'kind': kind,
+                    'obj_type': obj_type,
                     'main_name': main_name,
                     'main_photo': main_photo,
                     'id': item.uuid,
                     'member': member_list
-
                 }
                 solo_output.append(sub_output)
 
@@ -2218,7 +2218,7 @@ def re_search_all(request):
             for item in groups:
                 member_list = []
 
-                kind = 'group'
+                obj_type = 'group'
                 main_name = item.groupmainname.group_name.name
                 main_photo = item.groupmainphoto.file_50_url()
                 members = Member.objects.filter(group=item)
@@ -2226,7 +2226,7 @@ def re_search_all(request):
                     member_list.append(i.solo.solomainname.solo_name.name)
 
                 sub_output = {
-                    'kind': kind,
+                    'obj_type': obj_type,
                     'main_name': main_name,
                     'main_photo': main_photo,
                     'id': item.uuid,
@@ -2245,14 +2245,9 @@ def re_search_all(request):
 
             post_output = []
             for post in posts:
-                obj_type = 'solo'
-                try:
-                    type_check = post.solopost
-                except Exception as e:
-                    obj_type = 'group'
                 sub_output = {
                     'id': post.uuid,
-                    'obj_type': obj_type
+                    'obj_type': post.get_obj_type(),
                 }
 
                 post_output.append(sub_output)
@@ -2336,7 +2331,7 @@ def re_search_solo(request):
             output = []
             for item in objs:
                 member_list = []
-                kind = 'solo'
+                obj_type = 'solo'
                 main_name = item.solomainname.solo_name.name
                 main_photo = item.solomainphoto.file_50_url()
                 members = Member.objects.filter(solo=item)
@@ -2344,12 +2339,11 @@ def re_search_solo(request):
                     member_list.append(i.group.groupmainname.group_name.name)
 
                 sub_output = {
-                    'kind': kind,
+                    'obj_type': obj_type,
                     'main_name': main_name,
                     'main_photo': main_photo,
                     'id': item.uuid,
                     'member': member_list
-
                 }
                 output.append(sub_output)
 
@@ -2379,7 +2373,7 @@ def re_search_group(request):
             output = []
             for item in objs:
                 member_list = []
-                kind = 'group'
+                obj_type = 'group'
                 main_name = item.groupmainname.group_name.name
                 main_photo = item.groupmainphoto.file_50_url()
                 members = Member.objects.filter(group=item)
@@ -2387,7 +2381,7 @@ def re_search_group(request):
                     member_list.append(i.solo.solomainname.solo_name.name)
 
                 sub_output = {
-                    'kind': kind,
+                    'obj_type': obj_type,
                     'main_name': main_name,
                     'main_photo': main_photo,
                     'id': item.uuid,
@@ -2437,6 +2431,7 @@ def re_search_post(request):
                 if count == step:
                     end = post.uuid
                 sub_output = {
+                    'obj_type': post.get_obj_type(),
                     'id': post.uuid,
                 }
 
@@ -2538,7 +2533,9 @@ def re_follow_feed(request):
                     count = count + 1
                     if count == step:
                         end = post.uuid
+
                     sub_output = {
+                        'obj_type': post.get_obj_type(),
                         'id': post.uuid,
                     }
 

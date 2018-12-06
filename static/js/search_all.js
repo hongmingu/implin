@@ -46,9 +46,9 @@ $(function () {
                             })
                             var path = ''
                             var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                            if (value.kind === 'group') {
+                            if (value.obj_type === 'group') {
                                 path = scheme + window.location.host + "/group/profile/" + value.id + "/";
-                            } else if (value.kind === 'solo') {
+                            } else if (value.obj_type === 'solo') {
                                 path = scheme + window.location.host + "/solo/profile/" + value.id + "/";
                             }
                             var appender = $('<a href="' + path + '"><div class="clickable">' +
@@ -82,9 +82,9 @@ $(function () {
                             })
                             var path = ''
                             var scheme = window.location.protocol == "https:" ? "https://" : "http://";
-                            if (value.kind === 'group') {
+                            if (value.obj_type === 'group') {
                                 path = scheme + window.location.host + "/group/profile/" + value.id + "/";
-                            } else if (value.kind === 'solo') {
+                            } else if (value.obj_type === 'solo') {
                                 path = scheme + window.location.host + "/solo/profile/" + value.id + "/";
                             }
                             var appender = $('<a href="' + path + '"><div class="clickable">' +
@@ -111,7 +111,7 @@ $(function () {
                     } else {
                         $('#more_post').removeClass('hidden')
                         $.each(data.post_output, function (key, value) {
-                            var appender = '<div id="post_wrapper_' + value.id + '">' +
+                            var appender = '<div class="row div_base" id="post_wrapper_' + value.id + '">' +
                                 '<script defer>' +
                                 'post_populate("' + value.id + '", "'+value.obj_type+'")' +
                                 '<' + '/script>' +

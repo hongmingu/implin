@@ -7,10 +7,12 @@ $(function () {
         success: function (data) {
             console.log(data)
             $.each(data.output, function (key, value) {
-                var appender = '<div class="row div_base" id="post_div_' + value.id + '">' +
+                console.log(value.obj_type)
+                var appender = '<div class="row div_base" id="post_wrapper_' + value.id + '">' +
                     '<script defer>' +
-                    '    home_populate("' + value.id + '")' +
-                    '<' + '/script></div>'
+                    '    post_populate("' + value.id + '", "' + value.obj_type + '")' +
+                    '<' + '/script>' +
+                    '</div>'
                 $('#content').append(appender)
             })
             if (data.end === null) {
@@ -33,10 +35,11 @@ $(function () {
             },
             success: function (data) {
                 $.each(data.output, function (key, value) {
-                    var appender = '<div class="row div_base" id="post_div_' + value.id + '">' +
+                    var appender = '<div class="row div_base" id="post_wrapper_' + value.id + '">' +
                         '<script defer>' +
-                        '    home_populate("' + value.id + '")' +
-                        '<' + '/script></div>'
+                        '    post_populate("' + value.id + '", "' + value.obj_type + '")' +
+                        '<' + '/script>' +
+                        '</div>'
                     $('#content').append(appender)
                 })
                 if (data.end === null) {

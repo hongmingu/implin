@@ -33,6 +33,17 @@ class Post(models.Model):
         from django.urls import reverse
         return reverse('baseapp:post', kwargs={'uuid': self.uuid})
 
+    def get_obj_type(self):
+        solo_post = None
+        try:
+            solo_post = self.solopost
+        except Exception as e:
+            pass
+        if solo_post is not None:
+            return "solo"
+        else:
+            return "group"
+
 
 class PostText(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)

@@ -117,7 +117,9 @@ urlpatterns = [
             name='re_search_post'),
     re_path(r'^re/search/solo/$', base_ajax_views.re_search_solo,
             name='re_search_solo'),
-
+    re_path(r'^re/search/group/$', base_ajax_views.re_search_group,
+            name='re_search_group'),
+    
     re_path(r'^re/note/all/$', base_ajax_views.re_note_all,
             name='re_note_all'),
 
