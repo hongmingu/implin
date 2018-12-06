@@ -271,11 +271,8 @@ def created_post(sender, instance, created, **kwargs):
             print(e)
             pass
 
-
-
 from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
-
 from decimal import Decimal
 
 
