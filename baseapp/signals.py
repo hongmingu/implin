@@ -54,13 +54,12 @@ def deleted_notice_post_like(sender, instance, **kwargs):
 @receiver(post_save, sender=Follow)
 def created_follow(sender, instance, created, **kwargs):
     if created:
-        if instance.user == instance.follow:
-            return
         try:
             with transaction.atomic():
 
-                notice = Notice.objects.create(user=instance.follow, kind=FOLLOW, uuid=uuid.uuid4().hex)
-                notice_follow = NoticeFollow.objects.create(notice=notice, follow=instance)
+                if not instance.user == instance.follow:
+                    notice = Notice.objects.create(user=instance.follow, kind=FOLLOW, uuid=uuid.uuid4().hex)
+                    notice_follow = NoticeFollow.objects.create(notice=notice, follow=instance)
 
                 following_count = instance.user.followingcount
                 following_count.count = F('count') + 1
@@ -158,11 +157,28 @@ def created_post_comment(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-                notice = Notice.objects.create(user=instance.post.user, kind=POST_COMMENT, uuid=uuid.uuid4().hex)
-                notice_post_comment = NoticePostComment.objects.create(notice=notice, post_comment=instance)
+                # 여기뭐임 왜 카운트 안셈
+                if not instance.user == instance.post.user:
+                    notice = Notice.objects.create(user=instance.post.user, kind=POST_COMMENT, uuid=uuid.uuid4().hex)
+                    notice_post_comment = NoticePostComment.objects.create(notice=notice, post_comment=instance)
+
+                post_comment_count = instance.post.postcommentcount
+                post_comment_count.count = F('count') + 1
+                post_comment_count.save()
         except Exception:
             pass
 
+@receiver(post_delete, sender=PostComment)
+def deleted_post_comment(sender, instance, **kwargs):
+    if instance.notice:
+        try:
+            with transaction.atomic():
+                post_comment_count = instance.post.postcommentcount
+                post_comment_count.count = F('count') - 1
+                post_comment_count.save()
+        except Exception as e:
+            print(e)
+            pass
 
 @receiver(post_delete, sender=NoticePostComment)
 def deleted_notice_post_comment(sender, instance, **kwargs):
@@ -179,8 +195,10 @@ def created_post_like(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-                notice = Notice.objects.create(user=instance.post.user, kind=POST_LIKE, uuid=uuid.uuid4().hex)
-                notice_post_like = NoticePostLike.objects.create(notice=notice, post_like=instance)
+
+                if instance.user == instance.post.user:
+                    notice = Notice.objects.create(user=instance.post.user, kind=POST_LIKE, uuid=uuid.uuid4().hex)
+                    notice_post_like = NoticePostLike.objects.create(notice=notice, post_like=instance)
 
                 post_like_count = instance.post.postlikecount
                 post_like_count.count = F('count') + 1
@@ -247,7 +265,7 @@ def created_post(sender, instance, created, **kwargs):
     if created:
         try:
             with transaction.atomic():
-                post_count = PostCommentCount.objects.create(post=instance)
+                post_comment_count = PostCommentCount.objects.create(post=instance)
                 post_like_count = PostLikeCount.objects.create(post=instance)
         except Exception as e:
             print(e)

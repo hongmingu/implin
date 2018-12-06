@@ -55,10 +55,14 @@ class Notice(models.Model):
                 print(e)
                 pass
             if get_result is not None:
+                comment_text = get_result.text
+                if len(comment_text) > 10:
+                    comment_text = escape(comment_text)[0:10] + '...'
+                    comment_text = escape(comment_text)
                 result = {'post_id': get_result.post.uuid,
                           'username': get_result.user.userusername.username,
                           'user_photo': get_result.user.userphoto.file_50_url(),
-                          'comment_text': escape(get_result.text)[0:10]}
+                          'comment_text': comment_text}
             return result
         elif self.kind == POST_LIKE:
             try:

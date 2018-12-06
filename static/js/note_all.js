@@ -9,28 +9,35 @@ $(function () {
                 var appender;
                 switch (value.notice_kind) {
                     case 1001:
-                        appender = '<div class="note_wrapper">\n' +
+                        appender = '<div class="note_wrapper">' +
                             '<div class="note_img_wrapper">' +
                             '<a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a>' +
                             '</div>\n' +
                             '<div class="note_text_wrapper">' +
+                            '<span class="note_text_explain">follow by</span>' +
                             '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
-                            'follow you.' +
-                            '</div>\n' +
+                            '</div>' +
                             '</div>'
                         //follow
                         break;
                     case 2002:
-                        appender = '<div class="note_wrapper">\n' +
-                            '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>\n' +
-                            '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>comments on <a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">post</span></a> - <span class="note_text_detail">' + value.notice_value.comment_text + '</span></div>\n' +
+                        appender = '<div class="note_wrapper">' +
+                            '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>' +
+                            '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                            '<span class="note_text_explain">comment: </span>' +
+                            '<a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_comment clickable">' + value.notice_value.comment_text + '</span></a>' +
+                            '</div>' +
                             '</div>'
                         //post_comment
                         break;
                     case 2003:
-                        appender = '<div class="note_wrapper">\n' +
-                            '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>\n' +
-                            '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>likes <a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">post</span></a></div>\n' +
+                        appender = '<div class="note_wrapper">' +
+                            '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>' +
+                            '<div class="note_text_wrapper">' +
+                            '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                            '<span class="note_text_explain">liked</span>' +
+                            '<a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">this</span></a>' +
+                            '</div>\n' +
                             '</div>'
                         //post_like
                         break;
@@ -63,28 +70,35 @@ $(function () {
                     var appender;
                     switch (value.notice_kind) {
                         case 1001:
-                            appender = '<div class="note_wrapper">\n' +
+                            appender = '<div class="note_wrapper">' +
                                 '<div class="note_img_wrapper">' +
                                 '<a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a>' +
                                 '</div>\n' +
                                 '<div class="note_text_wrapper">' +
+                                '<span class="note_text_explain">follow by</span>' +
                                 '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
-                                'follow you.' +
-                                '</div>\n' +
+                                '</div>' +
                                 '</div>'
                             //follow
                             break;
                         case 2002:
-                            appender = '<div class="note_wrapper">\n' +
-                                '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>\n' +
-                                '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>comments on <a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">post</span></a> - <span class="note_text_detail">' + value.notice_value.comment_text + '</span></div>\n' +
+                            appender = '<div class="note_wrapper">' +
+                                '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>' +
+                                '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                                '<span class="note_text_explain">comment: </span>' +
+                                '<a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_comment clickable">' + value.notice_value.comment_text + '</span></a>' +
+                                '</div>' +
                                 '</div>'
                             //post_comment
                             break;
                         case 2003:
-                            appender = '<div class="note_wrapper">\n' +
-                                '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>\n' +
-                                '<div class="note_text_wrapper"><a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>likes <a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">post</span></a></div>\n' +
+                            appender = '<div class="note_wrapper">' +
+                                '<div class="note_img_wrapper"><a href="/' + value.notice_value.username + '/"><img class="note_img_small clickable" src="' + value.notice_value.user_photo + '"></a></div>' +
+                                '<div class="note_text_wrapper">' +
+                                '<a href="/' + value.notice_value.username + '/"><span class="note_text_username clickable">' + value.notice_value.username + '</span></a>' +
+                                '<span class="note_text_explain">liked</span>' +
+                                '<a href="/post/' + value.notice_value.post_id + '/"><span class="note_text_post clickable">this</span></a>' +
+                                '</div>\n' +
                                 '</div>'
                             //post_like
                             break;
