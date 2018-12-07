@@ -271,6 +271,45 @@ def created_post(sender, instance, created, **kwargs):
             print(e)
             pass
 
+
+@receiver(post_delete, sender=Post)
+def deleted_post(sender, instance, **kwargs):
+    try:
+        with transaction.atomic():
+            username = ''
+            user_id = ''
+            gross = 0
+            obj_type = ''
+            obj_id = ''
+            post_uuid = ''
+            try:
+                username = instance.user.userusername.username
+                user_id = instance.user.username
+                gross = instance.gross
+                obj_type = instance.get_obj_type(),
+                if obj_type == "solo":
+                    obj_id = instance.solopost.solo.uuid
+                elif obj_type == "group":
+                    obj_id = instance.grouppost.group.uuid
+                post_uuid = instance.uuid
+            except Exception as e:
+                pass
+            deleted_post = DeletedPost.objects.create(username=username,
+                                                      user_id=user_id,
+                                                      obj_id=obj_id,
+                                                      obj_type=obj_type,
+                                                      post_uuid=post_uuid,
+                                                      gross=gross)
+            text = ''
+            try:
+                text = instance.posttext_set.last().text
+            except Exception as e:
+                pass
+            deleted_post_text = DeletedPostText.objects.create(deleted_post=deleted_post, text=text)
+    except Exception as e:
+        print(e)
+        pass
+
 from paypal.standard.models import ST_PP_COMPLETED
 from paypal.standard.ipn.signals import valid_ipn_received
 from decimal import Decimal

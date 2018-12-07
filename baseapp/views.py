@@ -667,3 +667,19 @@ def follow_feed(request):
             return render(request, 'baseapp/follow_feed.html')
         else:
             return redirect(reverse('baseapp:main_create_log_in'))
+
+
+def log_charge(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return render(request, 'baseapp/log.html', {'log_type': 'charge'})
+        else:
+            return redirect(reverse('baseapp:main_create_log_in'))
+
+
+def log_pay(request):
+    if request.method == "GET":
+        if request.user.is_authenticated:
+            return render(request, 'baseapp/log.html', {'log_type': 'pay'})
+        else:
+            return redirect(reverse('baseapp:main_create_log_in'))

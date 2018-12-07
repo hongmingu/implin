@@ -45,6 +45,10 @@ urlpatterns = [
 
     re_path(r'^note/all/$', views.note_all, name='note_all'),
     re_path(r'^follow/feed/$', views.follow_feed, name='follow_feed'),
+
+    re_path(r'^log/charge/$', views.log_charge, name='log_charge'),
+    re_path(r'^log/pay/$', views.log_pay, name='log_pay'),
+
     # --------------------------------------------------------------------------------
     re_path(r'^re_settings/ajax/$', auth_ajax_views.re_settings, name='re_settings'),
     re_path(r'^re_settings/ajax/upload_user_photo/$', auth_ajax_views.upload_user_photo, name='re_upload_user_photo'),
@@ -128,6 +132,13 @@ urlpatterns = [
 
     re_path(r'^re/nav/badge/populate/$', base_ajax_views.re_nav_badge_populate,
             name='re_nav_badge_populate'),
+
+    re_path(r'^re/log/charge/$', base_ajax_views.re_log_charge,
+            name='re_log_charge'),
+
+    re_path(r'^re/log/pay/$', base_ajax_views.re_log_pay,
+            name='re_log_pay'),
+
     # --------------------------------------------------------------------------------
 
     re_path(r'^re/home/rank/$', base_ajax_views.re_home_rank,

@@ -1044,17 +1044,23 @@ def re_create_group_post_complete(request):
                     with transaction.atomic():
                         post = Post.objects.create(gross=gross, user=request.user, uuid=id)
                         post_text = PostText.objects.create(post=post, text=text)
+
                         local_date = localdate()
+
                         group_date, created = GroupDate.objects.get_or_create(group=group, date=local_date)
+                        group_post = GroupPost.objects.create(post=post, group=group, group_date=group_date)
 
                         group_date.gross = F('gross') + gross
                         group_date.save()
-                        group_post = GroupPost.objects.create(post=post, group=group, group_date=group_date)
-                        pay_log = PayLog.objects.create(post=post, gross=gross, uuid=uuid.uuid4().hex, wallet=wallet)
+
+                        pay_log = PayLog.objects.create(post=post,
+                                                        gross=gross,
+                                                        uuid=uuid.uuid4().hex,
+                                                        wallet=wallet,
+                                                        post_uuid=post.uuid)
+
                         wallet.gross = F('gross') - gross
                         wallet.save()
-                        pass
-
                 except Exception as e:
                     print(e)
                     return JsonResponse({'res': 0})
@@ -1111,12 +1117,10 @@ def re_create_solo_post_complete(request):
                 if wallet.gross < gross:
                     return JsonResponse({'res': 0})
 
-
                 text = text.strip()
                 if text == '':
                     text = None
                 id = uuid.uuid4().hex
-
                 try:
                     with transaction.atomic():
                         post = Post.objects.create(gross=gross, user=request.user, uuid=id)
@@ -1127,7 +1131,11 @@ def re_create_solo_post_complete(request):
                         solo_date.gross = F('gross') + gross
                         solo_date.save()
                         solo_post = SoloPost.objects.create(post=post, solo=solo, solo_date=solo_date)
-                        pay_log = PayLog.objects.create(post=post, gross=gross, uuid=uuid.uuid4().hex, wallet=wallet)
+                        pay_log = PayLog.objects.create(post=post,
+                                                        gross=gross,
+                                                        uuid=uuid.uuid4().hex,
+                                                        wallet=wallet,
+                                                        post_uuid=post.uuid)
                         wallet.gross = F('gross') - gross
                         wallet.save()
 
@@ -2500,7 +2508,6 @@ def re_nav_badge_populate(request):
         return JsonResponse({'res': 2})
 
 
-
 @ensure_csrf_cookie
 def re_follow_feed(request):
     if request.method == "POST":
@@ -2545,4 +2552,96 @@ def re_follow_feed(request):
 
         return JsonResponse({'res': 2})
 
+
+@ensure_csrf_cookie
+def re_log_charge(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                end_id = request.POST.get('end_id', None)
+                step = 20
+                charge_logs = None
+                wallet = None
+                try:
+                    wallet = request.user.wallet
+                except Exception as e:
+                    return JsonResponse({'res': 1})
+                if end_id == '':
+                    charge_logs = ChargeLog.objects.filter(Q(wallet=wallet)).order_by('-created').distinct()[:step]
+                else:
+                    end_charge_log = None
+                    try:
+                        end_charge_log = ChargeLog.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+                    charge_logs = ChargeLog.objects.filter(Q(wallet=wallet)
+                                                           & Q(pk__lt=end_charge_log.pk)).order_by(
+                        '-created').distinct()[:step]
+
+                output = []
+                count = 0
+                end = None
+                for item in charge_logs:
+                    count = count + 1
+                    if count == step:
+                        end = item.uuid
+
+                    sub_output = {
+                        'obj_id': item.transaction_id,
+                        'created': item.created,
+                        'gross': item.gross
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'end': end})
+
+        return JsonResponse({'res': 2})
+
+@ensure_csrf_cookie
+def re_log_pay(request):
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            if request.is_ajax():
+                end_id = request.POST.get('end_id', None)
+                step = 20
+                pay_logs = None
+                wallet = None
+                try:
+                    wallet = request.user.wallet
+                except Exception as e:
+                    return JsonResponse({'res': 1})
+                if end_id == '':
+                    pay_logs = PayLog.objects.filter(Q(wallet=wallet)).order_by('-created').distinct()[:step]
+                else:
+                    end_pay_log = None
+                    try:
+                        end_pay_log = PayLog.objects.get(uuid=end_id)
+                    except Exception as e:
+                        print(e)
+                        return JsonResponse({'res': 0})
+                    pay_logs = PayLog.objects.filter(Q(wallet=wallet)
+                                                     & Q(pk__lt=end_pay_log.pk)).order_by(
+                        '-created').distinct()[:step]
+
+                output = []
+                count = 0
+                end = None
+                for item in pay_logs:
+                    count = count + 1
+                    if count == step:
+                        end = item.uuid
+
+                    sub_output = {
+                        'obj_id': item.post_id,
+                        'created': item.created,
+                        'gross': item.gross
+                    }
+
+                    output.append(sub_output)
+
+                return JsonResponse({'res': 1, 'output': output, 'end': end})
+
+        return JsonResponse({'res': 2})
 

@@ -78,6 +78,11 @@
                             </div>
                         </a>
                     {% endif %}
+                {% if chosen_user == user %}
+                    <div align="right">
+                        <a href="{% url 'baseapp:log_charge' %}"><span class="log_pay_charge">charge log</span></a>
+                    </div>
+                {% endif %}
 
                 </div>
                 <div id="user_profile_post_list"></div>

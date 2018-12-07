@@ -55,6 +55,30 @@ class PostText(models.Model):
         return "Post pk: %s" % self.post.pk
 
 
+class DeletedPost(models.Model):
+    username = models.CharField(max_length=34, null=True, blank=True, default=None)
+    user_id = models.CharField(max_length=34, null=True, blank=True, default=None)
+    gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    obj_type = models.CharField(max_length=10, null=True, blank=True, default=None)
+    obj_id = models.CharField(max_length=34, null=True, blank=True, default=None)
+    post_uuid = models.CharField(max_length=34, null=True, blank=True, default=None)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "Post pk: %s, user: %s" % (self.pk, self.username)
+
+
+class DeletedPostText(models.Model):
+    deleted_post = models.ForeignKey(DeletedPost, on_delete=models.CASCADE, null=True, blank=True)
+    text = models.TextField(max_length=5000, null=True, blank=True, default=None)
+    updated = models.DateTimeField(auto_now=True)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return "Post pk: %s" % self.deleted_post.pk
+
+
 class PostComment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True)
     text = models.TextField(max_length=1000, null=True, blank=True)
@@ -411,6 +435,8 @@ class ChargeLog(models.Model):
 class PayLog(models.Model):
     wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True, blank=True)
     post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True, blank=True)
+
+    post_uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
