@@ -1,3 +1,14 @@
+:root {
+    --main-logopurplebottom-color: #8b00b8;
+    --main-logopurpletop-color: #d22195;
+    --main-logoyellowbottom-color: #f9d100;
+    --main-logoyellowtop-color: #fffd06;
+    --main-aselected-bcolor: #efdfff;
+    --main-aselected-color: #f7f1e3;
+    --main-light-bcolor: #f1f2f6;
+    --main-light-color: #ced6e0;
+}
+
 @media screen and (max-width: 768px) {
     /* 모바일에 사용될 스타일 시트를 여기에 작성합니다. */
     .mobile_display_none {
@@ -176,7 +187,8 @@ a:active {
 }
 
 .a_selected {
-    background-color: #ebebeb !important;
+    background-color: var(--main-aselected-bcolor) !important;
+    color: var(--main-aselected-color) !important;
 }
 
 /*
@@ -193,7 +205,7 @@ a:active {
 }
 
 .logo_icon {
-    background: -webkit-linear-gradient(#fffc00, gold);
+    background: -webkit-linear-gradient(#fffd06, #f9d100);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-right: 4px;
@@ -591,10 +603,11 @@ a:active {
     height: 30px;
 }
 .home_today{
-    font-size: 20px; border-radius: 3px; background-color: #8e97ed; padding: 3px;
+    font-size: 20px; border-radius: 1px; padding: 3px;
+    background-color: var(--main-aselected-bcolor);
 }
 .home_list_name_wrapper{
-    background-color: whitesmoke;
+    background-color: var(--main-light-color);
 }
 
 .home_rank_wrapper{
@@ -663,10 +676,10 @@ a:active {
     height: 30px;
 }
 .gen_today{
-    font-size: 20px; border-radius: 3px; background-color: #8e97ed; padding: 3px;
+    font-size: 20px; border-radius: 3px; background-color: var(--main-aselected-bcolor); padding: 3px;
 }
 .gen_list_name_wrapper{
-    background-color: whitesmoke;
+    background-color: var(--main-light-color);
 }
 
 .gen_rank_wrapper{

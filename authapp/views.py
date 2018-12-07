@@ -358,7 +358,7 @@ def main_create_log_in(request):
 
                     ####################################################
                     ####################################################
-                    return redirect(reverse('baseapp:main_create_log_in'))
+                    return redirect(reverse('baseapp:home'))
 
                 else:
                     data = {
@@ -377,10 +377,10 @@ def main_create_log_in(request):
 def log_out(request):
     if request.method == "POST":
         logout(request)
-        return redirect(reverse('baseapp:main_create_log_in'))
+        return redirect(reverse('baseapp:home'))
     else:
         logout(request)
-        return redirect(reverse('baseapp:main_create_log_in'))
+        return redirect(reverse('baseapp:home'))
 
 
 def primary_email_key_confirm(request, uid, token):
