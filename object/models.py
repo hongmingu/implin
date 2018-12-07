@@ -418,6 +418,9 @@ class ChargeLog(models.Model):
     wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True, blank=True)
 
     transaction_id = models.CharField(max_length=255, blank=True, null=True, default=None)
+    user_id = models.CharField(max_length=34, blank=True, null=True, default=None)
+    username = models.CharField(max_length=34, blank=True, null=True, default=None)
+
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 
     gross = models.DecimalField(max_digits=12, decimal_places=2, default=0)
@@ -436,7 +439,9 @@ class PayLog(models.Model):
     wallet = models.ForeignKey(Wallet, on_delete=models.SET_NULL, null=True, blank=True)
     post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True, blank=True)
 
-    post_uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
+    post_uuid = models.CharField(max_length=34, blank=True, null=True, default=None)
+    user_id = models.CharField(max_length=34, blank=True, null=True, default=None)
+    username = models.CharField(max_length=34, blank=True, null=True, default=None)
 
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
 

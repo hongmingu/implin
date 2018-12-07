@@ -1057,7 +1057,9 @@ def re_create_group_post_complete(request):
                                                         gross=gross,
                                                         uuid=uuid.uuid4().hex,
                                                         wallet=wallet,
-                                                        post_uuid=post.uuid)
+                                                        post_uuid=post.uuid,
+                                                        user_id=request.user.username,
+                                                        username=request.user.userusername.username)
 
                         wallet.gross = F('gross') - gross
                         wallet.save()
@@ -1135,7 +1137,9 @@ def re_create_solo_post_complete(request):
                                                         gross=gross,
                                                         uuid=uuid.uuid4().hex,
                                                         wallet=wallet,
-                                                        post_uuid=post.uuid)
+                                                        post_uuid=post.uuid,
+                                                        user_id=request.user.username,
+                                                        username=request.user.userusername.username)
                         wallet.gross = F('gross') - gross
                         wallet.save()
 

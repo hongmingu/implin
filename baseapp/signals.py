@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from object.models import *
 from relation.models import *
@@ -272,7 +272,7 @@ def created_post(sender, instance, created, **kwargs):
             pass
 
 
-@receiver(post_delete, sender=Post)
+@receiver(pre_delete, sender=Post)
 def deleted_post(sender, instance, **kwargs):
     try:
         with transaction.atomic():
@@ -286,13 +286,18 @@ def deleted_post(sender, instance, **kwargs):
                 username = instance.user.userusername.username
                 user_id = instance.user.username
                 gross = instance.gross
-                obj_type = instance.get_obj_type(),
-                if obj_type == "solo":
+                try:
                     obj_id = instance.solopost.solo.uuid
-                elif obj_type == "group":
-                    obj_id = instance.grouppost.group.uuid
+                    obj_type = "solo"
+                except Exception as e:
+                    try:
+                        obj_id = instance.grouppost.group.uuid
+                        obj_type = "group"
+                    except Exception as e:
+                        pass
                 post_uuid = instance.uuid
             except Exception as e:
+                print(e)
                 pass
             deleted_post = DeletedPost.objects.create(username=username,
                                                       user_id=user_id,
@@ -302,8 +307,9 @@ def deleted_post(sender, instance, **kwargs):
                                                       gross=gross)
             text = ''
             try:
-                text = instance.posttext_set.last().text
+                text = PostText.objects.filter(post=instance).last().text
             except Exception as e:
+                print(e)
                 pass
             deleted_post_text = DeletedPostText.objects.create(deleted_post=deleted_post, text=text)
     except Exception as e:
@@ -341,6 +347,9 @@ def ipn_signal(sender, **kwargs):
                 if created:
                     wallet.gross = F('gross') + Decimal(ipn_obj.payment_gross)
                     wallet.save()
+                    charge_log.username = user.userusername.username
+                    charge_log.user_id = user.username
+                    charge_log.save()
                     # 여러번 실험해서 더플리케이트 실험 하면 됨.
         except Exception as e:
             print(e)
