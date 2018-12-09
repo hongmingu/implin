@@ -27,12 +27,12 @@
             <li>
 
                 {% if user.is_authenticated %}
-                <a class="padding_15_i" id="a_user" href="{% url 'baseapp:create_new' %}">
-                    <i id="i_user" class="glyphicon glyphicon-plus"></i>
+                <a class="padding_15_i" id="a_plus" href="{% url 'baseapp:create_new' %}">
+                    <i id="i_plus" class="glyphicon glyphicon-plus"></i>
                 </a>
                 {% else %}
-                <a class="padding_15_i" id="a_user" href="{% url 'baseapp:main_create_log_in' %}">
-                    <i id="i_user" class="glyphicon glyphicon-plus"></i>
+                <a class="padding_15_i" id="a_plus" href="{% url 'baseapp:main_create_log_in' %}">
+                    <i id="i_plus" class="glyphicon glyphicon-plus"></i>
                 </a>
                 {% endif %}
 
@@ -74,7 +74,7 @@
 
 <span class="nav_badge" id="badge_home" data-u="#i_home"></span>
 <span class="nav_badge" id="badge_feed" data-u="#i_feed"></span>
-<span class="nav_badge" id="badge_user" data-u="#i_user"></span>
+<span class="nav_badge" id="badge_plus" data-u="#i_plus"></span>
 <span class="nav_badge" id="badge_note" data-u="#i_note"></span>
 
 <div class="modal fade" id="modal_menu">
