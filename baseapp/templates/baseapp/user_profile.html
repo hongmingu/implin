@@ -52,45 +52,49 @@
                              src="{{ chosen_user.userphoto.file_300_url }}">
                     </div>
 
-                    <div align="center" class="pro_user_text_name"><span>{{ chosen_user.usertextname.name }}</span></div>
+                    <div align="center" class="pro_user_text_name"><span>{{ chosen_user.usertextname.name }}</span>
+                    </div>
                     <div align="center" class="pro_username"><span>{{ chosen_user.userusername.username }}</span></div>
 
                     <div class="row">
                         <div class="col-xs-6" align="right"><span class="pro_follow_explain">following: </span>
                             <a href="#">
-                                <span id="count_following" class="pro_follow_count">{{ chosen_user.followingcount.count }}</span>
+                                <span id="count_following"
+                                      class="pro_follow_count">{{ chosen_user.followingcount.count }}</span>
                             </a>
                         </div>
                         <div class="col-xs-6" align="left"><span class="pro_follow_explain">followers: </span>
                             <a href="#">
-                                <span id="count_follower" class="pro_follow_count">{{ chosen_user.followercount.count }}</span>
+                                <span id="count_follower"
+                                      class="pro_follow_count">{{ chosen_user.followercount.count }}</span>
                             </a>
                         </div>
                     </div>
 
                     {% if following == None %}
-                        <a href="">
-                            <div class="hidden" align="center" id="follow">
-                                <span class="clickable pro_follow" id="follow_text">follow</span>
-                            </div>
-                        </a>
+                        <div class="hidden" align="center" id="follow_wrapper">
+                            <a href="">
+                                <span class="clickable pro_follow" id="follow">follow</span>
+                            </a>
+                        </div>
                     {% else %}
-                        <a href="">
-                            <div class="hidden" align="center" id="follow">
-                                <span class="clickable pro_follow" id="follow_text">following <span
+                        <div class="hidden" align="center" id="follow_wrapper">
+                            <a href="">
+                                <span class="clickable pro_follow" id="follow">following <span
                                         class="glyphicon glyphicon-ok"></span></span>
-                            </div>
-                        </a>
+                            </a>
+                        </div>
                     {% endif %}
-                {% if chosen_user == user %}
-                    <div align="right">
-                        <span class="log_current">{{ user.wallet.gross }}</span>
-                        <span class="log_current_dollar">$</span>
-                    </div>
-                    <div align="right">
-                        <a href="{% url 'baseapp:log_charge' %}"><span class="log_pay_charge clickable">charge log</span></a>
-                    </div>
-                {% endif %}
+                    {% if chosen_user == user %}
+                        <div align="right">
+                            <span class="log_current">{{ user.wallet.gross }}</span>
+                            <span class="log_current_dollar">$</span>
+                        </div>
+                        <div align="right">
+                            <a href="{% url 'baseapp:log_charge' %}"><span
+                                    class="log_pay_charge clickable">charge log</span></a>
+                        </div>
+                    {% endif %}
 
                 </div>
                 <div id="user_profile_post_list"></div>
@@ -152,7 +156,7 @@
                 $.each(data.output, function (key, value) {
 
                     if (chosen_user_id === user_id) {
-                        _modifier = '<div align="right"><a href="/update/' + value.obj_type + '/post/' + value.id + '/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="user_profile_post_delete">delete</span></a></div>'
+                        _modifier = '<div align="right"><a href="/update/' + value.obj_type + '/post/' + value.id + '/"><span class="pro_update clickable">update</span></a><span>  </span><a href=""><span class="pro_delete clickable">delete</span></a></div>'
                     }
                     var appender = '<div id="post_wrapper_with_modi_' + value.id + '">' +
                         '<div class="row div_base" id="post_wrapper_' + value.id + '">' +
@@ -196,7 +200,7 @@
                     $.each(data.output, function (key, value) {
 
                         if (chosen_user_id === user_id) {
-                            _modifier = '<div align="right"><a href="/update/' + value.obj_type + '/post/' + value.id + '/"><span class="user_profile_post_update">update</span></a><span>  </span><a href=""><span class="user_profile_post_delete">delete</span></a></div>'
+                            _modifier = '<div align="right"><a href="/update/' + value.obj_type + '/post/' + value.id + '/"><span class="pro_update clickable">update</span></a><span>  </span><a href=""><span class="pro_delete clickable">delete</span></a></div>'
                         }
                         var appender = '<div id="post_wrapper_with_modi_' + value.id + '">' +
                             '<div class="row div_base" id="post_wrapper_' + value.id + '">' +

@@ -11,9 +11,7 @@ $(function () {
 })
 $(function () {
     if($('#user_id').html()!==$('#chosen_user_id').html()){
-        if($('#follow').hasClass('hidden')){
-            $('#follow').removeClass('hidden')
-        }
+        $('#follow_wrapper').removeClass('hidden')
     }
 
     $('#follow').click(function (e) {
@@ -29,11 +27,11 @@ $(function () {
             },
             success: function (data) {
                 if (data.result === true) {
-                    $('#follow_text').html('following <span class="glyphicon glyphicon-ok"></span>')
+                    $('#follow').html('following <span class="glyphicon glyphicon-ok"></span>')
                     var count_follower = parseInt($('#count_follower').html()) + 1
                     $('#count_follower').html(count_follower)
                 } else {
-                    $('#follow_text').html('follow')
+                    $('#follow').html('follow')
                     var count_follower = parseInt($('#count_follower').html()) - 1
                     $('#count_follower').html(count_follower)
                 }

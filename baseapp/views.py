@@ -231,7 +231,6 @@ def solo_profile(request, uuid):
                 following = None
                 if SoloFollow.objects.filter(user=request.user, solo=solo).exists():
                     following = True
-                print(solo)
 
                 return render(request, 'baseapp/solo_profile.html',
                               {'solo': solo, 'following': following})

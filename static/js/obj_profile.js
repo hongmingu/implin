@@ -10,11 +10,11 @@ $(function () {
             success: function (data) {
                 if (data.res === 1) {
                     if (data.result === 'follow') {
-                        $('#follow_text').html('<span class="now_following">following <span class="glyphicon glyphicon-ok"></span></span>')
+                        $('#follow').html('<span class="now_following">following <span class="glyphicon glyphicon-ok"></span></span>')
                         var count = $('#follower_count').html()
                         $('#follower_count').html(parseInt(count) + 1)
                     } else if (data.result === 'cancel') {
-                        $('#follow_text').html('<span class="now_unfollow">follow</span>')
+                        $('#follow').html('<span class="now_unfollow">follow</span>')
                         var count = $('#follower_count').html()
                         $('#follower_count').html(parseInt(count) - 1)
                     }

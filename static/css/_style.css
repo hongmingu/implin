@@ -902,20 +902,20 @@ a:active {
 }
 
 .pro_user_text_name {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .pro_username {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
 }
 
 .pro_follow_explain {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .pro_follow_count {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .pro_follow {
@@ -934,4 +934,20 @@ a:active {
 .log_wanna_charge{
     background-color: var(--main-logopurpletop-color, purple);
     color: var(--main-logoyellowbottom-color, gold);
+}
+.pro_update{
+    padding: 1px;
+    background-color: lightgreen;
+}
+.pro_delete{
+    padding: 1px;
+    background-color: lightpink;
+}
+.pro_obj_read_post{
+    padding: 1px;
+    background-color: lightgreen;
+}
+.pro_obj_create_post{
+    padding: 1px;
+    background-color: lightpink;
 }

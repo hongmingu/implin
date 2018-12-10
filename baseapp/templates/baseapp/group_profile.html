@@ -27,7 +27,7 @@
 {% else %}
     <div class="hidden" id="user_id"></div>
 {% endif %}
-    <div class="hidden" id="obj_type">group</div>
+<div class="hidden" id="obj_type">group</div>
 
 <!--page info end -->
 
@@ -43,24 +43,33 @@
 
                     <div align="center"><span>{{ group.groupmainname.group_name.name }}</span></div>
 
-                    <div align="center"><span>followers: </span><span id="follower_count">{{ group.groupfollowercount.count }}</span></div>
+                    <div align="center"><span>followers: </span><span
+                            id="follower_count">{{ group.groupfollowercount.count }}</span></div>
 
-                {% if following == None %}
-                    <a href="">
-                        <div class="hidden" align="center" id="follow">
-                            <span class="clickable" id="follow_text"><span class="now_unfollow">follow</span></span>
-                        </div>
-                    </a>
-                {% else %}
-                    <a href="">
-                        <div class="hidden" align="center" id="follow">
-                            <span class="clickable" id="follow_text"><span class="now_following">following <span class="glyphicon glyphicon-ok"></span></span></span>
-                        </div>
-                    </a>
-                {% endif %}
-                <a href="/create/group/post/{{ group.uuid }}/"><div align="center">go to create posts</div></a>
 
-                <a href="/group/{{ group.uuid }}/"><div align="center">go to read posts</div></a>
+                    {% if following == None %}
+                        <div align="center">
+                            <a href="">
+                                <span class="clickable pro_follow" id="follow">follow</span>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div align="center">
+                            <a href="">
+                                <span class="clickable pro_follow" id="follow">following <span
+                                        class="glyphicon glyphicon-ok"></span></span>
+                            </a>
+                        </div>
+                    {% endif %}
+                <br>
+                    <a href="/create/group/post/{{ group.uuid }}/">
+                        <div align="center"><span class="pro_obj_create_post clickable">go to create posts</span></div>
+                    </a>
+                <br>
+
+                    <a href="/group/{{ group.uuid }}/">
+                        <div align="center"><span class="pro_obj_read_post clickable">go to read posts</span></div>
+                    </a>
 
                 </div>
 
@@ -71,8 +80,8 @@
 
 {% include 'baseapp/_modal_follow.html' %}
 
-  <!-- Hidden 으로 데이터 저장해놓고 modal on show 랑 hide 에서 그 데이터 불러와서 모달 채우게 하자. 그리고 임플린은 친구 중심이고
-  피드가 존재하게 되었기 때문에 팔로우가 부가적으로 존재하는 것 뿐이다. -->
+<!-- Hidden 으로 데이터 저장해놓고 modal on show 랑 hide 에서 그 데이터 불러와서 모달 채우게 하자. 그리고 임플린은 친구 중심이고
+피드가 존재하게 되었기 때문에 팔로우가 부가적으로 존재하는 것 뿐이다. -->
 
 
 </body>
