@@ -992,7 +992,7 @@ def re_create_group_post(request):
     if request.method == "POST":
         if request.is_ajax():
             if request.user.is_authenticated:
-                group_id = request.POST.get('group_id', None)
+                group_id = request.POST.get('obj_id', None)
                 group = None
                 try:
                     group = Group.objects.get(uuid=group_id)
@@ -1013,7 +1013,7 @@ def re_create_group_post_complete(request):
     if request.method == "POST":
         if request.is_ajax():
             if request.user.is_authenticated:
-                group_id = request.POST.get('group_id', None)
+                group_id = request.POST.get('obj_id', None)
                 gross = request.POST.get('gross', None)
                 text = request.POST.get('text', None)
                 gross = Decimal(gross)
@@ -1076,7 +1076,7 @@ def re_create_solo_post(request):
     if request.method == "POST":
         if request.is_ajax():
             if request.user.is_authenticated:
-                solo_id = request.POST.get('solo_id', None)
+                solo_id = request.POST.get('obj_id', None)
                 solo = None
                 try:
                     solo = Solo.objects.get(uuid=solo_id)
@@ -1097,7 +1097,7 @@ def re_create_solo_post_complete(request):
     if request.method == "POST":
         if request.is_ajax():
             if request.user.is_authenticated:
-                solo_id = request.POST.get('solo_id', None)
+                solo_id = request.POST.get('obj_id', None)
                 gross = request.POST.get('gross', None)
                 text = request.POST.get('text', None)
                 gross = Decimal(gross)
@@ -1397,10 +1397,6 @@ def re_comment_add(request):
                     with transaction.atomic():
                         post_comment = PostComment.objects.create(post=post, user=request.user, uuid=uuid.uuid4().hex,
                                                                   text=text)
-                        from django.db.models import F
-                        post_comment_count = post.postcommentcount
-                        post_comment_count.count = F('count') + 1
-                        post_comment_count.save()
                         # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
                 except Exception as e:
                     print(e)
@@ -1437,10 +1433,6 @@ def re_comment_delete(request):
                 try:
                     with transaction.atomic():
                         comment.delete()
-                        from django.db.models import F
-                        post_comment_count = post.postcommentcount
-                        post_comment_count.count = F('count') - 1
-                        post_comment_count.save()
                 except Exception:
                     return JsonResponse({'res': 0})
                 return JsonResponse({'res': 1})
@@ -1514,6 +1506,7 @@ def re_post_like(request):
                             post_like.delete()
                             liked = 'false'
                     except Exception as e:
+                        print(e)
                         return JsonResponse({'res': 0})
                 else:
                     try:
@@ -1521,6 +1514,7 @@ def re_post_like(request):
                             post_like = PostLike.objects.create(post=post, user=request.user)
                             liked = 'true'
                     except Exception as e:
+                        print(e)
                         return JsonResponse({'res': 0})
 
                 return JsonResponse({'res': 1, 'liked': liked})
@@ -1706,7 +1700,7 @@ def re_solo_follow(request):
     if request.method == "POST":
         if request.user.is_authenticated:
             if request.is_ajax():
-                solo_id = request.POST.get('solo_id', None)
+                solo_id = request.POST.get('obj_id', None)
                 solo = None
                 try:
                     solo = Solo.objects.get(uuid=solo_id)
@@ -1749,7 +1743,7 @@ def re_group_follow(request):
     if request.method == "POST":
         if request.user.is_authenticated:
             if request.is_ajax():
-                group_id = request.POST.get('group_id', None)
+                group_id = request.POST.get('obj_id', None)
                 group = None
                 try:
                     group = Group.objects.get(uuid=group_id)
@@ -2638,7 +2632,7 @@ def re_log_pay(request):
                         end = item.uuid
 
                     sub_output = {
-                        'obj_id': item.post_id,
+                        'obj_id': item.post_uuid,
                         'created': item.created,
                         'gross': item.gross
                     }

@@ -25,7 +25,7 @@ var obj_post_populate = function obj_post_populate(id, obj_type) {
                     }
 
                     var comment_textarea = '<div align="center"><form><div class="input-group input-group-sm">' +
-                        '<textarea class="form-control" id="pop_comment_textarea_'+id+'" placeholder="a comment"></textarea>' +
+                        '<textarea class="form-control pop_comment_textarea" id="pop_comment_textarea_'+id+'" placeholder="a comment"></textarea>' +
                         '<div class="input-group-btn">' +
                         '<button class="btn btn-default" id="pop_comment_btn_'+id+'">' +
                         '<i class="glyphicon glyphicon-send"></i>' +

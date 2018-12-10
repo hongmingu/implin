@@ -157,14 +157,14 @@ def create_solo_post(request, uuid):
     if request.method == "GET":
         if not request.user.is_authenticated:
             return redirect(reverse('baseapp:main_create_log_in'))
-        return render(request, 'baseapp/create_solo_post.html', {'id': uuid})
+        return render(request, 'baseapp/create_obj_post.html', {'id': uuid, 'obj_type': 'solo'})
 
 
 def create_group_post(request, uuid):
     if request.method == "GET":
         if not request.user.is_authenticated:
             return redirect(reverse('baseapp:main_create_log_in'))
-        return render(request, 'baseapp/create_group_post.html', {'id': uuid})
+        return render(request, 'baseapp/create_obj_post.html', {'id': uuid, 'obj_type': 'group'})
 
 
 def update_solo_post(request, uuid):
@@ -177,7 +177,7 @@ def update_solo_post(request, uuid):
         except Exception as e:
             return redirect(reverse('baseapp:main_create_log_in'))
 
-        return render(request, 'baseapp/update_solo_post.html', {'id': uuid})
+        return render(request, 'baseapp/update_obj_post.html', {'id': uuid, 'obj_type': 'solo'})
 
 
 def update_group_post(request, uuid):
@@ -190,7 +190,7 @@ def update_group_post(request, uuid):
         except Exception as e:
             return redirect(reverse('baseapp:main_create_log_in'))
 
-        return render(request, 'baseapp/update_group_post.html', {'id': uuid})
+        return render(request, 'baseapp/update_obj_post.html', {'id': uuid, 'obj_type': 'group'})
 
 
 def user_profile(request, user_username):

@@ -9,11 +9,7 @@
     <script src="{% static 'js/navbar.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
     <script src="{% static 'js/nav_badge.js' %}"></script>
-
-    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
-    {% if user.is_authenticated %}
-    {% else %}
-    {% endif %}
+    <script src="{% static 'js/update_obj_post.js' %}"></script>
 
 </head>
 <body class="light_background_color height_100">
@@ -23,10 +19,13 @@
 <!--이거 제대로 작동 안 한다 확인해야 한다.-->
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
+    <div class="hidden" id="user_username">{{ user.userusername.username }}</div>
 {% else %}
     <div class="hidden" id="user_id"></div>
+    <div class="hidden" id="user_username"></div>
 {% endif %}
     <div class="hidden" id="id">{{ id }}</div>
+    <div class="hidden" id="obj_type">{{ obj_type }}</div>
 
 <div class="container-fluid margin_top_50">
     <div class="row">
@@ -57,43 +56,4 @@
 
 </body>
 
-
-<script>
-    $(function () {
-        $('#update_post_complete').click(function (e) {
-            e.preventDefault()
-            $.ajax({
-                url:'/re/update/solo/post/complete/', type:'post', dataType:'json', cache:false,
-                data:{
-                    id: $('#id').html(),
-                    text: $.trim($('#update_post_textarea').val())
-                },
-                success:function (data) {
-                    if (data.res === 1){
-                        location.reload()
-                    }
-                }
-            });
-
-        })
-        $.ajax({
-            url:'/re/update/solo/post/', type:'post', dataType:'json', cache:false,
-            data:{
-                id: $('#id').html(),
-            },
-            success:function (data) {
-                if (data.res === 1){
-                    $('#update_post_img').attr('src', data.output.main_photo)
-                    $('#update_post_name').html(data.output.main_name)
-                    $('#update_post_gross').html(data.output.gross)
-                    $('#server_date').html(data.output.date)
-                    $('#update_post_textarea').val(data.output.text)
-                }
-            }
-        });
-
-
-    });
-
-</script>
 </html>

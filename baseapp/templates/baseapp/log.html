@@ -38,10 +38,16 @@
             <div class="row">
                 {% if log_type == 'charge' %}
                     <div align="right">
+                        <a href="{% url 'baseapp:pay_start' %}" target="_blank" rel="noopener noreferrer"><span class="log_wanna_charge">charge</span></a>
+                    </div>
+                    <div align="right">
                         <a href="{% url 'baseapp:log_pay' %}"><span class="log_pay_charge">pay log</span></a>
                     </div>
 
                 {% else %}
+                    <div align="right">
+                        <a href="{% url 'baseapp:pay_start' %}" target="_blank" rel="noopener noreferrer"><span class="log_wanna_charge">charge</span></a>
+                    </div>
                     <div align="right">
                         <a href="{% url 'baseapp:log_charge' %}"><span class="log_pay_charge">charge log</span></a>
                     </div>

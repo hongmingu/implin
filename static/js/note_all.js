@@ -5,6 +5,7 @@ $(function () {
             end_id: $('#end_id').html()
         },
         success: function (data) {
+            console.log(data)
             $.each(data.output, function (key, value) {
                 var appender;
                 switch (value.notice_kind) {
