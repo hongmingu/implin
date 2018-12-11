@@ -33,7 +33,11 @@
                     <br>
                     <input id="unit_input" pattern="^\d{0,8}$"/><span class="dollar_unit">$</span>
                     <br>
-                    <a href=""><div class="charge clickable" id="charge">charge</div></a>
+                    <a href="">
+                        <div class="charge clickable" id="charge">charge</div>
+                    </a>
+                    <br>
+                    <div><span class="charge_note" id="charge_note"></span></div>
                 </div>
 
             </div>
@@ -46,41 +50,36 @@
         $('#charge').click(function (e) {
             e.preventDefault()
             var get_unit = $('#unit_input').val()
-            if (get_unit.length === 0){
+            if (get_unit.length === 0) {
+                $('#charge_note').html('cannot charge 0$')
                 return false
             }
+
+            if (isNaN(Number(get_unit))) {
+                $('#charge_note').html('check your input, only digit is working')
+                return false
+            }
+            $('#charge_note').html('')
             var str_unit = get_unit.toString()
             var height = 'height=' + window.innerHeight
-            window.open('/pay/charge/?q='+str_unit, '',
-                'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, fullscreen=yes, width=768,'+ height);
+            window.open('/pay/charge/?q=' + str_unit, '',
+                'toolbar=no, location=no, status=no, menubar=no, scrollbars=yes, resizable=yes, fullscreen=yes, width=768,' + height);
             return false;
         })
 
     })
-    $('#btn_decimal').click(function (e) {
-        e.preventDefault()
-        var pattern = /^\d*(\.\d{0,2})?$/
-        var get_value = $('#input_decimal').val()
-        var str_value = get_value.toString()
-        var fixed = Number(get_value).toFixed(2)
-        console.log(get_value)
-        console.log(fixed)
-        console.log(typeof fixed)
-        console.log(typeof parseInt(fixed))
-        console.log(str_value.match())
-    })
-$(document).on('keydown', 'input[pattern]', function(e){
-  var input = $(this);
-  var oldVal = input.val();
-  var regex = new RegExp(input.attr('pattern'), 'g');
+    $(document).on('keydown', 'input[pattern]', function (e) {
+        var input = $(this);
+        var oldVal = input.val();
+        var regex = new RegExp(input.attr('pattern'), 'g');
 
-  setTimeout(function(){
-    var newVal = input.val();
-    if(!regex.test(newVal)){
-      input.val(oldVal);
-    }
-  }, 0);
-});
+        setTimeout(function () {
+            var newVal = input.val();
+            if (!regex.test(newVal)) {
+                input.val(oldVal);
+            }
+        }, 0);
+    });
 </script>
 
 </html>

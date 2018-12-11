@@ -39,6 +39,11 @@ $(function () {
         }
 
         var get_fixed = Number(get_value).toFixed(2)
+        if (isNaN(get_fixed)){
+            $('#create_post_note').html('check your input, only digit and dot(.) is working')
+            return false
+        }
+        return false
         var current_value = $('#create_post_current_wallet').html()
         var current_fixed = Number(current_value).toFixed(2)
         $('#create_post_note').html('')

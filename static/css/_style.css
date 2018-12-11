@@ -424,7 +424,9 @@ a:active {
     background-color: #abb5ff;
     font-size: 14px;
 }
-
+.charge_note{
+    background-color: pink; font-size: 12px;
+}
 .dollar_unit {
     font-size: 14px;
     font-weight: bold;
