@@ -440,7 +440,10 @@ a:active {
     background-color: #c4e3f3;
     font-size: 14px;
 }
-
+.more_load {
+    background-color: #c4e3f3;
+    font-size: 14px;
+}
 .create_search_result {
     margin-top: 10px;
 }
@@ -950,4 +953,47 @@ a:active {
 .pro_obj_create_post{
     padding: 1px;
     background-color: lightpink;
+}
+.search_obj_img{
+    width: 50px; height: 50px;
+}
+.search_obj_img_wrapper{
+    display: inline-block; vertical-align: top;
+}
+.search_obj_detail_wrapper{
+    margin-left: 6px;
+    display: inline-block;
+    height: 50px;
+}
+.search_obj_detail_name{
+    font-weight: bold;
+}
+.search_obj_wrapper{
+    margin-bottom: 4px;
+}
+.search_user_wrapper{
+    margin-bottom: 4px;
+}
+.search_user_username{
+    font-weight: bold;
+}
+.search_user_textname{
+    margin-left: 3px;
+}
+.search_user_img_wrapper{
+    display: inline-block; vertical-align: top;
+}
+.search_user_detail_wrapper{
+    margin-left: 6px;
+    display: inline-block;
+    height: 50px;
+}
+.search_user_img_small{
+    height: 50px; width: 50px;
+}
+.search_user_detail_username{
+    font-weight: bold; font-size: 16px;
+}
+.search_user_detail_name{
+    font-size: 14px;
 }

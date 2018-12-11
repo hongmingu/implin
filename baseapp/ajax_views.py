@@ -2414,6 +2414,8 @@ def re_search_post(request):
             if end_id == '':
                 posts = Post.objects.filter(Q(user__userusername__username__icontains=search_word)
                                             | Q(posttext__text__icontains=search_word)
+                                            | Q(solopost__solo__soloname__name__icontains=search_word)
+                                            | Q(grouppost__group__groupname__name__icontains=search_word)
                                             | Q(user__usertextname__name__icontains=search_word)).order_by(
                     '-created').distinct()[:step]
             else:
@@ -2518,7 +2520,7 @@ def re_follow_feed(request):
                     posts = Post.objects.filter(Q(user__is_followed__user=request.user)
                                                 | Q(grouppost__group__is_group_followed__user=request.user)
                                                 | Q(solopost__solo__is_solo_followed__user=request.user)
-                                                ).order_by('-created').distinct()[:step]
+                                                ).exclude(Q(user=request.user)).order_by('-created').distinct()[:step]
                 else:
                     end_post = None
                     try:
@@ -2529,7 +2531,8 @@ def re_follow_feed(request):
                     posts = Post.objects.filter((Q(user__is_followed__user=request.user)
                                                 | Q(grouppost__group__is_group_followed__user=request.user)
                                                 | Q(solopost__solo__is_solo_followed__user=request.user))
-                                                & Q(pk__lt=end_post.pk)).order_by('-created').distinct()[:step]
+                                                & Q(pk__lt=end_post.pk)).exclude(
+                        Q(user=request.user)).order_by('-created').distinct()[:step]
 
                 output = []
                 count = 0

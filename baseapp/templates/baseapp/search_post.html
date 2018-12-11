@@ -96,7 +96,7 @@
         $('#more_load').on('click', function (e) {
             e.preventDefault()
             $.ajax({
-                url: '/re/search/user/', type: 'post', dataType: 'json', cache: false,
+                url: '/re/search/post/', type: 'post', dataType: 'json', cache: false,
                 data: {
                     search_word: $('#search_word').html(),
                     end_id: $('#end_id').html()

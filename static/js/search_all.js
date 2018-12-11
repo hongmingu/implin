@@ -11,7 +11,6 @@ $(function () {
                 search_word: $('#search_word').html()
             },
             success: function (data) {
-                console.log(data)
                 if (data.res === 1) {
                     //post set
                     if (data.user_output.length === 0) {
@@ -21,8 +20,10 @@ $(function () {
                         $('#more_user').removeClass('hidden')
                         $.each(data.user_output, function (key, value) {
                             var appender = '<div class="search_user_wrapper">' +
+                                '<a href="/' + value.username + '/"><span>' +
                                 '<span class="search_user_username">' + value.username + '</span>' +
                                 '<span class="search_user_textname">' + value.user_text_name + '</span>' +
+                                '</span></a>' +
                                 '</div>'
                             $('#content_user').append(appender)
                         })
@@ -51,7 +52,7 @@ $(function () {
                             } else if (value.obj_type === 'solo') {
                                 path = scheme + window.location.host + "/solo/profile/" + value.id + "/";
                             }
-                            var appender = $('<a href="' + path + '"><div class="clickable">' +
+                            var appender = $('<a href="' + path + '"><div class="clickable search_obj_wrapper">' +
                                 '<div class="search_obj_img_wrapper">' +
                                 '<img class="search_obj_img" src="' + value.main_photo + '">' +
                                 '</div>' +
@@ -87,7 +88,7 @@ $(function () {
                             } else if (value.obj_type === 'solo') {
                                 path = scheme + window.location.host + "/solo/profile/" + value.id + "/";
                             }
-                            var appender = $('<a href="' + path + '"><div class="clickable">' +
+                            var appender = $('<a href="' + path + '"><div class="clickable search_obj_wrapper">' +
                                 '<div class="search_obj_img_wrapper">' +
                                 '<img class="search_obj_img" src="' + value.main_photo + '">' +
                                 '</div>' +
@@ -102,7 +103,6 @@ $(function () {
                     }
 
 
-
                     if (data.post_output.length === 0) {
                         $('#content_post').append('<div class="h4">no results</div>')
                         $('#more_post').addClass('hidden')
@@ -113,7 +113,7 @@ $(function () {
                         $.each(data.post_output, function (key, value) {
                             var appender = '<div class="row div_base" id="post_wrapper_' + value.id + '">' +
                                 '<script defer>' +
-                                'post_populate("' + value.id + '", "'+value.obj_type+'")' +
+                                'post_populate("' + value.id + '", "' + value.obj_type + '")' +
                                 '<' + '/script>' +
                                 '</div>'
                             $('#content_post').append(appender)
