@@ -997,3 +997,22 @@ a:active {
 .search_user_detail_name{
     font-size: 14px;
 }
+
+.note_wrapper{
+    margin-bottom: 4px;
+}
+.note_img_wrapper{
+    display: inline-block; width: 50px; height: 50px;
+}
+.note_text_wrapper{
+    display: inline-block; margin-left: 4px;
+}
+.note_text_username{
+    font-weight: bold; margin-left: 4px; margin-right: 4px;
+}
+.note_text_post{
+    font-weight: bold; margin-left: 4px; margin-right: 4px;
+}
+.note_text_comment{
+    font-weight: bold; margin-left: 4px; margin-right: 4px;
+}
