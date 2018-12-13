@@ -16,7 +16,6 @@
 {% include 'baseapp/_navbar.html' %}
 
 {% include 'others/bootstrap_tester.html' %}
-<!--이거 제대로 작동 안 한다 확인해야 한다.-->
 {% if user.is_authenticated %}
     <div class="hidden" id="user_id">{{ user.username }}</div>
     <div class="hidden" id="user_username">{{ user.userusername.username }}</div>

@@ -12,19 +12,9 @@
     <script src="{% static 'js/date_differ.js' %}"></script>
 
     <script src="{% static 'js/post_populate.js' %}"></script>
-    <link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet">
-    {% if user.is_authenticated %}
-    {% else %}
-    {% endif %}
-
-
 </head>
 <body class="light_background_color height_100">
-<!--navbar start-->
 {% include 'baseapp/_navbar.html' %}
-
-<!--navbar end-->
-<!--page info-->
 {% include 'others/bootstrap_tester.html' %}
 <div class="hidden" id="page_kind">user</div>
 
@@ -34,8 +24,6 @@
 {% else %}
     <div class="hidden" id="user_id"></div>
 {% endif %}
-
-<!--page info end -->
 
 <div class="container-fluid margin_top_50">
     <div class="row">
@@ -54,10 +42,6 @@
 </div>
 
 {% include 'baseapp/_modal_populate.html' %}
-
-  <!-- obj date 의 경우엔 1,2,3등 포스트가보이게한다(누적은 신경안씀), group_date 는 따로 만들 필요가 없다.
-  group post 도 필요없다. 그냥 group rank by date 만 만들자. 누적을 이용해서 . 그러면 된다. -->
-
 
 </body>
 </html>

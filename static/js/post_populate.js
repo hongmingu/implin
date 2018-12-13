@@ -7,9 +7,7 @@ var post_populate = function post_populate(id, obj_type) {
                 obj_type: obj_type
             },
             success: function (data) {
-                //{'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id', ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
                 if (data.res === 1) {
-                    console.log(data)
                     var text = ''
                     if (data.output.text === null){
 
@@ -56,9 +54,6 @@ var post_populate = function post_populate(id, obj_type) {
                     } else {
                         heart = '<a href=""><span class="pop_heart" id="pop_heart_'+id+'">♡</span></a>'
                     }
-                    // 여기에 코멘트들 작업
-                    // 코멘트들 작업시 x버튼 클릭하면 지워지게 하는 것 작업.
-                    // 그럴러면 서버에서 user_id 받아서 그것과 실제 user_id 비교해서 작업해야 한다.
                     var appender = $('<div id="pop_'+id+'">' +
                         '<div align="right"><a href=""><span class="glyphicon glyphicon-option-horizontal pop_menu"></span></a></div>' +
                         '<div><a href="/'+data.output.username+'/"><span class="pop_username">'+data.output.username+'</span></a></div>' +
@@ -403,4 +398,3 @@ $(function () {
         })
     })
 })
-// more load 구현

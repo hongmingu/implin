@@ -12,34 +12,6 @@ from django.utils.timezone import now, timedelta
 # Create your views here.
 
 
-
-def post_update(request, uuid):
-    if request.method == "GET":
-        if request.user.is_authenticated:
-            post = None
-            try:
-                post = Post.objects.get(uuid=uuid, user=request.user)
-
-            except Post.DoesNotExist:
-                return render(request, '404.html')
-            just_created = {}
-            if not post.postfirstcheck.first_checked:
-                just_created['ok'] = 'on'
-                post_first_check = post.postfirstcheck
-                post_first_check.first_checked = True
-                post_first_check.save()
-            else:
-                just_created['ok'] = 'off'
-                if post.is_open:
-                    just_created['current'] = 'open'
-                else:
-                    just_created['current'] = 'close'
-
-            return render(request, 'baseapp/post_update.html', {'post': post, 'just_created': just_created})
-
-
-
-
 def b_admin(request):
     if request.method == "GET":
         if request.user.is_superuser:
