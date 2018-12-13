@@ -91,8 +91,6 @@ class PostComment(models.Model):
     def __str__(self):
         return "post comment: %s" % self.pk
 
-# 지금 생각으로는 돈 내고 쓰는 post가 중심이지 comment가 중심이 아니므로 코멘트에 라이크는 없다. 구현하기 귀찮다. 그냥해
-
 
 class PostCommentCount(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, null=True, blank=True)
@@ -135,7 +133,6 @@ class Group(models.Model):
     name = models.TextField(max_length=1000, null=True, blank=True, default=None)
     description = models.TextField(max_length=2000, null=True, blank=True, default=None)
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
-    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -154,7 +151,6 @@ class Solo(models.Model):
     name = models.TextField(max_length=1000, null=True, blank=True, default=None)
     description = models.TextField(max_length=2000, null=True, blank=True, default=None)
     uuid = models.CharField(max_length=34, unique=True, blank=True, null=True, default=None)
-    # 여기서 unique True 면 null값도 두 개 이상 넣을 수 없나?
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 

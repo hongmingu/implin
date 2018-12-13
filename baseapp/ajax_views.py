@@ -1346,7 +1346,7 @@ def re_post_populate(request):
                 sub_output = {
                     'comment_username': comment.user.userusername.username,
                     'comment_user_id': comment.user.username,
-                    'comment_text': comment.text,
+                    'comment_text': escape(comment.text),
                     'comment_id': comment.uuid,
                     'comment_created': comment.created
                 }
@@ -1359,7 +1359,7 @@ def re_post_populate(request):
             output = {
                 'user_id': post.user.username,
                 'username': post.user.userusername.username,
-                'text': post.posttext_set.last().text,
+                'text': escape(post.posttext_set.last().text),
                 'gross': post.gross,
                 'created': post.created,
                 'date': date,
@@ -1370,8 +1370,6 @@ def re_post_populate(request):
                 'comment_count': post.postcommentcount.count,
                 'comment_output': comment_output,
             }
-            # {'user_id', 'username', 'gross(포스트의)', 'date(포스트의)', 'created', 'obj_id',
-            #  ['comment_username', 'comment_text', 'comment_user_id', 'comment_created', 'comment_id']}
 
             return JsonResponse({'res': 1, 'output': output})
 
@@ -1397,12 +1395,11 @@ def re_comment_add(request):
                     with transaction.atomic():
                         post_comment = PostComment.objects.create(post=post, user=request.user, uuid=uuid.uuid4().hex,
                                                                   text=text)
-                        # customers = Customer.objects.filter(scoops_ordered__gt=F('store_visits'))
                 except Exception as e:
                     print(e)
                     return JsonResponse({'res': 0})
 
-                return JsonResponse({'res': 1, 'comment_id': post_comment.uuid, 'comment_text': post_comment.text})
+                return JsonResponse({'res': 1, 'comment_id': post_comment.uuid, 'comment_text': escape(post_comment.text)})
 
         return JsonResponse({'res': 2})
 
@@ -1470,7 +1467,7 @@ def re_comment_more_load(request):
                 sub_output = {
                     'comment_username': comment.user.userusername.username,
                     'comment_user_id': comment.user.username,
-                    'comment_text': comment.text,
+                    'comment_text': escape(comment.text),
                     'comment_id': comment.uuid,
                     'comment_created': comment.created
                 }
