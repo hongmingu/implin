@@ -1460,7 +1460,7 @@ def re_comment_more_load(request):
 
             for comment in post_comments:
                 count = count + 1
-                if count == 20:
+                if count == step:
                     last = comment.uuid
                 sub_output = {
                     'comment_username': comment.user.userusername.username,

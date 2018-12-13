@@ -37,7 +37,7 @@ var post_populate = function post_populate(id, obj_type) {
                     var last_comment_id = ''
                     $.each(data.output.comment_output, function (key, value) {
                         var delete_btn = ''
-                        if (value.comment_user_id === user_id || value.comment_user_id === post_user_id){
+                        if (value.comment_user_id === user_id || user_id === post_user_id){
                             delete_btn = '<a href=""><span class="glyphicon glyphicon-remove pop_comment_delete" data-u="'+value.comment_id+'"></span></a>'
                         }
                         comments = comments + '<div id="pop_comment_wrapper_'+value.comment_id+'">' +
@@ -119,7 +119,7 @@ var post_populate = function post_populate(id, obj_type) {
                                     var _comment = ''
                                     $.each(s_data.output, function (s_key, s_value) {
                                         var delete_btn = ''
-                                        if (s_value.comment_user_id === user_id || s_value.comment_user_id === post_user_id){
+                                        if (s_value.comment_user_id === user_id || user_id === post_user_id){
                                             delete_btn = '<a href=""><span class="glyphicon glyphicon-remove pop_comment_delete" data-u="'+s_value.comment_id+'"></span></a>'
                                         }
                                         _comment = _comment + '<div id="pop_comment_wrapper_'+s_value.comment_id+'">' +
