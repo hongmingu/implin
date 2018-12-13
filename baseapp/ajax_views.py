@@ -1441,6 +1441,7 @@ def re_comment_more_load(request):
             post_id = request.POST.get('post_id', None)
             last_comment_id = request.POST.get('last_comment_id', None)
             post = None
+            step = 20
             try:
                 post = Post.objects.get(uuid=post_id)
             except Exception as e:
@@ -1452,7 +1453,7 @@ def re_comment_more_load(request):
             except Exception as e:
                 return JsonResponse({'res': 0})
 
-            post_comments = PostComment.objects.filter(post=post, pk__gt=post_comment_last.pk).order_by('created')[:20]
+            post_comments = PostComment.objects.filter(post=post, pk__gt=post_comment_last.pk).order_by('created')[:step]
             output = []
             last = None
             count = 0
@@ -1623,15 +1624,16 @@ def re_following_list(request):
 
                 next = None
                 output = []
+                step = 31
                 if user is not None:
                     if next_id == '':
-                        followings = Follow.objects.filter(user=user).order_by('created')[:31]
+                        followings = Follow.objects.filter(user=user).order_by('created')[:step]
                     else:
                         try:
                             last_following = Follow.objects.get(follow__username=next_id, user=user)
                         except:
                             return JsonResponse({'res': 0})
-                        followings = Follow.objects.filter(Q(user=user) & Q(pk__gte=last_following.pk)).order_by('created')[:31]
+                        followings = Follow.objects.filter(Q(user=user) & Q(pk__gte=last_following.pk)).order_by('created')[:step]
                     count = 0
                     for follow in followings:
                         count = count+1
@@ -1657,6 +1659,7 @@ def re_follower_list(request):
                 user_id = request.POST.get('user_id', None)
                 next_id = request.POST.get('next_user_id', None)
                 user = None
+                step = 31
                 try:
                     user = User.objects.get(username=user_id)
                 except User.DoesNotExist:
@@ -1666,13 +1669,13 @@ def re_follower_list(request):
                 output = []
                 if user is not None:
                     if next_id == '':
-                        followers = Follow.objects.filter(follow=user).order_by('created')[:31]
+                        followers = Follow.objects.filter(follow=user).order_by('created')[:step]
                     else:
                         try:
                             last_follower = Follow.objects.get(follow=user, user__username=next_id)
                         except Exception as e:
                             return JsonResponse({'res': 0})
-                        followers = Follow.objects.filter(Q(follow=user) & Q(pk__gte=last_follower.pk)).order_by('created')[:31]
+                        followers = Follow.objects.filter(Q(follow=user) & Q(pk__gte=last_follower.pk)).order_by('created')[:step]
                     count = 0
                     for follow in followers:
                         count = count+1
@@ -1935,9 +1938,10 @@ def re_all_rank(request):
     if request.method == "POST":
         if request.is_ajax():
             day = request.POST.get('day', None)
+            step = 100
 
-            qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:100]
-            qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:100]
+            qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:step]
+            qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:step]
             # qs2 = Group.objects.filter(groupname__name__contains=keyword).order_by('created')[:10]
             from itertools import chain
             from operator import attrgetter
@@ -1953,7 +1957,7 @@ def re_all_rank(request):
                 key=lambda x: (x.gross, -x.updated.timestamp(), -x.created.timestamp()),
                 reverse=True
             )
-            result_list = result_list[:100]
+            result_list = result_list[:step]
             # descending order
             # result_list = sorted(
             #     chain(queryset1, queryset2),
@@ -2016,9 +2020,8 @@ def re_solo_rank(request):
     if request.method == "POST":
         if request.is_ajax():
             day = request.POST.get('day', None)
-            print(day)
-
-            qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:100]
+            step = 100
+            qs1 = SoloDate.objects.filter(date=day).order_by('-gross')[:step]
 
             output = []
             for item in qs1:
@@ -2055,8 +2058,8 @@ def re_group_rank(request):
     if request.method == "POST":
         if request.is_ajax():
             day = request.POST.get('day', None)
-
-            qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:100]
+            step = 100
+            qs2 = GroupDate.objects.filter(date=day).order_by('-gross')[:step]
 
             output = []
             for item in qs2:
@@ -2097,6 +2100,7 @@ def re_solo_posts(request):
             obj_id = request.POST.get('obj_id', None)
             end_id = request.POST.get('end_id', None)
             solo = None
+            step = 30
             try:
                 solo = Solo.objects.get(uuid=obj_id)
             except Exception as e:
@@ -2106,13 +2110,13 @@ def re_solo_posts(request):
             if solo is not None:
 
                 if end_id == '':
-                    posts = Post.objects.filter(solopost__solo=solo).order_by('-created')[:30]
+                    posts = Post.objects.filter(solopost__solo=solo).order_by('-created')[:step]
                 else:
                     try:
                         end_post = Post.objects.get(uuid=end_id)
                     except Exception as e:
                         return JsonResponse({'res': 0})
-                    posts = Post.objects.filter(solopost__solo=solo, pk__lt=end_post.pk).order_by('-created')[:30]
+                    posts = Post.objects.filter(solopost__solo=solo, pk__lt=end_post.pk).order_by('-created')[:step]
 
                 output = []
                 count = 0
@@ -2136,6 +2140,7 @@ def re_group_posts(request):
             obj_id = request.POST.get('obj_id', None)
             end_id = request.POST.get('end_id', None)
             group = None
+            step = 30
             try:
                 group = Group.objects.get(uuid=obj_id)
             except Exception as e:
@@ -2144,13 +2149,13 @@ def re_group_posts(request):
             if group is not None:
 
                 if end_id == '':
-                    posts = Post.objects.filter(grouppost__group=group).order_by('-created')[:30]
+                    posts = Post.objects.filter(grouppost__group=group).order_by('-created')[:step]
                 else:
                     try:
                         end_post = Post.objects.get(uuid=end_id)
                     except Exception as e:
                         return JsonResponse({'res': 0})
-                    posts = Post.objects.filter(grouppost__group=group, pk__lt=end_post.pk).order_by('-created')[:30]
+                    posts = Post.objects.filter(grouppost__group=group, pk__lt=end_post.pk).order_by('-created')[:step]
 
                 output = []
                 count = 0
