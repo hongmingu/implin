@@ -1266,6 +1266,7 @@ def re_profile_post(request):
             chosen_user_id = request.POST.get('chosen_user_id', None)
             last_id = request.POST.get('last_post_id', None)
             user = None
+            step = 20
             try:
                 user = User.objects.get(username=chosen_user_id)
             except User.DoesNotExist:
@@ -1273,7 +1274,7 @@ def re_profile_post(request):
             posts = None
 
             if last_id == '':
-                posts = Post.objects.filter(Q(user=user)).order_by('-created').distinct()[:20]
+                posts = Post.objects.filter(Q(user=user)).order_by('-created').distinct()[:step]
             else:
                 last_post = None
                 try:
@@ -1282,12 +1283,8 @@ def re_profile_post(request):
                     return JsonResponse({'res': 0})
                 if last_post is not None:
                     posts = Post.objects.filter(
-                        Q(user=user) & Q(pk_lt=last_post.pk)).order_by('-created').distinct()[:20]
+                        Q(user=user) & Q(pk_lt=last_post.pk)).order_by('-created').distinct()[:step]
 
-            # 이제 리스트 만드는 코드가 필요하다. #########
-
-            # filter(Q(post__uuid=post_id) & Q(pk__lt=last_post_chat.pk))
-            ################################
             output = []
             count = 0
             last = None
@@ -1295,7 +1292,7 @@ def re_profile_post(request):
             obj_type = None
             for post in posts:
                 count = count + 1
-                if count == 20:
+                if count == step:
                     last = post.uuid
 
                 obj_type = 'solo'
