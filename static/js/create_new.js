@@ -28,7 +28,6 @@ $(function () {
             success: function (data) {
                 if (data.res === 1) {
                     $('#create_search_result').empty()
-                    console.log(data)
                     $.each(data.output, function (key, value) {
                         var member = '';
                         $.each(value.member, function (sub_key, sub_value) {

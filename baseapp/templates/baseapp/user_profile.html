@@ -1,10 +1,28 @@
 <!DOCTYPE html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Demo</title>
+    <title>galabill {{ chosen_user.userusername.username }}</title>
     {% include 'others/header_static.html' %}
     {% include 'others/favicon.html' %}
 
+    <meta name="keywords" content="galabill, celebs, celebrity, rank, top100, {{ chosen_user.userusername.username }}"/>
+    <meta name="author" content="galabill"/>
+    <meta name="title" content="galabill"/>
+    <meta name="description" content="make your bias up"/>
+
+    <meta property="og:url" content="https://www.galabill.com{{ request.get_full_path }}"/>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="galabill"/>
+    <meta property="og:site_name" content="galabill"/>
+    <meta property="og:description" content="make your bias up"/>
+
+    <meta property="og:image" content="{{ chosen_user.userphoto.file_300_url }}"/>
+
+    <meta name="twitter:image" content="{{ chosen_user.userphoto.file_300_url }}">
+
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:site" content="@galabill"/>
+    <meta name="twitter:creator" content="@{{ chosen_user.userusername.username }}">
     {% load static from staticfiles %}
     <script src="{% static 'js/navbar.js' %}"></script>
     <script src="{% static 'js/a_selected.js' %}"></script>
