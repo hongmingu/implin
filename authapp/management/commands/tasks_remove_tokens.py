@@ -9,5 +9,5 @@ class Command(BaseCommand):
     help = 'ping sitemaps on google or bing'
 
     def handle(self, *args, **options):
-        User.objects.filter(userdelete__created__lte=now()-timedelta(days=14)).delete()
+        user_delete = User.objects.filter(userdelete__created__lte=now()-timedelta(days=14)).delete()
 
