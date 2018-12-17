@@ -28,7 +28,6 @@ class Post(models.Model):
         else:
             return "group - Post pk: %s, user: %s" % (self.pk, self.user.userusername.username)
 
-
     def get_absolute_url(self):
         from django.urls import reverse
         return reverse('baseapp:post', kwargs={'uuid': self.uuid})
@@ -142,6 +141,10 @@ class Group(models.Model):
     def get_main_name(self):
         return self.groupmainname.group_name.name
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('baseapp:group_posts', kwargs={'uuid': self.uuid})
+
     class Meta:
         unique_together = ('name', 'description',)
 
@@ -159,6 +162,10 @@ class Solo(models.Model):
 
     def get_main_name(self):
         return self.solomainname.solo_name.name
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('baseapp:solo_posts', kwargs={'uuid': self.uuid})
 
     class Meta:
         unique_together = ('name', 'description',)
