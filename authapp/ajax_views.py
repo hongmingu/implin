@@ -115,7 +115,6 @@ def re_settings(request):
 
                         try:
                             with transaction.atomic():
-
                                 checker_while_loop = 0
                                 counter_if_loop = 0
                                 uid = urlsafe_base64_encode(force_bytes(request.user.pk)).decode()
@@ -167,7 +166,6 @@ def re_settings(request):
 
                         try:
                             with transaction.atomic():
-
                                 checker_while_loop = 0
                                 counter_if_loop = 0
                                 uid = urlsafe_base64_encode(force_bytes(request.user.pk)).decode()

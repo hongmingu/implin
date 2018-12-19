@@ -258,9 +258,7 @@ def main_create_log_in(request):
                 token = account_activation_token.make_token(new_user_create)
                 while checker_while_loop is 0:
                     if counter_if_loop <= 9:
-
                         try:
-
                             UserPrimaryEmailAuthToken.objects.create(
                                 user_primary_email=new_user_primary_email_create,
                                 uid=uid,
@@ -546,8 +544,8 @@ def password_reset(request):
             recipient_list=email_list
         )
         # user_primary_email.email
-        return render(request, 'authapp/password_reset_email_sent.html')
-
+        clue = {'message': asterisk_total(user_primary_email.email)}
+        return render(request, 'authapp/password_reset_email_sent.html', {'clue': clue})
     else:
         return render_with_clue_one_form(request, 'authapp/password_reset.html', None, PasswordResetForm())
 
