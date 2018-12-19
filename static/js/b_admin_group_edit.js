@@ -115,8 +115,6 @@ $(function () {
                 $.each(data.member_solo_output, function (key, value) {
                     $('#member_list').append('<div class="h4">' + value.name + '</div><div class="h5">' + value.id + '</div>')
                 })
-                console.log(data)
-                //location.reload()
             }
         }
     });

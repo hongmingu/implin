@@ -444,12 +444,14 @@ def re_b_admin_group_edit_photo_delete(request):
                 try:
                     group = Group.objects.get(uuid=id)
                 except Exception as e:
+                    print(e)
                     return JsonResponse({'res': 0})
 
                 group_photo = None
                 try:
                     group_photo = GroupPhoto.objects.get(uuid=photo_id)
                 except Exception as e:
+                    print(e)
                     return JsonResponse({'res': 0})
 
                 group_main_photo = group.groupmainphoto
