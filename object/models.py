@@ -306,12 +306,12 @@ class GroupPhoto(models.Model):
     def file_50_url(self):
         if self.file_50:
             return self.file_50.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
 
     def file_300_url(self):
         if self.file_300:
             return self.file_300.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
 
 
 class GroupMainPhoto(models.Model):
@@ -330,12 +330,12 @@ class GroupMainPhoto(models.Model):
     def file_50_url(self):
         if self.group_photo:
             return self.group_photo.file_50.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
 
     def file_300_url(self):
         if self.group_photo:
             return self.group_photo.file_300.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
 
 
 class SoloPhoto(models.Model):
@@ -355,12 +355,12 @@ class SoloPhoto(models.Model):
     def file_50_url(self):
         if self.file_50:
             return self.file_50.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
 
     def file_300_url(self):
         if self.file_300:
             return self.file_300.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
 
 
 class SoloMainPhoto(models.Model):
@@ -379,12 +379,12 @@ class SoloMainPhoto(models.Model):
     def file_50_url(self):
         if self.solo_photo:
             return self.solo_photo.file_50.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_50.png"
 
     def file_300_url(self):
         if self.solo_photo:
             return self.solo_photo.file_300.url
-        return 'https://' + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
+        return settings.AWS_S3_SCHEME + settings.AWS_S3_CUSTOM_DOMAIN + "/media/default/default_photo_300.png"
 
 
 class Member(models.Model):
