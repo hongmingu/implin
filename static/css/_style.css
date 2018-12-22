@@ -424,9 +424,12 @@ a:active {
     background-color: #abb5ff;
     font-size: 14px;
 }
-.charge_note{
-    background-color: pink; font-size: 12px;
+
+.charge_note {
+    background-color: pink;
+    font-size: 12px;
 }
+
 .dollar_unit {
     font-size: 14px;
     font-weight: bold;
@@ -442,10 +445,12 @@ a:active {
     background-color: #c4e3f3;
     font-size: 14px;
 }
+
 .more_load {
     background-color: #c4e3f3;
     font-size: 14px;
 }
+
 .create_search_result {
     margin-top: 10px;
 }
@@ -930,91 +935,138 @@ a:active {
     color: var(--main-logoyellowbottom-color, gold);
     padding: 1px;
 }
-.log_current{
+
+.log_current {
     background-color: var(--main-light-bcolor, antiquewhite);
 }
-.log_pay_charge{
+
+.log_pay_charge {
     background-color: var(--main-aselected-bcolor, lightpink);
 }
-.log_wanna_charge{
+
+.log_wanna_charge {
     background-color: var(--main-logopurpletop-color, purple);
     color: var(--main-logoyellowbottom-color, gold);
 }
-.pro_update{
+
+.pro_update {
     padding: 1px;
     background-color: lightgreen;
 }
-.pro_delete{
+
+.pro_delete {
     padding: 1px;
     background-color: lightpink;
 }
-.pro_obj_read_post{
+
+.pro_obj_read_post {
     padding: 1px;
     background-color: lightgreen;
 }
-.pro_obj_create_post{
+
+.pro_obj_create_post {
     padding: 1px;
     background-color: lightpink;
 }
-.search_obj_img{
-    width: 50px; height: 50px;
+
+.search_obj_img {
+    width: 50px;
+    height: 50px;
 }
-.search_obj_img_wrapper{
-    display: inline-block; vertical-align: top;
+
+.search_obj_img_wrapper {
+    display: inline-block;
+    vertical-align: top;
 }
-.search_obj_detail_wrapper{
+
+.search_obj_detail_wrapper {
     margin-left: 6px;
     display: inline-block;
     height: 50px;
 }
-.search_obj_detail_name{
+
+.search_obj_detail_name {
     font-weight: bold;
 }
-.search_obj_wrapper{
+
+.search_obj_wrapper {
     margin-bottom: 4px;
 }
-.search_user_wrapper{
+
+.search_user_wrapper {
     margin-bottom: 4px;
 }
-.search_user_username{
+
+.search_user_username {
     font-weight: bold;
 }
-.search_user_textname{
+
+.search_user_textname {
     margin-left: 3px;
 }
-.search_user_img_wrapper{
-    display: inline-block; vertical-align: top;
+
+.search_user_img_wrapper {
+    display: inline-block;
+    vertical-align: top;
 }
-.search_user_detail_wrapper{
+
+.search_user_detail_wrapper {
     margin-left: 6px;
     display: inline-block;
     height: 50px;
 }
-.search_user_img_small{
-    height: 50px; width: 50px;
+
+.search_user_img_small {
+    height: 50px;
+    width: 50px;
 }
-.search_user_detail_username{
-    font-weight: bold; font-size: 16px;
+
+.search_user_detail_username {
+    font-weight: bold;
+    font-size: 16px;
 }
-.search_user_detail_name{
+
+.search_user_detail_name {
     font-size: 14px;
 }
 
-.note_wrapper{
+.note_wrapper {
     margin-bottom: 4px;
 }
-.note_img_wrapper{
-    display: inline-block; width: 50px; height: 50px;
+
+.note_img_wrapper {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
 }
-.note_text_wrapper{
-    display: inline-block; margin-left: 4px;
+
+.note_text_wrapper {
+    display: inline-block;
+    margin-left: 4px;
 }
-.note_text_username{
-    font-weight: bold; margin-left: 4px; margin-right: 4px;
+
+.note_text_username {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
 }
-.note_text_post{
-    font-weight: bold; margin-left: 4px; margin-right: 4px;
+
+.note_text_post {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
 }
-.note_text_comment{
-    font-weight: bold; margin-left: 4px; margin-right: 4px;
+
+.note_text_comment {
+    font-weight: bold;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.nav_note_count {
+    background-color: #ff6d66;
+    color: white;
+    font-size: 11px;
+    border-radius: 4px;
+    padding: 1px;
 }
